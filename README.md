@@ -1,4 +1,4 @@
-# AI-Wallet_Grade3
+# AI Wallet_Grade3
 | Items | Device/Software | Description |
 | ----- | ---- | ---- |
 | Board | [STM32H7VIT6](https://shopee.tw/STM32H7%E6%A0%B8%E5%BF%83%E6%9D%BF-%E5%8E%9F%E8%A3%9DSTM32H750VBT6-STM32H743VIT6-%E9%96%8B%E7%99%BC%E6%9D%BF%E6%A0%B8%E5%BF%83%E6%9D%BF-i.1373963606.29520723765?xptdk=6c2fda6e-0860-48dc-9459-c875ffafa929) | Calculate, Control |
