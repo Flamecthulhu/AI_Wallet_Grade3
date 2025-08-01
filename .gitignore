@@ -2,7 +2,8 @@ File name extention:
 *.cmd
 *.ini
 
-Test programs:
+Programs:
+.gitignore
 check cuda.py
 Locations.docx
 metro_inference.py

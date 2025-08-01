@@ -1,4 +1,4 @@
-# AI Wallet
+# AI Powered Wallet
 
 A smart wallet that uses location services (GPS/WiFi) to recommend the best options for users.
 
@@ -10,7 +10,7 @@ If yes, it automatically displays the QR code for access.
 If not, it connects MOSFET’s source and drain on the coil to allow the use of EasyCard.
 
 
-# Item list
+# Component list
 
 | Item | Component | Applicate Description | Price(NTD) | Quantity | Unit |
 | --- | --- | --- | --- | --- | --- |
