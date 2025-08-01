@@ -4,7 +4,7 @@ A smart wallet that uses location services (GPS/WiFi) to recommend the best opti
 
 By collecting location data, it can automatically display the appropriate QR code for entry or exit, eliminating the need for physical tickets and reducing the risk of losing or damaging them.
 
-# Example Use Case:
+# Example Use Case
 Analyzing location data, when the user arrives at a train station, school, or the place user frequently come, the wallet checks whether a ticket has been saved.
 If yes, it automatically displays the QR code for access.
 If not, it connects MOSFET’s source and drain on the coil to allow the use of EasyCard.
@@ -26,6 +26,9 @@ If not, it connects MOSFET’s source and drain on the coil to allow the use of 
 | Battery | 9000mAh | Power conponents | x | 1 | pack |
 | Jack | USB Type-C | Power input | 20 | 1 | piece |
 
+
+# Formulae
+- [MLP formulae](./MLP_formulae.pdf)
 
 # Reference articles
 - [整合Wi-Fi與GPS技術於室外定位之研究-林老生 郭清智-2014](https://landeconomics.nccu.edu.tw/upload/29/download_file/5146/18-01-1,%E6%95%B4%E5%90%88Wi-Fi%E8%88%87GPS%E6%8A%80%E8%A1%93%E6%96%BC%E5%AE%A4%E5%A4%96%E5%AE%9A%E4%BD%8D%E4%B9%8B%E7%A0%94%E7%A9%B6_%E6%9E%97%E8%80%81%E7%94%9F,%E9%83%AD%E6%B8%85%E6%99%BA.pdf)
