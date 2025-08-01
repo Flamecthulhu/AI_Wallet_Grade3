@@ -1,3 +1,20 @@
+File name extention:
 *.cmd
 *.ini
+
+Test programs:
 check cuda.py
+Locations.docx
+metro_inference.py
+MLP_Data_Definition.docx
+MLP_formulae.tex
+notes.txt
+process.html
+pth2csv_converter.py
+simplemlp_weights.pth
+TMRT_station.py
+
+Folders:
+STM32
+source
+__pycache__
