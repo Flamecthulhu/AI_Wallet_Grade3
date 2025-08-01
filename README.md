@@ -26,7 +26,6 @@ If not, it connects MOSFET’s source and drain on the coil to allow the use of 
 | Battery | 9000mAh | Power conponents | x | 1 | pack |
 | Jack | USB Type-C | Power input | 20 | 1 | piece |
 
-
 # Formulae
 - [MLP formulae](./MLP_formulae.pdf)
 
