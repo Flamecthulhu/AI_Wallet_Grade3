@@ -3,7 +3,6 @@ File name extention:
 *.ini
 
 Programs:
-.gitignore
 check cuda.py
 Locations.docx
 metro_inference.py
