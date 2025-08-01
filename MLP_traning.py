@@ -11,7 +11,7 @@ with open('C:\\Users\\allan\\Programs\\Program_Grade3\\source\\training_data.csv
         x.append(row)
 
 def sigmoid(z):
-    sigmoid_func = math.
+    #sigmoid_func = math.
     return
 
 print(x)
