@@ -1,4 +1,4 @@
-# AI Wallet_Grade3
+# AI Wallet
 
 A smart wallet that uses location services (GPS/WiFi) to recommend the best options for users.
 
