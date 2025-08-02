@@ -30,6 +30,7 @@ If not, it connects MOSFET’s source and drain on the coil to allow the use of 
 | IC | 2N7000 | Coil switch | x | 1 | piece |
 | Battery | 9000mAh | Power conponents | x | 1 | pack |
 | Jack | USB Type-C | Power input | 20 | 1 | piece |
+| Total | | | 1302 | NTD |
 
 ## Formulae
 - [MLP formulae](./MLP_formulae.pdf)
