@@ -7,6 +7,7 @@ By collecting location data, it can automatically display the appropriate QR cod
 ## Quick guidence
 - [Example](#example-use-case)
 - [Component list](#component-list)
+- [Software list](#software-list)
 - [Formulae](#formulae)
 - [Reference articles](#reference-articles)
 
@@ -17,7 +18,7 @@ If not, it connects MOSFET’s source and drain on the coil to allow the use of 
 
 ## Component list
 
-| Item | Component | Applicate Description | Price(NTD) | Quantity | Unit |
+| Type | Component | Applicate Description | Price(NTD) | Quantity | Unit |
 | --- | --- | --- | --- | --- | --- |
 | Board | [STM32H7VIT6](https://shopee.tw/STM32H7%E6%A0%B8%E5%BF%83%E6%9D%BF-%E5%8E%9F%E8%A3%9DSTM32H750VBT6-STM32H743VIT6-%E9%96%8B%E7%99%BC%E6%9D%BF%E6%A0%B8%E5%BF%83%E6%9D%BF-i.1373963606.29520723765?xptdk=6c2fda6e-0860-48dc-9459-c875ffafa929) | Calculate, Control | 385 | 1 | piece |
 | Module | ublox Neo-7m | Positioning, Time acquisition | 0 | 1 | unit |
@@ -31,6 +32,14 @@ If not, it connects MOSFET’s source and drain on the coil to allow the use of 
 | Battery | 9000mAh | Power conponents | x | 1 | pack |
 | Jack | USB Type-C | Power input | 20 | 1 | piece |
 | Total | | | 1302 | 11 | NTD |
+
+## Software list
+| Type | Name | Applicate Description |
+| --- | --- | --- |
+| App | Visual Studio Code | Codind programs |
+| App | STM32 CubeIDE | Codind MCU programs |
+| Web | Google Docs | Discuss detail |
+| Web | GitHub | Repository data, codes |
 
 ## Formulae
 - [MLP formulae](./MLP_formulae.pdf)
