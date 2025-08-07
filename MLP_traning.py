@@ -3,7 +3,7 @@ import csv
 import math
 
 x = [] #inputs
-with open('C:\\Users\\allan\\Programs\\Program_Grade3\\source\\training_data.csv', newline='') as csvfile:
+with open('training_data.csv', newline='') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|') #csv.reader(csvfile, /, dialect='excel', **fmtparams)
     next(spamreader)
     for row in spamreader:
@@ -11,8 +11,7 @@ with open('C:\\Users\\allan\\Programs\\Program_Grade3\\source\\training_data.csv
         x.append(row)
 
 def sigmoid(z):
-    #sigmoid_func = math.
-    return
+    return 1 / (1 + math.exp(-z))
 
 print(x)
 
