@@ -1,6 +1,9 @@
 File name extention:
 *.cmd
 *.ini
+*.aux
+*.log
+*.gz
 
 Programs:
 check cuda.py
