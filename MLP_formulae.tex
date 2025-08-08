@@ -1,0 +1,53 @@
+\documentclass{article}
+\usepackage{amsmath}
+\title{Multilayer Perceptron Formulae}
+\author{Pei-Yuan Sun, Allan Cosmo}
+
+\begin{document}
+\maketitle
+    $$Z = \sum_{i=1}^{n}(x_{i} \cdot w_{i})+b_{i}$$
+    ${Z}$ is the linear combination and is not activated.
+    $x_{i}$ is your input (either a vector or an array).\\
+    $w_{i}$ is the weight for each input.
+    $b_{i}$ is the bias for each neuron node.
+    $$A=f(Z)$$
+    $A$ is activated.
+    $f(\cdot)$ is activation function.\\
+    Activation functions:\\[10pt]
+    Tanh:$$tanh(z)=\frac{e^z-e^{-z}}{e^z+e^{-z}}$$
+    ReLU:$$f(z)=max(0,z)$$
+    Sigmoid:$$\sigma(z)=\frac{1}{1+e^{-z}}$$
+    Softmax:$$Softmax(z_i)=\frac{e^{z_i}}{\sum_{j=1}^{N}e^{z_j}}$$
+    Forward propagation\\
+    \begin{itemize}
+        \item Calculating $Z$ (linear combination of inputs)
+        \item Applying activation function $A = f(Z)$
+        \item Repeating layer-by-layer until final prediction $\hat{y}$
+    \end{itemize}
+    In layer L:\\ 
+    Weight: $W^{(L)}$, Biases: $b^{(L)}$, Non-activated combination: $Z^{(L)}$,\\
+    Activated output: $A^{(L)}$, Activation function: $f^{(L)}(\cdot)$.\\
+    Input: $$x^{(L_{in})}$$
+    Output:$$Z^{(L_{out})}=A^{(L_{hidden})}\times w^{(L_{out})}+b^{(L_{out})}$$
+    $$\hat{y}=f^{(L_{out})}(Z^{(L_{out})})$$
+    $\hat{y}$ is model predict output.
+    Loss function:\\[10pt]
+    Mean Squared Error, MSE
+    $$L(y,\hat{y})=\frac{1}{m}\sum_{i=1}^{m}(y_i-\hat{y}_i)^2$$
+    Binary Cross-Entropy (for sigmoid output): \\
+    $$L(y,\hat{y})=-\frac{1}{m}\sum_{i=1}^{m}[y_i\ln(\hat{y}_i)+(1-y_i)\ln(1-\hat{y}_i)]$$
+    Categorical Cross-Entropy (for softmax output): \\
+    $$L(y,\hat{y})=-\sum_{i=1}^{m}(y_i\times\ln(\hat{y}_i))$$\\
+    Backward propagation\\
+    Output Gradient
+    $$\delta^{(L_{out})}=\frac{\partial L}{\partial A^{(L_{out})}}\times f^{(L_{out})}(Z^{(L_{out})})$$
+    $$\frac{\partial L}{\partial W^{(L_{out})}}=A^{(L_{hidden})T}\times\delta^{(L_{out})}$$
+    $$\frac{\partial L}{\partial b^{(L_{out})}}=sum(\delta^{(L_{out})},axis=0)$$\\
+    Hidden Gradient
+    $$\delta^{(L-1)}=\delta^{(L)}\times (W^{(L)})^T\times f^{(L-1)}(Z^{(L-1)})$$
+    $$\frac{\partial L}{\partial W^{(L-1)}}=A^{(L-1)T}\times\delta^{(L-1)}$$
+    $$\frac{\partial L}{\partial b^{(L-1)}}=sum(\delta^{(L-1)},axis=0)$$\\
+    Update weights and biases(Gradient Descent)
+    $$W^{(L)}_{new}=W^{(L)}_{old}-learning\_rate\times\frac{\partial L}{\partial W^{(L)}}$$
+    $$b^{(L)}_{new}=b^{(L)}_{old}-learning\_rate\times\frac{\partial L}{\partial b^{(L)}}$$
+\end{document}

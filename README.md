@@ -36,8 +36,8 @@ If not, it connects MOSFET’s source and drain on the coil to allow the use of 
 ## Software list
 | Type | Name | Applicate Description |
 | --- | --- | --- |
-| App | Visual Studio Code | Codind programs |
-| App | STM32 CubeIDE | Codind MCU programs |
+| App | Visual Studio Code | Coding programs |
+| App | STM32 CubeIDE | Coding MCU programs |
 | Web | Google Docs | Discuss detail |
 | Web | GitHub | Repository data, codes |
 

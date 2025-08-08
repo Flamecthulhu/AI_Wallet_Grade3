@@ -1,5 +1,6 @@
 File name extention:
 *.cmd
+*.txt
 *.ini
 *.aux
 *.log
@@ -10,8 +11,6 @@ check cuda.py
 Locations.docx
 metro_inference.py
 MLP_Data_Definition.docx
-MLP_formulae.tex
-notes.txt
 process.html
 pth2csv_converter.py
 simplemlp_weights.pth
