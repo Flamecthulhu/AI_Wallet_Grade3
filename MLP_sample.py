@@ -25,8 +25,8 @@ y = torch.tensor(labels, dtype=torch.long).to(device)
 class SimpleMLP(nn.Module):
     def __init__(self):
         super().__init__()
-        self.fc1 = nn.Linear(18, 64)
         self.relu = nn.ReLU()
+        self.fc1 = nn.Linear(18, 64)
         self.fc2 = nn.Linear(64, 32)
         self.fc3 = nn.Linear(32, 9)
 
