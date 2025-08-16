@@ -16,6 +16,7 @@ simplemlp_weights.pth
 TMRT_station.py
 
 Folders:
+.venv
 STM32
 source
 __pycache__
