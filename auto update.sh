@@ -8,5 +8,5 @@ read -p "Enter your update message: " UserUpdate
 
 git config --global --list
 git add .
-git commit -m "[${current_date} ${current_time}]: ${UserUpdate}"
+git commit -m "[${current_date} ${current_time} From macOS]: ${UserUpdate}"
 git push origin main

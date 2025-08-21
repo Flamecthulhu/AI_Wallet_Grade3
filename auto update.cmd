@@ -6,5 +6,5 @@ git config --global user.email "allancosmo107001@gmail.com"
 set /p UserUpdate=Enter your update message: 
 git config --global --list
 git add .
-git commit -m  "[%current_date% %current_time%]: %UserUpdate%"
+git commit -m  "[%current_date% %current_time% From Windows]: %UserUpdate%"
 git push origin main
