@@ -2,6 +2,15 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:closure.playground">
+   </FileRef>
+   <FileRef
+      location = "group:function.playground">
+   </FileRef>
+   <FileRef
+      location = "group:Ifelse.playground">
+   </FileRef>
+   <FileRef
       location = "group:Operators.playground">
    </FileRef>
    <FileRef
