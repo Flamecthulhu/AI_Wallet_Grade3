@@ -65,9 +65,5 @@ for i in range(100):
 torch.save(model.state_dict(), "samplemlp_weights.pth")
 end_time = time.time()
 print(f"Elapsed time: {end_time-start_time:.3f} seconds")
-    #24.073544,20.699775,7,457,5,-1,-1,-1,1,-1,1,0,1,-1,0,0,0,1
-    #24.111348,120.616108,9,570,6,3,1,0,0,0,1,0,-1,0,1,1,1,0
-    #25.013923,121.462947,19,1158,2,4,0,1,0,1,1,0,-1,0,1,1,1,0
-    
 
 
