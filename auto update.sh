@@ -1,3 +1,4 @@
+echo https://github.com/Flamecthulhu/AI_Wallet_Grade3
 current_time=$(date +"%H:%M:%S")
 current_date=$(date +"%Y-%m-%d")
 current_os="$(sw_vers -productName) $(sw_vers -productVersion)"

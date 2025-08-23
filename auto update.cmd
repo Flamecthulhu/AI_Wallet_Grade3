@@ -1,4 +1,5 @@
 @echo off
+echo https://github.com/Flamecthulhu/AI_Wallet_Grade3
 for /f "delims=" %%i in ('powershell -NoProfile -Command "Get-Date -Format \"yyyy-MM-dd HH:mm:ss\""') do set datetime=%%i
 set current_date=%datetime:~0,10%
 set current_time=%datetime:~11,8%
