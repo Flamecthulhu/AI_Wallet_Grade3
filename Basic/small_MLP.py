@@ -4,7 +4,17 @@ import sympy as sy
 
 x = [[1,2,3], [4,5,6]]
 y = [1, 0]
+"""
+3個parameter對應3個weight做fan-in, 2組陣列, 共6個weights.
+fan-out = 4, 會有3組陣列, 每個陣列有4個weights, 共12個weights.
 
+[wi11,wi12,wi13]    [wh11,wh12,wh13,wh14]
+                    [wh21,wh22,wh23,wh24]
+                    [wh31,wh32,wh33,wh34]
+[wi21,wi22,wi23]    [wh41,wh42,wh43,wh44]
+
+
+"""
 def activation_function(z):
     return 1 / (1 + math.exp(-z))
 
@@ -32,7 +42,7 @@ def process_layer(input_data, fan_in, fan_out, layer_name):
     
     return activated
 
-fan_sizes = [len(x[0]), 8, 4, 2] #input, fc1, fc2, output
+fan_sizes = [len(x[0]), 4, 4, 2] #input, fc1, fc2, output
 current_input = x[0]
 
 for i in range(len(fan_sizes) - 1):

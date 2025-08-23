@@ -25,7 +25,7 @@ def xavier_bias_init(fan_out):
     return bias
 
 fan_in = len(x[0])
-fan_out = 32
+fan_out = 64
 
 weight = xavier_weight_init(fan_in, fan_out)
 bias = xavier_bias_init(fan_out)
