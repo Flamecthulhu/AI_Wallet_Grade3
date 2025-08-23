@@ -2,8 +2,15 @@ current_time=$(date +"%H:%M:%S")
 current_date=$(date +"%Y-%m-%d")
 current_os="$(sw_vers -productName) $(sw_vers -productVersion)"
 
-git config --global user.name "Flamecthulhu"
-git config --global user.email "allancosmo107001@gmail.com"
+if ! git config --global user.name > /dev/null; then
+    read -p "Enter your git user name: " gitname
+    git config --global user.name "$gitname"
+fi
+
+if ! git config --global user.email > /dev/null; then
+    read -p "Enter your git user email: " gitemail
+    git config --global user.email "$gitemail"
+fi
 
 read -p "Enter your update message: " UserUpdate
 
