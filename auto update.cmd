@@ -11,5 +11,3 @@ git config --global --list
 git add .
 git commit -m "[%current_date% %current_time% From Windows]: %UserUpdate%"
 git push origin main
-
-REM 範例輸出: [2025-08-23 20:10:32 From Windows]:
