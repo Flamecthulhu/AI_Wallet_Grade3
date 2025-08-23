@@ -36,3 +36,5 @@ print("Weights:", weight)
 print("Bias:", bias)
 print("Output:", output)
 print("Activated:", activated)
+
+
