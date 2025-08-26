@@ -4,10 +4,8 @@ import datetime
 current_time = datetime.datetime.now().strftime("%H:%M:%S")
 current_date = datetime.datetime.now().strftime("%Y-%m-%d")
 current_os = subprocess.getoutput("sw_vers -productName") + " " + subprocess.getoutput("sw_vers -productVersion")
-if current_os == "'sw_vers' is not recognized as an internal or external command,operable program or batch file. 'sw_vers' is not recognized as an internal or external command,operable program or batch file.":
-    current_os = subprocess.getoutput('powershell -NoProfile -Command "(Get-CimInstance Win32_OperatingSystem).Caption"')
-    #powershell -NoProfile -Command "(Get-CimInstance Win32_OperatingSystem).Caption"
-
+if current_os == "'sw_vers' is not recognized as an internal or external command,\noperable program or batch file. 'sw_vers' is not recognized as an internal or external command,\noperable program or batch file.":
+    current_os = (subprocess.getoutput('powershell -NoProfile -Command "(Get-CimInstance Win32_OperatingSystem).Caption"')).strip("Microsoft")
 
 def set_git_config(key, prompt):
     try:
