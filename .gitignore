@@ -1,22 +1,19 @@
-File name extention:
+### File Ext. ###
 *.txt
 *.ini
-*.aux
-*.log
-*.gz
+*.docx
 
-Programs:
-check cuda.py
-Locations.docx
-metro_inference.py
-MLP_Data_Definition.docx
-process.html
-pth2csv_converter.py
-simplemlp_weights.pth
-TMRT_station.py
-
-Folders:
-.venv
+### Folders ###
 STM32
 source
 __pycache__
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store
+
+### Virtual Env. ###
+.macvenv
+.winvenv
