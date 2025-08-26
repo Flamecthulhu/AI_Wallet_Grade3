@@ -4,7 +4,7 @@ import datetime
 current_time = datetime.datetime.now().strftime("%H:%M:%S")
 current_date = datetime.datetime.now().strftime("%Y-%m-%d")
 current_os = subprocess.getoutput("sw_vers -productName") + " " + subprocess.getoutput("sw_vers -productVersion")
-if current_os == "no such":
+if current_os == "'sw_vers' is not recognized as an internal or external command, operable program or batch file.":
     current_os = subprocess.getoutput('powershell -NoProfile -Command "(Get-CimInstance Win32_OperatingSystem).Caption"')
     #powershell -NoProfile -Command "(Get-CimInstance Win32_OperatingSystem).Caption"
 
