@@ -36,3 +36,6 @@ print("Weights:", weight)
 print("Bias:", bias)
 print("Output:", output)
 print("Activated:", activated)
+
+def softmax(z):
+    return math.exp(z) / (math.exp(z[j]) for j in range(len(z[0])))

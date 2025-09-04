@@ -5,6 +5,9 @@ val a: Int = 5
 val b: Double = 3.14
 val c: String = "Hello"
 val d: Boolean = true
+val e: Char = 'E'
+
+var f: Int = b.toInt()
 
 fun add(x: Int, y: Int): Int {
     return x + y
