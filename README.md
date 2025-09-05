@@ -11,6 +11,7 @@ By collecting location data, it can automatically display the appropriate QR cod
 - [Formulae](#formulae)
 - [Reference articles](#reference-articles)
 
+
 ## Example Use Case
 Analyzing location data, when the user arrives at a train station, school, or the place user frequently come, the wallet checks whether a ticket has been saved.
 If yes, it automatically displays the QR code for access.
@@ -29,7 +30,7 @@ If not, it connects MOSFET’s source and drain on the coil to allow the use of 
 | Module | [MP1584EN](https://shopee.tw/%E3%80%90%E7%8F%BE%E8%B2%A8%E3%80%91-MP1584EN-%E9%99%8D%E5%A3%93%E6%A8%A1%E7%B5%84-DC-DC-3A-%E9%9B%BB%E6%BA%90%E6%A8%A1%E7%B5%84-%E5%8F%AF%E8%AA%BF-%E5%9B%BA%E5%AE%9A%E8%BC%B8%E5%87%BA-%E8%B6%85%E5%B0%8F%E9%AB%94%E7%A9%8D-%E8%BC%B8%E5%85%A54.5~28V-%E5%B0%8F%E9%BD%8A%E7%9A%84%E5%AE%B6-i.1536798550.42607613267?sp_atk=337dce50-0e61-4b2e-a480-89e0ecfe375d&xptdk=337dce50-0e61-4b2e-a480-89e0ecfe375d) | Voltage reduction | 45 | 1 | unit |
 | IC | [EasyCard](https://shopee.tw/%E5%B7%B2%E7%84%8A%E6%8E%A5%E5%A5%BD%E7%9A%84%E7%B7%9A%E5%9C%88-%E6%94%B9%E9%80%A0%E6%82%A0%E9%81%8A%E5%8D%A1-%E4%B8%80%E5%8D%A1%E9%80%9A-icash2.0-%E5%B0%88%E7%94%A8-%E5%8F%AF%E8%AD%B7%E8%B2%9D-%E8%B3%BC%E8%B2%B7%E5%89%8D%E8%AB%8B%E7%9C%8B%E5%95%86%E5%93%81%E6%8F%8F%E8%BF%B0-i.34448402.2671862034?sp_atk=80168b58-c73f-45b1-8f94-b450b0201075&xptdk=80168b58-c73f-45b1-8f94-b450b0201075) | Transit authentication | 199 | 1 | piece |
 | IC | 2N7000 | Coil switch | x | 1 | piece |
-| Battery | 9000mAh | Power conponents | x | 1 | pack |
+| Battery | ~~9000mAh~~ | Power conponents | x | 1 | pack |
 | Jack | USB Type-C | Power input | 20 | 1 | piece |
 | Total | | | 1302 | 11 | NTD |
 
@@ -43,6 +44,8 @@ If not, it connects MOSFET’s source and drain on the coil to allow the use of 
 
 ## Formulae
 - [MLP formulae](./MLP_formulae.pdf)
+## Links
+- [Google Drive](https://drive.google.com/drive/u/0/folders/1YwunItaLr3p2QV96NU1orU-EpbJaYyqv)
 
 ## Reference articles
 - [整合Wi-Fi與GPS技術於室外定位之研究-林老生 郭清智-2014](https://landeconomics.nccu.edu.tw/upload/29/download_file/5146/18-01-1,%E6%95%B4%E5%90%88Wi-Fi%E8%88%87GPS%E6%8A%80%E8%A1%93%E6%96%BC%E5%AE%A4%E5%A4%96%E5%AE%9A%E4%BD%8D%E4%B9%8B%E7%A0%94%E7%A9%B6_%E6%9E%97%E8%80%81%E7%94%9F,%E9%83%AD%E6%B8%85%E6%99%BA.pdf)
