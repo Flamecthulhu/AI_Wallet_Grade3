@@ -5,12 +5,12 @@ A smart wallet that uses location services (GPS/WiFi) to recommend the best opti
 By collecting location data, it can automatically display the appropriate QR code for entry or exit, eliminating the need for physical tickets and reducing the risk of losing or damaging them.
 
 ## Quick guidence
-- [Example](#example-use-case)
+- [Example use case](#example-use-case)
 - [Component list](#component-list)
 - [Software list](#software-list)
 - [Formulae](#formulae)
+- [Links](#links)
 - [Reference articles](#reference-articles)
-
 
 ## Example Use Case
 Analyzing location data, when the user arrives at a train station, school, or the place user frequently come, the wallet checks whether a ticket has been saved.
@@ -18,7 +18,6 @@ If yes, it automatically displays the QR code for access.
 If not, it connects MOSFET’s source and drain on the coil to allow the use of EasyCard.
 
 ## Component list
-
 | Type | Component |  Communication | Applicate Description | Price(NTD) | Quantity | Unit |
 | --- | --- | --- | --- | --- | --- | --- |
 | Board | [STM32H7VIT6](https://shopee.tw/STM32H7%E6%A0%B8%E5%BF%83%E6%9D%BF-%E5%8E%9F%E8%A3%9DSTM32H750VBT6-STM32H743VIT6-%E9%96%8B%E7%99%BC%E6%9D%BF%E6%A0%B8%E5%BF%83%E6%9D%BF-i.1373963606.29520723765?xptdk=6c2fda6e-0860-48dc-9459-c875ffafa929) | 4xUART, 4xI2C, 6xSPI |Calculate, Control | 385 | 1 | piece |
@@ -43,11 +42,14 @@ If not, it connects MOSFET’s source and drain on the coil to allow the use of 
 | Web | Google Docs | Discuss detail |
 | Web | GitHub | Repository data, codes |
 
-
 ## Formulae
 - [MLP formulae](./MLP_formulae.pdf)
+
 ## Links
-- [Google Drive](https://drive.google.com/drive/u/0/folders/1YwunItaLr3p2QV96NU1orU-EpbJaYyqv)
+- [專題製作 (Google.Docs)](https://docs.google.com/document/d/1-IISGgF8X5tYGCxTpJfdwXhCcVmH8Mb71v42PAtXhI0/edit?tab=t.0)
+- [專題構想書 (Google.Docs)](https://docs.google.com/document/d/1wJuGpTwVF7ZDf-fiy_uiF1CF_Y2mxeQgy5cqK6Bc2YU/edit?tab=t.0)
+- [專題檔案 (Google.Drive)](https://drive.google.com/drive/u/0/folders/1YwunItaLr3p2QV96NU1orU-EpbJaYyqv)
+
 
 ## Reference articles
 - [整合Wi-Fi與GPS技術於室外定位之研究-林老生 郭清智-2014](https://landeconomics.nccu.edu.tw/upload/29/download_file/5146/18-01-1,%E6%95%B4%E5%90%88Wi-Fi%E8%88%87GPS%E6%8A%80%E8%A1%93%E6%96%BC%E5%AE%A4%E5%A4%96%E5%AE%9A%E4%BD%8D%E4%B9%8B%E7%A0%94%E7%A9%B6_%E6%9E%97%E8%80%81%E7%94%9F,%E9%83%AD%E6%B8%85%E6%99%BA.pdf)
