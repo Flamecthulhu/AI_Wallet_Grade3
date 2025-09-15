@@ -19,10 +19,3 @@ git config --global --list
 git add .
 git commit -m "[%current_date% %current_time% From %current_os%]: %UserUpdate%"
 git push origin main
-
-if exist X:\ (
-    net use X: /delete
-) else (
-    set /p targetIP=Target IP: 
-    net use X: \\%targetIP%\E /user:allan 107001
-)

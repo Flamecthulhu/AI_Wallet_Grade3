@@ -39,8 +39,10 @@ If not, it connects MOSFET’s source and drain on the coil to allow the use of 
 | --- | --- | --- |
 | App | Visual Studio Code | Coding programs |
 | App | STM32 CubeIDE | Coding MCU programs |
+| App | Autodesk Fusion | Design 3D model |
 | Web | Google Docs | Discuss detail |
 | Web | GitHub | Repository data, codes |
+
 
 ## Formulae
 - [MLP formulae](./MLP_formulae.pdf)
