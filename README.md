@@ -5,12 +5,19 @@ A smart wallet that uses location services (GPS/WiFi) to recommend the best opti
 By collecting location data, it can automatically display the appropriate QR code for entry or exit, eliminating the need for physical tickets and reducing the risk of losing or damaging them.
 
 ## Quick guidence
+- [Keywords](#keywords)
 - [Example use case](#example-use-case)
 - [Component list](#component-list)
 - [Software list](#software-list)
+- [Imports](#imports)
 - [Formulae](#formulae)
 - [Links](#links)
 - [Reference articles](#reference-articles)
+
+## Keywords
+- Multilayer Perceptron(MLP)
+- K-Nearst Neighborhood(KNN)
+- WiFi enforce positioning using fingerprinting
 
 ## Example Use Case
 Analyzing location data, when the user arrives at a train station, school, or the place user frequently come, the wallet checks whether a ticket has been saved.
@@ -42,15 +49,28 @@ If not, it connects MOSFET’s source and drain on the coil to allow the use of 
 | Web | Google Docs | Discuss detail |
 | Web | GitHub | Repository data, codes |
 
+## Imports
+```python
+python3 -m pip install sympy
+ 
+import sympy as sy
+import math
+import random
+import csv
+```
+
 ## Formulae
 - [MLP formulae](./MLP_formulae.pdf)
 
 ## Links
-- [專題製作 (Google.Docs)](https://docs.google.com/document/d/1-IISGgF8X5tYGCxTpJfdwXhCcVmH8Mb71v42PAtXhI0/edit?tab=t.0)
-- [專題構想書 (Google.Docs)](https://docs.google.com/document/d/1wJuGpTwVF7ZDf-fiy_uiF1CF_Y2mxeQgy5cqK6Bc2YU/edit?tab=t.0)
-- [專題檔案 (Google.Drive)](https://drive.google.com/drive/u/0/folders/1YwunItaLr3p2QV96NU1orU-EpbJaYyqv)
+- [專題製作 (Google Docs)](https://docs.google.com/document/d/1-IISGgF8X5tYGCxTpJfdwXhCcVmH8Mb71v42PAtXhI0/edit?tab=t.0)
+- [專題構想書 (Google Docs)](https://docs.google.com/document/d/1wJuGpTwVF7ZDf-fiy_uiF1CF_Y2mxeQgy5cqK6Bc2YU/edit?tab=t.0)
+- [專題檔案 (Google Drive)](https://drive.google.com/drive/u/0/folders/1YwunItaLr3p2QV96NU1orU-EpbJaYyqv)
 
 
 ## Reference articles
-- [整合Wi-Fi與GPS技術於室外定位之研究-林老生 郭清智-2014](https://landeconomics.nccu.edu.tw/upload/29/download_file/5146/18-01-1,%E6%95%B4%E5%90%88Wi-Fi%E8%88%87GPS%E6%8A%80%E8%A1%93%E6%96%BC%E5%AE%A4%E5%A4%96%E5%AE%9A%E4%BD%8D%E4%B9%8B%E7%A0%94%E7%A9%B6_%E6%9E%97%E8%80%81%E7%94%9F,%E9%83%AD%E6%B8%85%E6%99%BA.pdf)
+### Positioning
+- [On Outdoor Positioning with Wi-Fi and GPS-Lao-Sheng Lin, Ching-Chih Kuo](https://landeconomics.nccu.edu.tw/upload/29/download_file/5146/18-01-1,%E6%95%B4%E5%90%88Wi-Fi%E8%88%87GPS%E6%8A%80%E8%A1%93%E6%96%BC%E5%AE%A4%E5%A4%96%E5%AE%9A%E4%BD%8D%E4%B9%8B%E7%A0%94%E7%A9%B6_%E6%9E%97%E8%80%81%E7%94%9F,%E9%83%AD%E6%B8%85%E6%99%BA.pdf)
+- [On outdoor positioning with Wi-Fi-Binghao Li, Ishrat J. Quader, Andrew G. Dempster](https://www.researchgate.net/publication/251404219_On_outdoor_positioning_with_Wi-Fi#fullTextFileContent)
+### Machine Learning
 - [Learning representations by back-propagating errors-David E. Rumelhari, Geoffrey E. Hintont & Ronald J. Williams-1986](https://gwern.net/doc/ai/nn/1986-rumelhart-2.pdf)
