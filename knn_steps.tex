@@ -1,0 +1,29 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+
+\title{K-Nearest Neighborhood Formulae}
+\author{Pei-Yuan Sun, Allan Cosmo}
+\date{September 16, 2025}
+
+\begin{document}
+
+   \maketitle
+   \section{Distance Calculation}
+      1. Euclidean distance
+         $$d(p,q)=\sqrt{\sum^{n}_{i=1}(p_{i}-q_{i})^2}$$\\
+      2. Manhatton distance
+         $$d(p,q)=\sum^{n}_{i=1}|p_{i}-q_{i}|$$\\
+      3. Minkowski distance
+         $$d(p,q)=\left(\sum^{n}_{i=1}|p_{i}-q_{i}|^r\right)^\frac{1}{r}$$\\
+   \section{Choosing K value}
+      K is too small(K=1) -> Overfitting\\
+      K is to large(K>10) -> Underfitting\\
+      Usually start with 3,5,7,etc.\\
+      Use Cross-Validation to validate the K value\\
+    \section{Voting or Averaging}
+       Classification -> Majority Vote\\
+       Regression -> Average\\
+       formula: 
+       $$\hat{y}=\frac{1}{k}\sum^{k}_{i=1}y_{i}$$
+
+\end{document}
