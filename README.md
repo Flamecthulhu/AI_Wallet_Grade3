@@ -1,4 +1,5 @@
 # AI Powered Wallet
+### [中文版 Traditional Chinese version](./README_TC.md)
 ## Overview
 A smart wallet that uses location services (GPS/WiFi) to recommend the best options for users.
 
@@ -9,10 +10,11 @@ By collecting location data, it can automatically display the appropriate QR cod
 2. [Example use case](#example-use-case)
 3. [Component list](#component-list)
 4. [Software list](#software-list)
-5. [Imports](#imports)
-6. [Formula](#formula)
-7. [Relate links](#relate-links)
-8. [Reference articles](#reference-articles)
+5. [Graphics](#graphics)
+6. [Imports](#imports)
+7. [Formula](#formula)
+8. [Relate links](#relate-links)
+9. [Reference articles](#reference-articles)
 
 ## Key knowledges
 - Multilayer Perceptron(MLP)
