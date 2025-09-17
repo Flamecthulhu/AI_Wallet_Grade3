@@ -81,7 +81,7 @@ import csv
 ```
 
 ## Formula
-- [MLP Steps (PDF)](./Data/MLP_formulae.pdf)
+- [MLP Steps (PDF)](./Data/MLP%20steps.pdf)
 - [KNN Stpes (PDF)](./Data/KNN%20steps.pdf)
 
 ## Relate Links
