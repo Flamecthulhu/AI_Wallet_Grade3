@@ -81,8 +81,8 @@ import csv
 ```
 
 ## Formula
-- [MLP Steps (PDF)](./Data/MLP%20steps.pdf)
-- [KNN Stpes (PDF)](./Data/KNN%20steps.pdf)
+- [MLP Steps (PDF)](./Data/mlp%20steps.pdf)
+- [KNN Stpes (PDF)](./Data/knn%20steps.pdf)
 
 ## Relate Links
 - [專題製作 (Google Docs)](https://docs.google.com/document/d/1-IISGgF8X5tYGCxTpJfdwXhCcVmH8Mb71v42PAtXhI0/edit?tab=t.0)
