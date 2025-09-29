@@ -4,7 +4,6 @@
 *.docx
 
 ### Folders ###
-STM32
 source
 __pycache__
 
