@@ -1,16 +1,6 @@
-/*
- * ESP32 HM-10 BLE 模組 AT 命令工具
- * 適用於 HM-10, HM-11 等 BLE 4.0 模組
- * 
- * HM-10 特點:
- * - 預設鮑率: 9600
- * - 不需要按鍵進入 AT 模式 (隨時可用)
- * - 命令不需要換行符號 (發送後立即執行)
- * - 大部分命令回應 OK 或 OK+xxx
- */
-
-#define BT_RXD2 16  // ESP32 RX2 (連接到 HM-10 TX)
-#define BT_TXD2 17  // ESP32 TX2 (連接到 HM-10 RX)
+#include <Arduino.h>
+#define BT_RXD2 15  // ESP32 RX2 (連接到 HM-10 TX)
+#define BT_TXD2 16  // ESP32 TX2 (連接到 HM-10 RX)
 
 void setup() {
   // USB 串口 (電腦監控)

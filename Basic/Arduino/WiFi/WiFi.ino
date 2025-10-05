@@ -10,8 +10,9 @@
  */
 
 // ESP32-S3 UART1 連接 ESP-01S
-#define ESP01_RXD 18   // ESP32-S3 RX1 -> ESP-01S TX
-#define ESP01_TXD 17   // ESP32-S3 TX1 -> ESP-01S RX
+#include <Arduino.h>
+#define ESP01_RXD 6   // ESP32-S3 RX1 -> ESP-01S TX
+#define ESP01_TXD 7   // ESP32-S3 TX1 -> ESP-01S RX
 
 // 你的 WiFi 設定
 const char* ssid = "Allan’s iPhone 12 mini";      // 改成你的 WiFi 名稱

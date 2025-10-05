@@ -1,11 +1,13 @@
+#include <Arduino.h>
 #include <SPI.h>
 
-#define EPD_CS    10
-#define EPD_DC    9
-#define EPD_RST   8
-#define EPD_BUSY  7
+#define EPD_CS    8
+#define EPD_DC    18
+#define EPD_RST   17
+#define EPD_BUSY  3
 #define EPD_WIDTH  152
 #define EPD_HEIGHT 296
+
 
 class SSD1680 {
   private:
@@ -132,8 +134,6 @@ class SSD1680 {
       sendData(0xF7);
       sendCommand(0x20);
       waitBusy();
-      
-      Serial.println("顯示更新完成");
     }
     
     void clear() {
@@ -154,14 +154,23 @@ class SSD1680 {
       sendData(0xF7);
       sendCommand(0x20);
       waitBusy();
-      
-      Serial.println("螢幕已清除");
     }
     
-    void sleep() {
-      sendCommand(0x10);  // 深度睡眠模式
+    void wake() 
+    {
+      digitalWrite(EP_RST, HIGH);
+      delay(20);
+      digitalWrite(EP_RST, LOW);
+      delay(2);
+      digitalWrite(EP_RST, HIGH);
+      delay(20);
+      waitBusy();
+    }
+
+    void sleep() 
+    {
+      sendCommand(0x10);
       sendData(0x01);
-      Serial.println("進入睡眠模式");
     }
 };
 
