@@ -10,12 +10,12 @@
   #define DEBUG_PRINTLN(x)
 #endif
 
-const uint8_t BT_RX = 15;
-const uint8_t BT_TX = 16;
-const uint8_t WiFi_RX = 6;
-const uint8_t WiFi_TX = 7;
-const uint8_t GPS_RX = 4;
-const uint8_t GPS_TX = 5;
+const uint8_t BT_TX = 15;
+const uint8_t BT_RX = 16;
+const uint8_t WiFi_TX = 6;
+const uint8_t WiFi_RX = 7;
+const uint8_t GPS_TX = 4;
+const uint8_t GPS_RX = 5;
 const uint8_t EP_CS = 8;
 const uint8_t EP_DC = 18;
 const uint8_t EP_RST = 17;

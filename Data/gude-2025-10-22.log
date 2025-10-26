@@ -1,0 +1,4 @@
+13:11:08:334 [CRITICAL]	SharedConnection - Failed to open WinHTTP Session. The operation completed successfully.
+, last error code = 0 
+13:11:08:336 [ERROR]	Failed to Configure Secure Protocols. The operation completed successfully.
+, last error code = 0 
