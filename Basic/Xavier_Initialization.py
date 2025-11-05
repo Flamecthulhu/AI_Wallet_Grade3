@@ -1,7 +1,7 @@
 import math
 import random
 
-x = [1, 2, 3]
+x = [1, 2, 3, 4, 5, 6]
 
 def xavier_weight_init(fan_in, fan_out):
     weight_limit = math.sqrt(6 / (fan_in + fan_out))

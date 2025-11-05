@@ -10,18 +10,60 @@
   #define DEBUG_PRINTLN(x)
 #endif
 
+/*
+NMEA GPS
+  $GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A
+  $GPVTG,054.7,T,034.4,M,005.5,N,010.2,K*48
+  $GPGGA,123520,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47
+  $GPGSA,A,3,04,05,07,09,12,25,29,31,32,17,24,10,1.8,1.0,1.5*33
+  $GPGLL,4916.45,N,12311.12,W,225444,A,*1D
+
+$GPGGA,181908.00,3404.7041778,N,07044.3966270,W,4,13,1.00,495.144,M,29.200,M,0.10,0000*40
+
+181908.00 is the time stamp: UTC time in hours, minutes and seconds.
+3404.7041778 is the latitude in the DDMM.MMMMM format. Decimal places are variable.
+N denotes north latitude.
+07044.3966270 is the longitude in the DDDMM.MMMMM format. Decimal places are variable.
+W denotes west longitude.
+4 denotes the Quality Indicator:
+0 = void
+1 = Uncorrected coordinate
+2 = Differentially correct coordinate (e.g., WAAS, DGPS)
+4 = RTK Fix coordinate (centimeter precision)
+5 = RTK Float (decimeter precision)
+13 denotes number of satellites used in the coordinate
+1.0 denotes the HDOP (horizontal dilution of precision)
+495.144 denotes altitude of the antenna
+M denotes units of altitude (eg. meters or feet)
+29.200 denotes the geoidal separation (subtract this from the altitude of the antenna to arrive at the Height Above Ellipsoid (HAE).
+M denotes the units used by the geoidal separation
+1.0 denotes the age of the correction (if any)
+0000 denotes the correction station ID (if any)
+*40 denotes the checksum
+*/
+
 const uint8_t BT_TX = 15;
 const uint8_t BT_RX = 16;
 const uint8_t WiFi_TX = 6;
 const uint8_t WiFi_RX = 7;
 const uint8_t GPS_TX = 4;
 const uint8_t GPS_RX = 5;
+
+const uint8_t RELAY = 46;
+
 const uint8_t EP_CS = 8;
 const uint8_t EP_DC = 18;
 const uint8_t EP_RST = 17;
 const uint8_t EP_BUSY = 3;
 const uint16_t EP_HEIGHT = 296;
 const uint8_t EP_WIDTH = 152;
+
+uint8_t hour, minute, second, status = 0;
+float lon, lat;
+
+SoftwareSerial BTSer(BT_RX, BT_TX);
+SoftwareSerial WFSer(WiFi_RX, WiFi_TX);
+SoftwareSerial GPSSer(GPS_RX, GPS_TX);
 
 class SSD1680 
 {
@@ -52,7 +94,7 @@ class SSD1680
       {
         delay(10);
       }
-      DEBUG_PRINTLN("E-Paper readu");
+      DEBUG_PRINTLN("E-Paper ready");
     }
     
   public:
@@ -168,48 +210,90 @@ class SSD1680
       sendData(0x01);
     }
 };
-
 SSD1680 ep;
-SoftwareSerial SerialWF(WiFi_RX, WiFi_TX);
 
 void setup()
 {
     Serial.begin(115200);
-    Serial2.begin(9600, SERIAL_8N1, BT_RX, BT_TX);
-    SerialWF.begin(115200);
+    BTSer.begin(9600);
+    GPSSer.begin(9600);
+    WFSer.begin(115200);
+
     ep.init();
     delay(500);
     ep.clear();
     delay(2000);
     ep.sleep();
+
+    pinMode(RELAY, OUTPUT);
+    digitalWrite(RELAY, LOW);
 }
 
 void loop()
 {
-  if (Serial2.available()) {
+  if (BTSer.available()) 
+  {
     String response = "";
-    while (Serial2.available()) {
-      char c = Serial2.read();
+    while (BTSer.available()) 
+    {
+      char c = BTSer.read();
       response += c;
       delay(2);
     }
-    Serial.print("<<< ");
+    Serial.print("BLE: ");
     Serial.println(response);
-    if (response == "TEST")  epPattern();
-    if (response == "cls") 
+    if (response == "test")  epPattern();
+    if (response == "cls")
     {
       ep.wake();
       delay(50);
       ep.clear();
     }
+    if (response == "relay")
+    {
+      if (status == 0)
+      {
+        digitalWrite(RELAY, HIGH);
+        status = 1;
+      }
+      else
+      {
+        digitalWrite(RELAY, LOW);
+        status = 0;
+      }
+    }
   }
-  if (Serial.available()) {
+  if (Serial.available()) 
+  {
     String command = Serial.readStringUntil('\n');
     command.trim();    
     Serial.print(">>> ");
     Serial.println(command);
-    Serial2.print(command);
+    BTSer.print(command);
     delay(300);
+  }
+  if (WFSer.available()) 
+  {
+    String response = "";
+    while (WFSer.available()) 
+    {
+      char c = WFSer.read();
+      response += c;
+
+      delay(2);
+    }
+    Serial.print("WiFi: ");
+    Serial.println(response);
+  }
+  if (GPSSer.available()) 
+  {
+    String line = GPSSer.readStringUntil('\n');
+    line.trim();
+    if (line.startsWith("$GPGGA")) 
+    {
+      Serial.print("GPGGA: ");
+      Serial.println(line.substring(8));
+    }
   }
 }
 
