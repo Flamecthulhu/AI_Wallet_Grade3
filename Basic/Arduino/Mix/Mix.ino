@@ -409,12 +409,13 @@ void loop()
       char c = Serial1.read();
       response += c;
       delay(2);
-    }
-    Serial.print("ESP-01s: ");
-    Serial.println(response);
+    }    
     if (response.startsWith("+CWLAP:"))
     {
       digitalWrite(WF_LED, HIGH);
+      response = response.substring(7);
+      Serial.print("ESP-01s: ");
+      Serial.println(response);
     }
   }
 
