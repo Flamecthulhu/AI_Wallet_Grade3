@@ -47,7 +47,7 @@ If not, it connects MOSFET’s source and drain on the coil to allow the use of 
 | IC | [EasyCard Chip](https://shopee.tw/%E5%B7%B2%E7%84%8A%E6%8E%A5%E5%A5%BD%E7%9A%84%E7%B7%9A%E5%9C%88-%E6%94%B9%E9%80%A0%E6%82%A0%E9%81%8A%E5%8D%A1-%E4%B8%80%E5%8D%A1%E9%80%9A-icash2.0-%E5%B0%88%E7%94%A8-%E5%8F%AF%E8%AD%B7%E8%B2%9D-%E8%B3%BC%E8%B2%B7%E5%89%8D%E8%AB%8B%E7%9C%8B%E5%95%86%E5%93%81%E6%8F%8F%E8%BF%B0-i.34448402.2671862034?sp_atk=80168b58-c73f-45b1-8f94-b450b0201075&xptdk=80168b58-c73f-45b1-8f94-b450b0201075) |  | Transit authentication | 199 | 1 | piece |
 | IC | [RECOY R2-1A05](https://www.tme.eu/en/details/r2-1a05/reed-electromagnetic-relays/recoy-rayex-electronics/) |  | Relay, Coil switch | 40 | 1 | piece |
 | Battery | ~~9000mAh~~ |  | Power conponents | x | 1 | pack |
-| Total | | 3xUART, 1xI2C |  |  | ~~10~~ 9 | NTD |
+| Total | | 3xUART, 1xSPI |  |  | ~~10~~ 9 | NTD |
 
 ## Software list
 | Type | Name | Applicate Description | Example Usage |
@@ -97,4 +97,5 @@ import csv
 - [On outdoor positioning with Wi-Fi-Binghao Li, Ishrat J. Quader, Andrew G. Dempster](https://www.researchgate.net/publication/251404219_On_outdoor_positioning_with_Wi-Fi#fullTextFileContent)
 ### Machine Learning
 - [Learning representations by back-propagating errors-David E. Rumelhari, Geoffrey E. Hintont & Ronald J. Williams-1986](https://gwern.net/doc/ai/nn/1986-rumelhart-2.pdf)
+
 
