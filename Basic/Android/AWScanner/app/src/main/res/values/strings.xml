@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">AWScanner</string>
+    <string name="app_version">v0.0.1</string>
+    <string name="bluetooth_scan">Bluetooth scan</string>
+</resources>

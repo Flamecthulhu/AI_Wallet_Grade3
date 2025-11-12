@@ -1,11 +1,11 @@
 #include <Arduino.h>
 
 #define INPUT_SIZE 18
-#define HIDDEN1_SIZE 64
-#define HIDDEN2_SIZE 32
-#define OUTPUT_SIZE 9
+#define HIDDEN1_SIZE 8
+#define HIDDEN2_SIZE 4
+#define OUTPUT_SIZE 3
 #define LEARNING_RATE 0.001
-#define MAX_SAMPLES 100  // Reduced for Arduino memory constraints
+#define MAX_SAMPLES 10  // Reduced for Arduino memory constraints
 
 typedef struct {
     float w1[HIDDEN1_SIZE][INPUT_SIZE];

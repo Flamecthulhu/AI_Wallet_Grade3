@@ -251,6 +251,56 @@ void adam_update(Network *net, int t) {
     }
 }
 
+void print_network(Network *net) {
+    int i, j;
+    printf("\n--- FINAL NETWORK PARAMETERS ---\n");
+
+    printf("\nB1 (biases hidden1):\n");
+    for (i = 0; i < HIDDEN1_SIZE; i++) {
+        printf("%.8f%s", net->b1[i], (i % 8 == 7) ? "\n" : " ");
+    }
+    if (HIDDEN1_SIZE % 8) printf("\n");
+
+    printf("\nW1 (hidden1 x input):\n");
+    for (i = 0; i < HIDDEN1_SIZE; i++) {
+        for (j = 0; j < INPUT_SIZE; j++) {
+            printf("%.8f ", net->w1[i][j]);
+        }
+        printf("\n");
+    }
+
+    printf("\nB2 (biases hidden2):\n");
+    for (i = 0; i < HIDDEN2_SIZE; i++) {
+        printf("%.8f%s", net->b2[i], (i % 8 == 7) ? "\n" : " ");
+    }
+    if (HIDDEN2_SIZE % 8) printf("\n");
+
+    printf("\nW2 (hidden2 x hidden1):\n");
+    for (i = 0; i < HIDDEN2_SIZE; i++) {
+        for (j = 0; j < HIDDEN1_SIZE; j++) {
+            printf("%.8f ", net->w2[i][j]);
+        }
+        printf("\n");
+    }
+
+    printf("\nB3 (biases output):\n");
+    for (i = 0; i < OUTPUT_SIZE; i++) {
+        printf("%.8f%s", net->b3[i], (i % 8 == 7) ? "\n" : " ");
+    }
+    if (OUTPUT_SIZE % 8) printf("\n");
+
+    printf("\nW3 (output x hidden2):\n");
+    for (i = 0; i < OUTPUT_SIZE; i++) {
+        for (j = 0; j < HIDDEN2_SIZE; j++) {
+            printf("%.8f ", net->w3[i][j]);
+        }
+        printf("\n");
+    }
+
+    printf("\n--- END PARAMETERS ---\n");
+    fflush(stdout);
+}
+
 int main() {
     clock_t start_time = clock();
     srand(time(NULL));
@@ -342,6 +392,10 @@ int main() {
     
     clock_t end_time = clock();
     printf("Elapsed time: %.3f seconds\n", (double)(end_time - start_time) / CLOCKS_PER_SEC);
-    
+
+    // print final weights and biases
+    print_network(net);
+
+    system("pause");
     return 0;
 }

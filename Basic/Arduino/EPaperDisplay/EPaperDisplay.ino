@@ -28,11 +28,11 @@ class SSD1680 {
     }
     
     void waitBusy() {
-      Serial.println("等待顯示器就緒...");
+      //Serial.println("等待顯示器就緒...");
       while(digitalRead(EPD_BUSY) == HIGH) {
         delay(10);
       }
-      Serial.println("顯示器就緒");
+      //Serial.println("顯示器就緒");
     }
     
   public:
@@ -158,11 +158,11 @@ class SSD1680 {
     
     void wake() 
     {
-      digitalWrite(EP_RST, HIGH);
+      digitalWrite(EPD_RST, HIGH);
       delay(20);
-      digitalWrite(EP_RST, LOW);
+      digitalWrite(EPD_RST, LOW);
       delay(2);
-      digitalWrite(EP_RST, HIGH);
+      digitalWrite(EPD_RST, HIGH);
       delay(20);
       waitBusy();
     }
@@ -178,7 +178,7 @@ SSD1680 epd;
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("SSD1680 電子紙測試程式");
+  //Serial.println("SSD1680 電子紙測試程式");
   
   epd.init();
   delay(500);
@@ -190,6 +190,8 @@ void setup() {
   // 顯示測試圖案
   displayTestPattern();
   
+
+
   // 進入睡眠模式以省電
   epd.sleep();
 }
@@ -200,7 +202,7 @@ void loop() {
 
 void displayTestPattern() {
   Serial.println("顯示測試圖案");
-  
+  /*
   uint16_t width = (EPD_WIDTH % 8 == 0) ? (EPD_WIDTH / 8) : (EPD_WIDTH / 8 + 1);
   uint16_t height = EPD_HEIGHT;
   uint8_t image[width * height];
@@ -215,6 +217,25 @@ void displayTestPattern() {
       }
     }
   }
+  Serial.printf("Dec: %d\n", int(image));
+  Serial.printf("Hex: %X\n", int(image));
   
+  int binaryNum[10000];
+  int i = 0;
+  int n = int(image);
+
+  while (n > 0) {
+    binaryNum[i] = n % 2;
+    n = n / 2;
+    i++;
+  }
+
+  Serial.printf("Bin: ");
+  for (int j = i - 1; j >= 0; j--)
+    Serial.printf("%d", binaryNum[j]);
+  Serial.printf("\n");
+
+  */
+  uint8_t image = 1070468032;
   epd.display(image);
 }

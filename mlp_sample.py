@@ -12,7 +12,7 @@ print(f"Using device: {device}")
 inputs = []
 labels = []
 
-with open("C:\\Users\\allan\\Programs\\Program_Grade3\\source\\training_data.csv", "r") as f:
+with open("Data\\training_data.csv", "r") as f:
     reader = csv.reader(f)
     next(reader)
     for row in reader:

@@ -1,7 +1,10 @@
 #include <SoftwareSerial.h>
 #include <Arduino.h>
 #include <SPI.h>
+#include "EPD266_BW.h"
+
 #define DEBUG 1
+
 #if DEBUG
   #define DEBUG_PRINT(x, y) Serial.print(x, y)
   //#define DEBUG_PRINTF(x) Serial.printf(x)
@@ -100,7 +103,7 @@ const uint8_t BT_RLED = 36;
 const uint8_t WF_LED = 20;
 
 const uint16_t GSPBAUD = 9600;
-const uint WIFIBAUD = 115200;
+const int WIFIBAUD = 115200;
 const uint16_t BTBAUD = 9600;
 
 const uint8_t RELAY = 46;
@@ -119,6 +122,7 @@ float lon, lat;
 //SoftwareSerial BTSer(BT_RX, BT_TX);
 //SoftwareSerial WFSer(WiFi_RX, WiFi_TX);
 SoftwareSerial GPSSer(GPS_RX, GPS_TX);
+GxEPD2_BW<GxEPD2_266_BN, GxEPD2_266_BN::HEIGHT> epd(GxEPD2_266_BN(EP_CS, EP_DC, EP_RES, EP_BUSY));
 
 static const uint8_t cfg_nav5_automotive[] = 
 {
@@ -311,11 +315,13 @@ void setup()
 
     GPSSer.write(cfg_nav5_automotive, sizeof(cfg_nav5_automotive));
 
+    /*
     ep.init();
     delay(500);
     ep.clear();
     delay(2000);
     ep.sleep();
+    */
 }
 
 void loop()
@@ -377,13 +383,22 @@ void loop()
       digitalWrite(BT_RLED, LOW);
     }  
 
-    if (response == "test")  epPattern();
+    if (response == "test")  
+    {
+      //epPattern();
+      epd.print("Test text");
+      epd.display();
+    }
 
     else if (response == "cls")
     {
+      /*
       ep.wake();
       delay(50);
       ep.clear();
+      */
+      epd.fillScreen(GxEPD_WHITE);
+      epd.display();
     }
 
     else if (response == "relay")
@@ -500,6 +515,7 @@ void loop()
   }
 }
 
+/*
 void epPattern()
 {
     ep.wake();
@@ -518,3 +534,5 @@ void epPattern()
     ep.display(image);
     ep.sleep();
 }
+
+*/
