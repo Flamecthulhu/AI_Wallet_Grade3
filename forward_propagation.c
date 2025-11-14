@@ -5,7 +5,8 @@
 #define MAX_LINE_LENGTH 4096
 #define MAX_FIELDS 100
 
-int main() {
+int main() 
+{
     FILE *file;
     char line[MAX_LINE_LENGTH];
     char *token;
@@ -14,13 +15,15 @@ int main() {
     
     // Open the CSV file
     file = fopen("Data\\training_data.csv", "r");
-    if (file == NULL) {
+    if (file == NULL) 
+    {
         perror("Error opening file");
         return 1;
     }
     
     // Read line by line
-    while (fgets(line, sizeof(line), file)) {
+    while (fgets(line, sizeof(line), file)) 
+    {
         // Remove newline character if present
         line[strcspn(line, "\n")] = 0;
         
@@ -28,15 +31,18 @@ int main() {
         
         // Split line by comma delimiter
         token = strtok(line, ",");
-        while (token != NULL && field_count < MAX_FIELDS) {
+        while (token != NULL && field_count < MAX_FIELDS) 
+        {
             fields[field_count++] = token;
             token = strtok(NULL, ",");
         }
         
         // Print the fields separated by commas
-        for (int i = 0; i < field_count; i++) {
+        for (int i = 0; i < field_count; i++) 
+        {
             printf("%s", fields[i]);
-            if (i < field_count - 1) {
+            if (i < field_count - 1) 
+            {
                 printf(",");
             }
         }
@@ -45,6 +51,6 @@ int main() {
     
     fclose(file);
 
-    
+    system("pause");
     return 0;
 }

@@ -16,3 +16,4 @@ __pycache__
 ### Virtual Env. ###
 .macvenv
 .winvenv
+.venv

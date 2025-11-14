@@ -1,7 +1,9 @@
 #include <SoftwareSerial.h>
 #include <Arduino.h>
 #include <SPI.h>
+
 #include "EPD266_BW.h"
+#include "interface.c"
 
 #define DEBUG 1
 
@@ -25,26 +27,27 @@ NMEA GPS
 
 $GPGGA,181908.00,3404.7041778,N,07044.3966270,W,4,13,1.00,495.144,M,29.200,M,0.10,0000*40
 
-181908.00 is the time stamp: UTC time in hours, minutes and seconds.
-3404.7041778 is the latitude in the DDMM.MMMMM format. Decimal places are variable.
-N denotes north latitude.
-07044.3966270 is the longitude in the DDDMM.MMMMM format. Decimal places are variable.
-W denotes west longitude.
-4 denotes the Quality Indicator:
-0 = void
-1 = Uncorrected coordinate
-2 = Differentially correct coordinate (e.g., WAAS, DGPS)
-4 = RTK Fix coordinate (centimeter precision)
-5 = RTK Float (decimeter precision)
-13 denotes number of satellites used in the coordinate
-1.0 denotes the HDOP (horizontal dilution of precision)
-495.144 denotes altitude of the antenna
-M denotes units of altitude (eg. meters or feet)
-29.200 denotes the geoidal separation (subtract this from the altitude of the antenna to arrive at the Height Above Ellipsoid (HAE).
-M denotes the units used by the geoidal separation
-1.0 denotes the age of the correction (if any)
-0000 denotes the correction station ID (if any)
-*40 denotes the checksum
+  181908.00 is the time stamp: UTC time in hours, minutes and seconds.
+  3404.7041778 is the latitude in the DDMM.MMMMM format. Decimal places are variable.
+  N denotes north latitude.
+  07044.3966270 is the longitude in the DDDMM.MMMMM format. Decimal places are variable.
+  W denotes west longitude.
+  4 denotes the Quality Indicator:
+  0 = void
+  1 = Uncorrected coordinate
+  2 = Differentially correct coordinate (e.g., WAAS, DGPS)
+  3 = 
+  4 = RTK Fix coordinate (centimeter precision)
+  5 = RTK Float (decimeter precision)
+  13 denotes number of satellites used in the coordinate
+  1.0 denotes the HDOP (horizontal dilution of precision)
+  495.144 denotes altitude of the antenna
+  M denotes units of altitude (eg. meters or feet)
+  29.200 denotes the geoidal separation (subtract this from the altitude of the antenna to arrive at the Height Above Ellipsoid (HAE).
+  M denotes the units used by the geoidal separation
+  1.0 denotes the age of the correction (if any)
+  0000 denotes the correction station ID (if any)
+  *40 denotes the checksum
 
 Serial
   BLE<+cmd>
@@ -122,7 +125,7 @@ float lon, lat;
 //SoftwareSerial BTSer(BT_RX, BT_TX);
 //SoftwareSerial WFSer(WiFi_RX, WiFi_TX);
 SoftwareSerial GPSSer(GPS_RX, GPS_TX);
-GxEPD2_BW<GxEPD2_266_BN, GxEPD2_266_BN::HEIGHT> epd(GxEPD2_266_BN(EP_CS, EP_DC, EP_RES, EP_BUSY));
+GxEPD2_BW<GxEPD2_266_BN, GxEPD2_266_BN::HEIGHT> epd(GxEPD2_266_BN(EP_CS, EP_DC, EP_RST, EP_BUSY));
 
 static const uint8_t cfg_nav5_automotive[] = 
 {
@@ -288,40 +291,101 @@ class SSD1680
       waitBusy();
     }
 };
-SSD1680 ep;
+//SSD1680 ep;
+
+class Uinterface
+{
+  public:
+    void Startup()
+    {
+      epd.fillScreen(GxEPD_WHITE);
+      epd.drawBitmap(0, 0, startup, 296, 152, GxEPD_BLACK);
+      epd.display();
+    }
+
+    void EasyCard()
+    {
+      epd.fillScreen(GxEPD_WHITE);
+      epd.drawBitmap(0, 0, easycard, 296, 152, GxEPD_BLACK);
+      epd.display();
+    }
+
+    void Einvoice()
+    {
+      epd.fillScreen(GxEPD_WHITE);
+      epd.drawBitmap(0, 0, einvoice, 296, 152, GxEPD_BLACK);
+      epd.display();
+    }
+
+    void TRA()
+    {
+      epd.fillScreen(GxEPD_WHITE);
+      epd.drawBitmap(0, 0, tra, 296, 152, GxEPD_BLACK);
+      epd.display();
+    }
+    void THSR()
+    {
+      epd.fillScreen(GxEPD_WHITE);
+      epd.drawBitmap(0, 0, thsr, 296, 152, GxEPD_BLACK);
+      epd.display();
+    }
+
+    void Homescreen()
+    {
+      epd.fillScreen(GxEPD_WHITE);
+      epd.drawBitmap(0, 0, homescreen, 296, 152, GxEPD_BLACK);
+      epd.display();
+    }
+};
+
+Uinterface ui;
+
+void epdInit() 
+{
+  epd.init(115200, false, 50, false);
+  epd.setRotation(1);
+  epd.setTextColor(GxEPD_BLACK);
+  epd.setTextSize(4);
+  epd.setFullWindow();
+}
 
 void setup()
 {
-    Serial.begin(115200);
-    //BTSer.begin(BTBAUD);
-    GPSSer.begin(GSPBAUD);
-    //WFSer.begin(WIFIBAUD);
-    Serial1.begin(WIFIBAUD, SERIAL_8N1, WiFi_RX, WiFi_TX);
-    Serial2.begin(BTBAUD, SERIAL_8N1, BT_RX, BT_TX);
-    
-    pinMode(GPS_RLED, OUTPUT);
-    pinMode(GPS_GLED, OUTPUT);
-    pinMode(BT_RLED, OUTPUT);
-    pinMode(BT_BLED, OUTPUT);
-    pinMode(WF_LED, OUTPUT);
-    pinMode(RELAY, OUTPUT);
-    
-    digitalWrite(RELAY, LOW);
-    digitalWrite(GPS_RLED, LOW);
-    digitalWrite(GPS_GLED, HIGH);
-    digitalWrite(BT_BLED, HIGH);
-    digitalWrite(BT_RLED, LOW);
-    digitalWrite(WF_LED, HIGH);
+  epdInit();
+  epd.setCursor(0, 0);
+  ui.Startup();
 
-    GPSSer.write(cfg_nav5_automotive, sizeof(cfg_nav5_automotive));
+  Serial.begin(115200);
+  //BTSer.begin(BTBAUD);
+  GPSSer.begin(GSPBAUD);
+  //WFSer.begin(WIFIBAUD);
+  Serial1.begin(WIFIBAUD, SERIAL_8N1, WiFi_RX, WiFi_TX);
+  Serial2.begin(BTBAUD, SERIAL_8N1, BT_RX, BT_TX);
+  
+  pinMode(GPS_RLED, OUTPUT);
+  pinMode(GPS_GLED, OUTPUT);
+  pinMode(BT_RLED, OUTPUT);
+  pinMode(BT_BLED, OUTPUT);
+  pinMode(WF_LED, OUTPUT);
+  pinMode(RELAY, OUTPUT);
+  
+  digitalWrite(RELAY, LOW);
+  digitalWrite(GPS_RLED, LOW);
+  digitalWrite(GPS_GLED, HIGH);
+  digitalWrite(BT_BLED, HIGH);
+  digitalWrite(BT_RLED, LOW);
+  digitalWrite(WF_LED, HIGH);
 
-    /*
-    ep.init();
-    delay(500);
-    ep.clear();
-    delay(2000);
-    ep.sleep();
-    */
+  GPSSer.write(cfg_nav5_automotive, sizeof(cfg_nav5_automotive));
+
+  ui.Homescreen();
+  /*
+  ep.init();
+  delay(500);
+  ep.clear();
+  delay(2000);
+  ep.sleep();
+  */
 }
 
 void loop()
@@ -355,6 +419,49 @@ void loop()
       DEBUG_PRINTLN("WF: " + command);
       Serial1.print(command);
       Serial1.print("\r\n");
+    }
+
+    else if (command == "cls")
+    {
+      epd.fillScreen(GxEPD_WHITE);
+      epd.display();
+    }
+
+    else if (command == "relay" || command == "easycard")
+    {
+      if (status == 0)
+      {
+        ui.EasyCard();
+        digitalWrite(RELAY, HIGH);
+        status = 1;
+      }
+      else
+      {
+        epd.fillScreen(GxEPD_WHITE);
+        epd.display();
+        digitalWrite(RELAY, LOW);
+        status = 0;
+      }
+    }
+
+    else if (command == "tra")
+    {
+      ui.TRA();
+    }
+
+    else if (command == "thsr")
+    {
+      ui.THSR();
+    }
+    
+    else if (command == "einvoice")
+    {
+      ui.Einvoice();
+    }
+
+    else if (command == "home" || command == "homescreen")
+    {
+      ui.Homescreen();
     }
     
   }
@@ -405,14 +512,37 @@ void loop()
     {
       if (status == 0)
       {
+        ui.EasyCard();
         digitalWrite(RELAY, HIGH);
         status = 1;
       }
       else
       {
+        epd.fillScreen(GxEPD_WHITE);
+        epd.display();
         digitalWrite(RELAY, LOW);
         status = 0;
       }
+    }
+
+    else if (response == "home" || command == "homescreen")
+    {
+      ui.Homescreen();
+    }
+    
+    else if (response == "tra")
+    {
+      ui.TRA();
+    }
+
+    else if (response == "thsr")
+    {
+      ui.THSR();
+    }
+
+    else if (response == "einvoice")
+    {
+      ui.Einvoice();
     }
   }
 
@@ -504,6 +634,7 @@ void loop()
       
     }
   }
+  
   search_loop = search_loop + 1;
   if (search_loop == 500000)
   {

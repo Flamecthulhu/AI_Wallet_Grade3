@@ -7,7 +7,7 @@ void SystemClock_Config(void);
 static void MPU_Config(void);
 
 uint8_t tx_buff[]={0,1,2,3,4,5,6,7};
-uint8_t rx_buff[8];
+uint8_t rx_buff[];
 
 int main(void)
 {

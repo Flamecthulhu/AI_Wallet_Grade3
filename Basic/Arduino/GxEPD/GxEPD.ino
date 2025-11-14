@@ -5,6 +5,7 @@
 #define RES 17
 #define DC 18
 #define CS 8
+#define EC 46
 
 GxEPD2_BW<GxEPD2_266_BN, GxEPD2_266_BN::HEIGHT> epd(GxEPD2_266_BN(CS, DC, RES, BUSY));
 
@@ -19,6 +20,9 @@ void epdInit()
 
 void setup() 
 {
+  pinMode(EC, OUTPUT);
+  digitalWrite(EC, LOW);
+
   epdInit();
   epd.setCursor(0, 0);
 
@@ -30,9 +34,11 @@ void setup()
   epd.drawBitmap(0, 0, einvoice, 296, 152, GxEPD_BLACK);
   epd.display();
 
+  digitalWrite(EC, HIGH);
   epd.fillScreen(GxEPD_WHITE); 
   epd.drawBitmap(0, 0, easycard, 296, 152, GxEPD_BLACK);
   epd.display();
+  digitalWrite(EC, LOW);
 
   epd.fillScreen(GxEPD_WHITE);
   epd.drawBitmap(0, 0, thsr, 296, 152, GxEPD_BLACK);
