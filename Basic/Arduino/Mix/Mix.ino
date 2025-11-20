@@ -105,7 +105,7 @@ const uint8_t BT_BLED = 45;
 const uint8_t BT_RLED = 36;
 const uint8_t WF_LED = 20;
 
-const uint16_t GSPBAUD = 9600;
+const uint16_t GPSBAUD = 9600;
 const int WIFIBAUD = 115200;
 const uint16_t BTBAUD = 9600;
 
@@ -357,7 +357,7 @@ void setup()
 
   Serial.begin(115200);
   //BTSer.begin(BTBAUD);
-  GPSSer.begin(GSPBAUD);
+  GPSSer.begin(GPSBAUD);
   //WFSer.begin(WIFIBAUD);
   Serial1.begin(WIFIBAUD, SERIAL_8N1, WiFi_RX, WiFi_TX);
   Serial2.begin(BTBAUD, SERIAL_8N1, BT_RX, BT_TX);

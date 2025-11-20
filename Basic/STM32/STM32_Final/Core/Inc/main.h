@@ -93,10 +93,14 @@ void Error_Handler(void);
 #define EPD_CS_GPIO_Port GPIOC
 #define EPD_BUSY_Pin GPIO_PIN_7
 #define EPD_BUSY_GPIO_Port GPIOC
+#define GPS_RLED_Pin GPIO_PIN_11
+#define GPS_RLED_GPIO_Port GPIOA
 #define GPS_GLED_Pin GPIO_PIN_12
 #define GPS_GLED_GPIO_Port GPIOA
-#define GPS_RLED_Pin GPIO_PIN_13
-#define GPS_RLED_GPIO_Port GPIOA
+#define DEBUG_TX_Pin GPIO_PIN_5
+#define DEBUG_TX_GPIO_Port GPIOD
+#define DEBUG_RX_Pin GPIO_PIN_6
+#define DEBUG_RX_GPIO_Port GPIOD
 
 /* USER CODE BEGIN Private defines */
 

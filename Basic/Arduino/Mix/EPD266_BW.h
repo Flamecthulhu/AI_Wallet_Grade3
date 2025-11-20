@@ -1,7 +1,3 @@
-// Display Library for SPI e-paper panels from Dalian Good Display and boards from Waveshare.
-// Reduced version - Author: Jean-Marc Zingg
-// Library: https://github.com/ZinggJM/GxEPD2
-
 #ifndef _GxEPD2_BW_H_
 #define _GxEPD2_BW_H_
 
@@ -21,7 +17,6 @@
 
 #include "GxEPD2_EPD.h"
 
-// 使用 __has_include 來條件性包含特定型號的頭文件
 #if defined __has_include
 #  if !__has_include("GxEPD2.h")
 #    undef __has_include

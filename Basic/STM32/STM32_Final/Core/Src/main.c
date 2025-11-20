@@ -21,7 +21,13 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
+#include "stm32h7xx_hal.h"
+#include "SSD1680.h"
+#include "fonts.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -49,6 +55,7 @@ TIM_HandleTypeDef htim2;
 UART_HandleTypeDef huart4;
 UART_HandleTypeDef huart5;
 UART_HandleTypeDef huart7;
+UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 
@@ -64,13 +71,29 @@ static void MX_TIM2_Init(void);
 static void MX_UART4_Init(void);
 static void MX_UART5_Init(void);
 static void MX_UART7_Init(void);
+static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
+void parse_gpgga(char *line);
+void HM10_Process(uint8_t byte);
+static void MX_SSD1680_Init(void);
+SPI_HandleTypeDef hspi1;
+SSD1680_HandleTypeDef hepd;
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+#define DEBUG_MODE 1
 
+uint16_t idx = 0;
+uint8_t BTBuffer[1];
+uint16_t wf_idx = 0;
+uint8_t WFBuffer[16];
+char GPSBuffer[128];
+
+static char btrecv[32];
+static uint8_t ptr = 0;
+char parts[15][16];
 /* USER CODE END 0 */
 
 /**
@@ -111,12 +134,72 @@ int main(void)
   MX_UART4_Init();
   MX_UART5_Init();
   MX_UART7_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+  MX_SSD1680_Init();
+  SSD1680_Border(&hepd, ColorWhite);
+  SSD1680_Clear(&hepd, ColorWhite);
 
+  uint8_t scale[176 / 8 * 4 ] = {
+	  0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55,
+	  0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F,
+	  0x7F, 0xFF, 0x7F, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0x7F, 0x7F,
+      0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+  };
+  SSD1680_SetRegion(&hepd, 0, 0, 176, 4, scale, NULL);
+
+  SSD1680_Text(&hepd, 0, 16, "Font 8x8", &cp866_8x8);
+  SSD1680_Text(&hepd, 0, 24, "Font 8x14", &cp866_8x14);
+  SSD1680_Text(&hepd, 0, 38, "Font 8x16", &cp866_8x16);
+
+  HAL_NVIC_SetPriority(TIM1_UP_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(TIM1_UP_IRQn);
+  HAL_TIM_Base_Start_IT(&htim1);
+
+  HAL_NVIC_SetPriority(TIM2_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(TIM2_IRQn);
+  HAL_TIM_Base_Start_IT(&htim2);
+
+  typedef struct
+  {
+      GPIO_TypeDef* port;
+      uint16_t pin;
+      GPIO_PinState state;
+  }
+  GpioSet;
+
+  GpioSet list[] =
+  {
+      {BT_BLED_GPIO_Port,  BT_BLED_Pin,  GPIO_PIN_SET},
+      {BT_RLED_GPIO_Port,  BT_RLED_Pin,  GPIO_PIN_RESET},
+      {GPS_RLED_GPIO_Port, GPS_RLED_Pin, GPIO_PIN_RESET},
+      {GPS_GLED_GPIO_Port, GPS_GLED_Pin, GPIO_PIN_SET},
+      {WF_LED_GPIO_Port,   WF_LED_Pin,   GPIO_PIN_SET},
+      {STA_LED_GPIO_Port,  STA_LED_Pin,  GPIO_PIN_SET},
+      {EC_LED_GPIO_Port,   EC_LED_Pin,   GPIO_PIN_SET},
+      {EC_RELAY_GPIO_Port, EC_RELAY_Pin, GPIO_PIN_RESET}
+  };
+
+  for (int i = 0; i < sizeof(list)/sizeof(list[0]); i++)
+  {
+      HAL_GPIO_WritePin(list[i].port, list[i].pin, list[i].state);
+  }
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  HAL_UART_Receive_IT(&huart4, BTBuffer, 1);
+  HAL_UART_Receive_IT(&huart5, WFBuffer, 1);
+  HAL_UART_Receive_IT(&huart7, (uint8_t*)GPSBuffer, 1);
+
+  uint8_t msg[] = "STM32 is now on\n";
+  HAL_UART_Transmit(&huart2, msg, sizeof(msg)-1, 1000);
+
+  SSD1680_Clear(&hepd, ColorWhite);
+
+  // 顯示文字
+  SSD1680_Text(&hepd, 0, 0, "Hello World!", &cp866_8x8);
+  SSD1680_Refresh(&hepd, FullRefresh);
   while (1)
   {
     /* USER CODE END WHILE */
@@ -141,7 +224,7 @@ void SystemClock_Config(void)
 
   /** Configure the main internal regulator output voltage
   */
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE0);
 
   while(!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY)) {}
 
@@ -154,12 +237,12 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
   RCC_OscInitStruct.PLL.PLLM = 4;
-  RCC_OscInitStruct.PLL.PLLN = 10;
+  RCC_OscInitStruct.PLL.PLLN = 60;
   RCC_OscInitStruct.PLL.PLLP = 2;
-  RCC_OscInitStruct.PLL.PLLQ = 2;
+  RCC_OscInitStruct.PLL.PLLQ = 5;
   RCC_OscInitStruct.PLL.PLLR = 2;
   RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1VCIRANGE_3;
-  RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1VCOMEDIUM;
+  RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1VCOWIDE;
   RCC_OscInitStruct.PLL.PLLFRACN = 0;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
@@ -173,13 +256,13 @@ void SystemClock_Config(void)
                               |RCC_CLOCKTYPE_D3PCLK1|RCC_CLOCKTYPE_D1PCLK1;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.SYSCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_HCLK_DIV1;
-  RCC_ClkInitStruct.APB3CLKDivider = RCC_APB3_DIV1;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_HCLK_DIV2;
+  RCC_ClkInitStruct.APB3CLKDivider = RCC_APB3_DIV2;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_APB1_DIV2;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_APB2_DIV1;
-  RCC_ClkInitStruct.APB4CLKDivider = RCC_APB4_DIV1;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_APB2_DIV2;
+  RCC_ClkInitStruct.APB4CLKDivider = RCC_APB4_DIV2;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
   {
     Error_Handler();
   }
@@ -204,15 +287,16 @@ static void MX_SPI1_Init(void)
   hspi1.Instance = SPI1;
   hspi1.Init.Mode = SPI_MODE_MASTER;
   hspi1.Init.Direction = SPI_DIRECTION_2LINES_TXONLY;
-  hspi1.Init.DataSize = SPI_DATASIZE_4BIT;
+  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
-  hspi1.Init.NSS = SPI_NSS_SOFT;
+  hspi1.Init.NSS = SPI_NSS_HARD_OUTPUT;
   hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
-  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-  hspi1.Init.CRCPolynomial = 0x0;
+  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_ENABLE;
+  hspi1.Init.CRCPolynomial = 0x107;
+  hspi1.Init.CRCLength = SPI_CRC_LENGTH_DATASIZE;
   hspi1.Init.NSSPMode = SPI_NSS_PULSE_ENABLE;
   hspi1.Init.NSSPolarity = SPI_NSS_POLARITY_LOW;
   hspi1.Init.FifoThreshold = SPI_FIFO_THRESHOLD_01DATA;
@@ -341,7 +425,7 @@ static void MX_UART4_Init(void)
 
   /* USER CODE END UART4_Init 1 */
   huart4.Instance = UART4;
-  huart4.Init.BaudRate = 115200;
+  huart4.Init.BaudRate = 9600;
   huart4.Init.WordLength = UART_WORDLENGTH_8B;
   huart4.Init.StopBits = UART_STOPBITS_1;
   huart4.Init.Parity = UART_PARITY_NONE;
@@ -363,7 +447,7 @@ static void MX_UART4_Init(void)
   {
     Error_Handler();
   }
-  if (HAL_UARTEx_DisableFifoMode(&huart4) != HAL_OK)
+  if (HAL_UARTEx_EnableFifoMode(&huart4) != HAL_OK)
   {
     Error_Handler();
   }
@@ -389,7 +473,7 @@ static void MX_UART5_Init(void)
 
   /* USER CODE END UART5_Init 1 */
   huart5.Instance = UART5;
-  huart5.Init.BaudRate = 9600;
+  huart5.Init.BaudRate = 115200;
   huart5.Init.WordLength = UART_WORDLENGTH_8B;
   huart5.Init.StopBits = UART_STOPBITS_1;
   huart5.Init.Parity = UART_PARITY_NONE;
@@ -411,7 +495,7 @@ static void MX_UART5_Init(void)
   {
     Error_Handler();
   }
-  if (HAL_UARTEx_DisableFifoMode(&huart5) != HAL_OK)
+  if (HAL_UARTEx_EnableFifoMode(&huart5) != HAL_OK)
   {
     Error_Handler();
   }
@@ -437,7 +521,7 @@ static void MX_UART7_Init(void)
 
   /* USER CODE END UART7_Init 1 */
   huart7.Instance = UART7;
-  huart7.Init.BaudRate = 115200;
+  huart7.Init.BaudRate = 9600;
   huart7.Init.WordLength = UART_WORDLENGTH_8B;
   huart7.Init.StopBits = UART_STOPBITS_1;
   huart7.Init.Parity = UART_PARITY_NONE;
@@ -459,13 +543,61 @@ static void MX_UART7_Init(void)
   {
     Error_Handler();
   }
-  if (HAL_UARTEx_DisableFifoMode(&huart7) != HAL_OK)
+  if (HAL_UARTEx_EnableFifoMode(&huart7) != HAL_OK)
   {
     Error_Handler();
   }
   /* USER CODE BEGIN UART7_Init 2 */
 
   /* USER CODE END UART7_Init 2 */
+
+}
+
+/**
+  * @brief USART2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART2_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART2_Init 0 */
+
+  /* USER CODE END USART2_Init 0 */
+
+  /* USER CODE BEGIN USART2_Init 1 */
+
+  /* USER CODE END USART2_Init 1 */
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 115200;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart2.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+  huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_SetTxFifoThreshold(&huart2, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_SetRxFifoThreshold(&huart2, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_EnableFifoMode(&huart2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART2_Init 2 */
+
+  /* USER CODE END USART2_Init 2 */
 
 }
 
@@ -497,7 +629,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(EPD_CS_GPIO_Port, EPD_CS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, GPS_GLED_Pin|GPS_RLED_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, GPS_RLED_Pin|GPS_GLED_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : STA_LED_Pin WF_LED_Pin BT_RLED_Pin BT_BLED_Pin
                            EC_RELAY_Pin EC_LED_Pin EPD_RST_Pin EPD_DC_Pin */
@@ -521,8 +653,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(EPD_BUSY_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : GPS_GLED_Pin GPS_RLED_Pin */
-  GPIO_InitStruct.Pin = GPS_GLED_Pin|GPS_RLED_Pin;
+  /*Configure GPIO pins : GPS_RLED_Pin GPS_GLED_Pin */
+  GPIO_InitStruct.Pin = GPS_RLED_Pin|GPS_GLED_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -534,6 +666,184 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+static void MX_SSD1680_Init(void)
+{
+    hepd.SPI_Handle = &hspi1;
+    hepd.CS_Port = EPD_CS_GPIO_Port;
+    hepd.CS_Pin  = EPD_CS_Pin;
+    hepd.DC_Port = EPD_DC_GPIO_Port;
+    hepd.DC_Pin  = EPD_DC_Pin;
+    hepd.RESET_Port = EPD_RST_GPIO_Port;
+    hepd.RESET_Pin  = EPD_RST_Pin;
+    hepd.BUSY_Port  = EPD_BUSY_GPIO_Port;
+    hepd.BUSY_Pin   = EPD_BUSY_Pin;
+    hepd.Color_Depth = 1;
+    hepd.Scan_Mode  = NarrowScan;
+    hepd.Resolution_X = 152;
+    hepd.Resolution_Y = 296;
+
+    SSD1680_Init(&hepd);
+}
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+    if (huart->Instance == UART4) // BT
+    {
+		HM10_Process(BTBuffer[0]);
+		HAL_UART_Receive_IT(&huart4, BTBuffer, 1);
+    }
+
+    else if (huart->Instance == UART5) // WiFi
+    {
+
+    	HAL_UART_Transmit(&huart2, WFBuffer, 1, 100);
+		HAL_UART_Receive_IT(&huart5, WFBuffer, 1);
+
+    }
+
+    else if (huart->Instance == UART7) // GPS
+    {
+        static uint8_t rx_byte;
+        rx_byte = GPSBuffer[0];
+
+        if (rx_byte == '\n' || rx_byte == '\r')
+        {
+            if (idx > 0)
+            {
+                GPSBuffer[idx] = '\0';
+                parse_gpgga(GPSBuffer);
+                idx = 0;
+            }
+        }
+
+        else if (rx_byte >= ' ' && rx_byte <= '~')
+        {
+            if (idx < sizeof(GPSBuffer) - 1)
+            {
+                GPSBuffer[idx++] = rx_byte;
+            }
+
+            else
+            {
+                idx = 0;
+            }
+        }
+        HAL_UART_Receive_IT(&huart7, (uint8_t*)&GPSBuffer[0], 1);
+    }
+}
+
+void parse_gpgga(char *line)
+{
+    if (strncmp(line, "$GPGGA", 6) != 0 && strncmp(line, "$GNGGA", 6) != 0)
+    {
+        return;
+    }
+
+    int i = 0;
+    char *token = strtok(line, ",");
+
+    while (token != NULL && i < 15) {
+        size_t len = strlen(token);
+        if (len > 15) len = 15;
+        memcpy(parts[i], token, len);
+        parts[i][len] = '\0';
+        i++;
+        token = strtok(NULL, ",");
+    }
+    if (i < 10)
+    {
+        return;
+    }
+
+    if (strlen(parts[6]) == 0 || parts[6][0] == '0')
+    {
+        return;
+    }
+
+    if (strlen(parts[2]) == 0) return;
+    float rawLat = atof(parts[2]);
+    if (rawLat == 0.0) return;
+
+    int latDeg = (int)(rawLat / 100);
+    float latMin = rawLat - latDeg * 100.0;
+    float lat = latDeg + latMin / 60.0;
+
+    if (strlen(parts[3]) > 0 && parts[3][0] == 'S')
+    {
+        lat = -lat;
+    }
+
+    if (strlen(parts[4]) == 0) return;
+    float rawLon = atof(parts[4]);
+    if (rawLon == 0.0) return;
+
+    int lonDeg = (int)(rawLon / 100);
+    float lonMin = rawLon - lonDeg * 100.0;
+    float lon = lonDeg + lonMin / 60.0;
+
+    if (strlen(parts[5]) > 0 && parts[5][0] == 'W') {
+        lon = -lon;
+    }
+
+    float alt = (strlen(parts[9]) > 0) ? atof(parts[9]) : 0.0;
+
+    int satellites = (strlen(parts[7]) > 0) ? atoi(parts[7]) : 0;
+
+    float rawTime = (strlen(parts[1]) > 0) ? atof(parts[1]) : 0.0;
+    uint8_t hour = ((int)rawTime / 10000) % 24;
+    uint8_t minute = ((int)rawTime / 100) % 100;
+    uint8_t second = (int)rawTime % 100;
+
+    #if DEBUG_MODE
+		char debug_msg[64];
+		int len = snprintf(debug_msg, sizeof(debug_msg), "Lat:%.6f Lon:%.6f Alt:%.1fm Sat:%d\n%02d:%02d:%02d UTC\n", lat, lon, alt, satellites, hour, minute, second);
+
+		if (len > 0 && len < sizeof(debug_msg))
+		{
+			HAL_UART_Transmit(&huart2, (uint8_t*)debug_msg, len, 1000);
+		}
+    #endif
+}
+
+void HM10_Process(uint8_t byte)
+{
+	btrecv[ptr++] = byte;
+	if (ptr >= sizeof(btrecv)-1) ptr = 0;
+	btrecv[ptr] = 0;
+
+	if (strstr(btrecv, "OK+CONN")) {
+		HAL_GPIO_WritePin(BT_BLED_GPIO_Port, BT_BLED_Pin, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(BT_RLED_GPIO_Port, BT_RLED_Pin, GPIO_PIN_SET);
+		ptr = 0;
+	}
+
+	else if (strstr(btrecv, "OK+LOST")) {
+		HAL_GPIO_WritePin(BT_BLED_GPIO_Port, BT_BLED_Pin, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(BT_RLED_GPIO_Port, BT_RLED_Pin, GPIO_PIN_RESET);
+		ptr = 0;
+	}
+
+	else
+	{
+		#if DEBUG_MODE
+			HAL_UART_Transmit(&huart2, (uint8_t*)btrecv, ptr, 100);
+		#endif
+	}
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+    if(htim->Instance == TIM2)
+    {
+		#if DEBUG_MODE
+    		uint8_t text[] = "Sending command to ESP01s\n";
+			HAL_UART_Transmit(&huart2, text, sizeof(text)-1, 100);
+			uint8_t cmd[] = "AT+CWLAP\r\n";
+			HAL_UART_Transmit(&huart5, cmd, sizeof(cmd)-1, 100);
+		#endif
+		HAL_GPIO_TogglePin(WF_LED_GPIO_Port, WF_LED_Pin);
+    }
+}
 
 /* USER CODE END 4 */
 
@@ -577,6 +887,7 @@ void Error_Handler(void)
   __disable_irq();
   while (1)
   {
+
   }
   /* USER CODE END Error_Handler_Debug */
 }
