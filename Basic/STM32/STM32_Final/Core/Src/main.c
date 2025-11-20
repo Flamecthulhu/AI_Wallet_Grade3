@@ -197,7 +197,6 @@ int main(void)
 
   SSD1680_Clear(&hepd, ColorWhite);
 
-  // 顯示文字
   SSD1680_Text(&hepd, 0, 0, "Hello World!", &cp866_8x8);
   SSD1680_Refresh(&hepd, FullRefresh);
   while (1)
