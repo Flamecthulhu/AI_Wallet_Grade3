@@ -1,0 +1,14 @@
+#ifndef __INTERFACE_H
+#define __INTERFACE_H
+
+// 使用 extern 宣告陣列。這不是定義，只是告訴編譯器它們會在別處定義。
+// 注意：陣列長度不需要寫，只要給出類型即可。
+extern const unsigned char startup[];
+extern const unsigned char homescreen[];
+extern const unsigned char thsr[];
+extern const unsigned char tra[];
+extern const unsigned char easycard[];
+extern const unsigned char einvoice[];
+extern const unsigned char einvoicev[];
+
+#endif /* __INTERFACE_H */

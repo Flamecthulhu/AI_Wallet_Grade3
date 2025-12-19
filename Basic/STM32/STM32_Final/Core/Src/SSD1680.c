@@ -186,7 +186,8 @@ HAL_StatusTypeDef SSD1680_UpdateControl(SSD1680_HandleTypeDef *hepd) {
  * @li Set data entry mode to @ref RightThenDown
  * @param[in] hepd: SSD1680 handle pointer
  */
-void SSD1680_Init(SSD1680_HandleTypeDef *hepd) {
+void SSD1680_Init(SSD1680_HandleTypeDef *hepd)
+{
   HAL_GPIO_WritePin(hepd->RESET_Port, hepd->RESET_Pin, GPIO_PIN_RESET);
   HAL_GPIO_WritePin(hepd->CS_Port, hepd->CS_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(hepd->DC_Port, hepd->DC_Pin, GPIO_PIN_SET);
@@ -194,73 +195,66 @@ void SSD1680_Init(SSD1680_HandleTypeDef *hepd) {
   HAL_GPIO_WritePin(hepd->RESET_Port, hepd->RESET_Pin, GPIO_PIN_SET);
   HAL_Delay(20);
 
-  /*
-   _START_SEQUENCE = (
-      b"\x12\x80\x14"  # soft reset and wait 20ms
-      b"\x11\x01\x03"  # Ram data entry mode
-      b"\x3C\x01\x05"  # border color
-      b"\x2c\x01\x36"  # Set vcom voltage
-      b"\x03\x01\x17"  # Set gate voltage
-      b"\x04\x03\x41\x00\x32"  # Set source voltage
-      b"\x4e\x01\x01"  # ram x count
-      b"\x4f\x02\x00\x00"  # ram y count
-      b"\x01\x03\x00\x00\x00"  # set display size
-      b"\x22\x01\xf4"  # display update mode
-  )
-  */
-
-  /***** #2 *****/
+  // 硬體重置
   SSD1680_Reset(hepd);
   SSD1680_Send(hepd, SSD1680_SW_RESET, 0, 0);
   SSD1680_Wait(hepd);
 
-  uint8_t userId[10] = { 0 };
-  SSD1680_Receive(hepd, SSD1680_READ_USER_ID, userId, sizeof(userId)); // 0x2E
+  // ===== Driver Output Control =====
+  uint8_t driverOutput[3];
+  driverOutput[0] = (hepd->Resolution_Y - 1) & 0xFF;        // 295 = 0x27
+  driverOutput[1] = ((hepd->Resolution_Y - 1) >> 8) & 0x01; // 0x01
+  driverOutput[2] = 0x00;  // GD=0, SM=0, TB=0
+  SSD1680_Send(hepd, SSD1680_GATE_SCAN, driverOutput, sizeof(driverOutput));
 
-  /***** #3 *****/
+  // ===== Data Entry Mode =====
+  const uint8_t dataEntry = 0x03;
+  SSD1680_Send(hepd, SSD1680_DATA_ENTRY_MODE, &dataEntry, sizeof(dataEntry));
 
-  //const uint8_t gateVoltage[] = { 0x00 };
-  //SSD1680_Send(&hepd, SSD1680_GATE_VOLTAGE, gateVoltage, sizeof(gateVoltage));  // 0x03
-  //const uint8_t sourceVoltage[] = { 0x41, 0x48, 0x32 };
-  //SSD1680_Send(&hepd, SSD1680_SOURCE_VOLTAGE, sourceVoltage, sizeof(sourceVoltage));  // 0x04
-  //const uint8_t vcomVoltage[] = { 0x38 };
-  //SSD1680_Send(&hepd, SSD1680_VCOM_VOLTAGE, vcomVoltage, sizeof(vcomVoltage));  // 0x2C
+  // ===== RAM X Range ===== (關鍵修正!)
+  // 152 / 8 = 19,所以範圍是 0-18
+  uint8_t ramXRange[2];
+  ramXRange[0] = 1;
+  ramXRange[1] = (hepd -> Resolution_X / 8);  // 152/8-1 = 18
+  SSD1680_Send(hepd, SSD1680_RAM_X_RANGE, ramXRange, sizeof(ramXRange));
 
-  SSD1680_GateScanRange(hepd, 0, hepd->Resolution_Y);
+  // ===== RAM Y Range =====
+  uint8_t ramYRange[4];
+  ramYRange[0] = 0;
+  ramYRange[1] = 0;
+  ramYRange[2] = (hepd->Resolution_Y - 1) & 0xFF;        // 0x27
+  ramYRange[3] = ((hepd->Resolution_Y - 1) >> 8) & 0x01; // 0x01
+  SSD1680_Send(hepd, SSD1680_RAM_Y_RANGE, ramYRange, sizeof(ramYRange));
+
+  // ===== Set RAM address counter =====
+  uint8_t ramX = 0;
+  SSD1680_Send(hepd, SSD1680_RAM_X, &ramX, sizeof(ramX));
+
+  uint8_t ramY[2] = {0, 0};
+  SSD1680_Send(hepd, SSD1680_RAM_Y, ramY, sizeof(ramY));
+
+  // ===== Border Waveform Control =====
+  const uint8_t border = 0x05;  // White border
+  SSD1680_Send(hepd, SSD1680_BORDER, &border, sizeof(border));
+
+  // ===== Temperature Sensor =====
+  // 寫入溫度暫存器
+  const uint8_t temp[] = { 0x64 };
+  SSD1680_Send(hepd, SSD1680_WRITE_TEMP, temp, sizeof(temp));
+
+  // 載入溫度值
+  const uint8_t temp2[] = { 0x91 };
+  SSD1680_Send(hepd, SSD1680_UPDATE_CONTROL_2, temp2, sizeof(temp2));
+  SSD1680_Send(hepd, SSD1680_MASTER_ACTIVATION, NULL, 0);
+  SSD1680_Wait(hepd);
+
+  // ===== Display Update Control =====
   SSD1680_UpdateControl(hepd);
 
-  /***** #4 *****/
-  SSD1680_DataEntryMode(hepd, RightThenDown);
-
-  /***** #5 *****/
-  /* Use SD1680 internal temperature sensor */
-/*
-  const uint8_t tempSensor[] = { 0x80 };
-  SSD1680_Send(hepd, SSD1680_SELECT_TEMP_SENSOR, tempSensor, sizeof(tempSensor));    // 0x18
-*/
-
-  /* Load temperature value */
-/*
-  const uint8_t loadTemp[] = { 0xB1 };
-  SSD1680_Send(hepd, SSD1680_UPDATE_CONTROL_2, loadTemp, sizeof(loadTemp));	// 0x22
-  SSD1680_Send(hepd, SSD1680_MASTER_ACTIVATION, NULL, 0);	// 0x20
-  SSD1680_Wait(hepd);
-*/
-
-  /* Write temperature register */
-  const uint8_t temp[] = { 0x64 };
-  SSD1680_Send(hepd, SSD1680_WRITE_TEMP, temp, sizeof(temp)); // 0x1A
-
-  /* Load temperature value */
-  const uint8_t temp2[] = { 0x91 };
-  SSD1680_Send(hepd, SSD1680_UPDATE_CONTROL_2, temp2, sizeof(temp2));	// 0x22
-  SSD1680_Send(hepd, SSD1680_MASTER_ACTIVATION, NULL, 0);	// 0x20
-  SSD1680_Wait(hepd);
-
-#if defined(DEBUG)
-  if (hepd->LED_Port)
-    HAL_GPIO_WritePin(hepd->LED_Port, hepd->LED_Pin, GPIO_PIN_SET);
-#endif // DEBUG
+  #if defined(DEBUG)
+     if (hepd->LED_Port)
+      HAL_GPIO_WritePin(hepd->LED_Port, hepd->LED_Pin, GPIO_PIN_SET);
+  #endif
 }
 
 /**
@@ -279,8 +273,11 @@ void SSD1680_Init(SSD1680_HandleTypeDef *hepd) {
 HAL_StatusTypeDef SSD1680_RAMXRange(SSD1680_HandleTypeDef *hepd, const uint8_t left, const uint8_t width) {
   if (left % 8 + width % 8)
     return HAL_ERROR;
-  const uint8_t ramXRange[] = { left / 8, (left + width) / 8 - 1};
-  return SSD1680_Send(hepd, SSD1680_RAM_X_RANGE, ramXRange, sizeof(ramXRange));   // 0x44
+  uint8_t start = (left / 8) + 1;
+  uint8_t end = ((left + width) / 8); // 簡化後就是 (left+width)/8
+
+  const uint8_t ramXRange[] = { start, end };
+  return SSD1680_Send(hepd, SSD1680_RAM_X_RANGE, ramXRange, sizeof(ramXRange));  // 0x44
 }
 
 /**
@@ -435,7 +432,7 @@ uint16_t SSD1680_ReadTemp(SSD1680_HandleTypeDef *hepd) {
  */
 HAL_StatusTypeDef SSD1680_ResetRange(SSD1680_HandleTypeDef *hepd) {
   HAL_StatusTypeDef status = HAL_OK;
-  if ((status = SSD1680_RAMXRange(hepd, 0, hepd->Resolution_X / 8)))
+  if ((status = SSD1680_RAMXRange(hepd, 0, hepd->Resolution_X)))
     return status;
   if ((status = SSD1680_RAMYRange(hepd, 0, hepd->Resolution_Y)))
     return status;
@@ -456,7 +453,7 @@ HAL_StatusTypeDef SSD1680_StartAddress(SSD1680_HandleTypeDef *hepd, const uint8_
   if (x % 8)
     return HAL_ERROR;
   HAL_StatusTypeDef status = HAL_OK;
-  const uint8_t xaddr = x / 8;
+  const uint8_t xaddr = x / 8 + 1;
   if ((status = SSD1680_Send(hepd, SSD1680_RAM_X, &xaddr, sizeof(xaddr))))   // 0x4E
     return status;
   if ((status = SSD1680_Send(hepd, SSD1680_RAM_Y, (uint8_t *)&y, sizeof(y))))   // 0x4F
@@ -673,6 +670,19 @@ HAL_StatusTypeDef SSD1680_VerticalText(SSD1680_HandleTypeDef *hepd, const uint8_
     }
   }
   return HAL_OK;
+}
+
+HAL_StatusTypeDef SSD1680_DrawBitmap(SSD1680_HandleTypeDef *hepd, const uint8_t x, const uint16_t y, const uint8_t *pData_k, const uint8_t width, const uint16_t height)
+{
+    HAL_StatusTypeDef status = HAL_OK;
+
+    status = SSD1680_SetRegion(hepd, x, y, width, height, pData_k, NULL);
+    if (status != HAL_OK)
+    {
+        return status;
+    }
+
+    return SSD1680_Refresh(hepd, FullRefresh);
 }
 
 /*

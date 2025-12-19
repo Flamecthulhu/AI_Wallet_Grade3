@@ -28,6 +28,8 @@
 #include "stm32h7xx_hal.h"
 #include "SSD1680.h"
 #include "fonts.h"
+
+#include "interfacev.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -73,11 +75,14 @@ static void MX_UART5_Init(void);
 static void MX_UART7_Init(void);
 static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
-void parse_gpgga(char *line);
+void parse_gpgga(uint8_t *line);
 void HM10_Process(uint8_t byte);
-static void MX_SSD1680_Init(void);
+void Handle_BT_Command(char* cmd);
+
 SPI_HandleTypeDef hspi1;
 SSD1680_HandleTypeDef hepd;
+
+static void MX_SSD1680_Init(void);
 
 /* USER CODE END PFP */
 
@@ -87,12 +92,26 @@ SSD1680_HandleTypeDef hepd;
 
 uint16_t idx = 0;
 uint8_t BTBuffer[1];
-uint16_t wf_idx = 0;
-uint8_t WFBuffer[16];
-char GPSBuffer[128];
 
-static char btrecv[32];
-static uint8_t ptr = 0;
+#define WIFI_BUF_SIZE 512
+static uint8_t WFBuffer[WIFI_BUF_SIZE];
+static uint16_t wf_idx = 0;
+
+uint8_t GPSBuffer[128];
+
+typedef struct {
+    char ssid[32];
+    int8_t rssi;
+} WiFiInfo;
+
+#define MAX_WIFI_COUNT 5
+static WiFiInfo wifi_list[MAX_WIFI_COUNT];
+static uint8_t wifi_count = 0;
+
+#define BT_BUF_SIZE 16
+static char btrecv[BT_BUF_SIZE];
+static uint8_t bt_idx = 0;
+
 char parts[15][16];
 /* USER CODE END 0 */
 
@@ -137,16 +156,19 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   MX_SSD1680_Init();
+
   SSD1680_Border(&hepd, ColorWhite);
   SSD1680_Clear(&hepd, ColorWhite);
+  SSD1680_Refresh(&hepd, FullRefresh);
 
   uint8_t scale[176 / 8 * 4 ] = {
-	  0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55,
-	  0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F,
-	  0x7F, 0xFF, 0x7F, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0x7F, 0x7F,
+      0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55,
+      0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F,
+      0x7F, 0xFF, 0x7F, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0x7F, 0x7F,
       0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
-  };
-  SSD1680_SetRegion(&hepd, 0, 0, 176, 4, scale, NULL);
+    };
+
+  SSD1680_SetRegion(&hepd, 0, 0, 152, 4, scale, NULL);
 
   SSD1680_Text(&hepd, 0, 16, "Font 8x8", &cp866_8x8);
   SSD1680_Text(&hepd, 0, 24, "Font 8x14", &cp866_8x14);
@@ -159,6 +181,9 @@ int main(void)
   HAL_NVIC_SetPriority(TIM2_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(TIM2_IRQn);
   HAL_TIM_Base_Start_IT(&htim2);
+
+  HAL_NVIC_SetPriority(UART5_IRQn, 1, 0);
+  HAL_NVIC_EnableIRQ(UART5_IRQn);
 
   typedef struct
   {
@@ -177,7 +202,8 @@ int main(void)
       {WF_LED_GPIO_Port,   WF_LED_Pin,   GPIO_PIN_SET},
       {STA_LED_GPIO_Port,  STA_LED_Pin,  GPIO_PIN_SET},
       {EC_LED_GPIO_Port,   EC_LED_Pin,   GPIO_PIN_SET},
-      {EC_RELAY_GPIO_Port, EC_RELAY_Pin, GPIO_PIN_RESET}
+      {EC_RELAY_GPIO_Port, EC_RELAY_Pin, GPIO_PIN_RESET},
+	  {EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET}
   };
 
   for (int i = 0; i < sizeof(list)/sizeof(list[0]); i++)
@@ -193,16 +219,29 @@ int main(void)
   HAL_UART_Receive_IT(&huart7, (uint8_t*)GPSBuffer, 1);
 
   uint8_t msg[] = "STM32 is now on\n";
+
   HAL_UART_Transmit(&huart2, msg, sizeof(msg)-1, 1000);
 
-  SSD1680_Clear(&hepd, ColorWhite);
 
-  SSD1680_Text(&hepd, 0, 0, "Hello World!", &cp866_8x8);
+  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
+  SSD1680_Clear(&hepd, ColorWhite);
+  SSD1680_DrawBitmap(&hepd, 0, 0, startupv, 152, 296);
   SSD1680_Refresh(&hepd, FullRefresh);
+  HAL_Delay(2000);
+  SSD1680_DrawBitmap(&hepd, 0, 0, einvoicev, 152, 296);
+  HAL_Delay(1000);
+  SSD1680_DrawBitmap(&hepd, 0, 0, easycardv, 152, 296);
+  HAL_Delay(1000);
+  SSD1680_DrawBitmap(&hepd, 0, 0, exhomescreen, 152, 296);
+  HAL_Delay(1000);
+  SSD1680_DrawBitmap(&hepd, 0, 0, extra, 152, 296);
+  HAL_Delay(1000);
+  SSD1680_DrawBitmap(&hepd, 0, 0, exthsr, 152, 296);
+  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
   while (1)
   {
     /* USER CODE END WHILE */
-
+	  //Nothing here
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -289,13 +328,12 @@ static void MX_SPI1_Init(void)
   hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
-  hspi1.Init.NSS = SPI_NSS_HARD_OUTPUT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi1.Init.NSS = SPI_NSS_SOFT;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_128;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
-  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_ENABLE;
-  hspi1.Init.CRCPolynomial = 0x107;
-  hspi1.Init.CRCLength = SPI_CRC_LENGTH_DATASIZE;
+  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi1.Init.CRCPolynomial = 0x0;
   hspi1.Init.NSSPMode = SPI_NSS_PULSE_ENABLE;
   hspi1.Init.NSSPolarity = SPI_NSS_POLARITY_LOW;
   hspi1.Init.FifoThreshold = SPI_FIFO_THRESHOLD_01DATA;
@@ -630,6 +668,9 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, GPS_RLED_Pin|GPS_GLED_Pin, GPIO_PIN_RESET);
 
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
+
   /*Configure GPIO pins : STA_LED_Pin WF_LED_Pin BT_RLED_Pin BT_BLED_Pin
                            EC_RELAY_Pin EC_LED_Pin EPD_RST_Pin EPD_DC_Pin */
   GPIO_InitStruct.Pin = STA_LED_Pin|WF_LED_Pin|BT_RLED_Pin|BT_BLED_Pin
@@ -659,6 +700,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : EPD_EN_Pin */
+  GPIO_InitStruct.Pin = EPD_EN_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(EPD_EN_GPIO_Port, &GPIO_InitStruct);
+
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
   /* USER CODE END MX_GPIO_Init_2 */
@@ -677,7 +725,8 @@ static void MX_SSD1680_Init(void)
     hepd.BUSY_Port  = EPD_BUSY_GPIO_Port;
     hepd.BUSY_Pin   = EPD_BUSY_Pin;
     hepd.Color_Depth = 1;
-    hepd.Scan_Mode  = NarrowScan;
+    hepd.SPI_Timeout = 100;
+    hepd.Scan_Mode  = WideScan;
     hepd.Resolution_X = 152;
     hepd.Resolution_Y = 296;
 
@@ -698,10 +747,51 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     	HAL_UART_Transmit(&huart2, WFBuffer, 1, 100);
 		HAL_UART_Receive_IT(&huart5, WFBuffer, 1);
 
+		uint8_t byte = WFBuffer[wf_idx];
+
+		// Debug: 顯示原始數據
+		#if DEBUG_MODE
+			if (byte >= ' ' && byte <= '~')
+			{
+				HAL_UART_Transmit(&huart2, &byte, 1, 10);
+			}
+			else if (byte == '\r')
+			{
+				uint8_t cr[] = "<CR>";
+				HAL_UART_Transmit(&huart2, cr, 4, 10);
+			}
+			else if (byte == '\n')
+			{
+				uint8_t lf[] = "<LF>\r\n";
+				HAL_UART_Transmit(&huart2, lf, 6, 10);
+			}
+		#endif
+
+		if (wf_idx < WIFI_BUF_SIZE - 1)
+		{
+			wf_idx++;
+		}
+		else
+		{
+			Process_WiFi_Data();
+		}
+
+		// 檢查是否收到完整回應 (以 "OK" 結尾)
+		if (wf_idx >= 2 &&
+			WFBuffer[wf_idx-2] == 'O' &&
+			WFBuffer[wf_idx-1] == 'K')
+		{
+			Process_WiFi_Data();
+		}
+
+		HAL_UART_Receive_IT(&huart5, &WFBuffer[wf_idx], 1);
+
     }
 
     else if (huart->Instance == UART7) // GPS
     {
+    	//HAL_UART_Transmit(&huart2, GPSBuffer, 1, 100);
+    	HAL_UART_Receive_IT(&huart7, GPSBuffer, 1);
         static uint8_t rx_byte;
         rx_byte = GPSBuffer[0];
 
@@ -731,7 +821,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     }
 }
 
-void parse_gpgga(char *line)
+void parse_gpgga(uint8_t *line)
 {
     if (strncmp(line, "$GPGGA", 6) != 0 && strncmp(line, "$GNGGA", 6) != 0)
     {
@@ -804,44 +894,275 @@ void parse_gpgga(char *line)
     #endif
 }
 
+void Handle_BT_Command(char* cmd)
+{
+    #if DEBUG_MODE
+        char msg[64];
+        int len = snprintf(msg, sizeof(msg), "\r\n[CMD] %s\r\n", cmd);
+        HAL_UART_Transmit(&huart2, (uint8_t*)msg, len, 100);
+    #endif
+
+    if (strcmp(cmd, "relay") == 0)
+    {
+        HAL_GPIO_TogglePin(EC_RELAY_GPIO_Port, EC_RELAY_Pin);
+        HAL_GPIO_TogglePin(EC_LED_GPIO_Port, EC_LED_Pin);
+    }
+    else if (strcmp(cmd, "cls") == 0)
+    {
+        SSD1680_Clear(&hepd, ColorWhite);
+        SSD1680_Refresh(&hepd, FullRefresh);
+    }
+    else if (strcmp(cmd, "test") == 0)
+    {
+        SSD1680_Clear(&hepd, ColorWhite);
+        SSD1680_Text(&hepd, 0, 0, "BT Test OK", &cp866_8x8);
+        SSD1680_Refresh(&hepd, FullRefresh);
+    }
+}
+
 void HM10_Process(uint8_t byte)
 {
-	btrecv[ptr++] = byte;
-	if (ptr >= sizeof(btrecv)-1) ptr = 0;
-	btrecv[ptr] = 0;
+    // Debug: 顯示接收到的字符
+    #if DEBUG_MODE
+        HAL_UART_Transmit(&huart2, &byte, 1, 10);
+    #endif
 
-	if (strstr(btrecv, "OK+CONN")) {
-		HAL_GPIO_WritePin(BT_BLED_GPIO_Port, BT_BLED_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(BT_RLED_GPIO_Port, BT_RLED_Pin, GPIO_PIN_SET);
-		ptr = 0;
-	}
+    // 加入緩衝區
+    if (bt_idx < BT_BUF_SIZE - 1)
+    {
+        btrecv[bt_idx++] = byte;
+        btrecv[bt_idx] = '\0';
+    }
+    else
+    {
+        // 滿了就重置
+        bt_idx = 0;
+        btrecv[0] = byte;
+        btrecv[1] = '\0';
+        bt_idx = 1;
+    }
 
-	else if (strstr(btrecv, "OK+LOST")) {
-		HAL_GPIO_WritePin(BT_BLED_GPIO_Port, BT_BLED_Pin, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(BT_RLED_GPIO_Port, BT_RLED_Pin, GPIO_PIN_RESET);
-		ptr = 0;
-	}
+    // 檢查是否包含關鍵字（滑動窗口檢查）
+    // 只檢查最後收到的部分
 
-	else
-	{
-		#if DEBUG_MODE
-			HAL_UART_Transmit(&huart2, (uint8_t*)btrecv, ptr, 100);
-		#endif
-	}
+    // 方法：檢查緩衝區中是否出現 "CONN" 或 "LOST"
+    if (strstr(btrecv, "CONN") != NULL)
+    {
+        // 連接成功
+        HAL_GPIO_WritePin(BT_BLED_GPIO_Port, BT_BLED_Pin, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(BT_RLED_GPIO_Port, BT_RLED_Pin, GPIO_PIN_SET);
+
+        #if DEBUG_MODE
+            uint8_t msg[] = "\r\n[BT] Connected\r\n";
+            HAL_UART_Transmit(&huart2, msg, sizeof(msg)-1, 100);
+        #endif
+
+        // 清空
+        bt_idx = 0;
+        memset(btrecv, 0, BT_BUF_SIZE);
+    }
+    else if (strstr(btrecv, "LOST") != NULL)
+    {
+        // 連接斷開
+        HAL_GPIO_WritePin(BT_BLED_GPIO_Port, BT_BLED_Pin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(BT_RLED_GPIO_Port, BT_RLED_Pin, GPIO_PIN_RESET);
+
+        #if DEBUG_MODE
+            uint8_t msg[] = "\r\n[BT] Disconnected\r\n";
+            HAL_UART_Transmit(&huart2, msg, sizeof(msg)-1, 100);
+        #endif
+
+        // 清空
+        bt_idx = 0;
+        memset(btrecv, 0, BT_BUF_SIZE);
+    }
+
+    // 處理用戶指令（換行結束）
+    if (byte == '\n' || byte == '\r')
+    {
+        if (bt_idx > 1 && strstr(btrecv, "OK") == NULL)
+        {
+            // 不是 HM-10 狀態訊息，是用戶指令
+            // 移除換行符
+            while (bt_idx > 0 && (btrecv[bt_idx-1] == '\r' || btrecv[bt_idx-1] == '\n'))
+            {
+                btrecv[--bt_idx] = '\0';
+            }
+
+            if (bt_idx > 0)
+            {
+                Handle_BT_Command(btrecv);
+            }
+        }
+
+        // 清空緩衝區
+        bt_idx = 0;
+        memset(btrecv, 0, BT_BUF_SIZE);
+    }
 }
+
+void Parse_WiFi_Line(char* line)
+{
+    // 格式: +CWLAP:(3,"2F_Office_2.4G",-57,"58:11:22:61:d6:80",1,-29,0,4,4,7,1)
+    //              ↑   ↑               ↑
+    //              加密 SSID            RSSI
+
+    char* ssid_start = strchr(line, '"');
+    if (!ssid_start) return;
+    ssid_start++; // 跳過第一個 "
+
+    char* ssid_end = strchr(ssid_start, '"');
+    if (!ssid_end) return;
+
+    // 提取 SSID
+    size_t ssid_len = ssid_end - ssid_start;
+    if (ssid_len > 31) ssid_len = 31;
+
+    char ssid[32];
+    strncpy(ssid, ssid_start, ssid_len);
+    ssid[ssid_len] = '\0';
+
+    // 找到 RSSI (在第一個逗號之後)
+    char* rssi_start = strchr(ssid_end, ',');
+    if (!rssi_start) return;
+    rssi_start++; // 跳過逗號
+
+    int8_t rssi = atoi(rssi_start);
+
+    // 檢查是否已存在
+    for (int i = 0; i < wifi_count; i++)
+    {
+        if (strcmp(wifi_list[i].ssid, ssid) == 0)
+        {
+            // 更新 RSSI（取較強的）
+            if (rssi > wifi_list[i].rssi)
+            {
+                wifi_list[i].rssi = rssi;
+            }
+            return;
+        }
+    }
+
+    // 加入新的 WiFi
+    if (wifi_count < MAX_WIFI_COUNT)
+    {
+        strncpy(wifi_list[wifi_count].ssid, ssid, 31);
+        wifi_list[wifi_count].ssid[31] = '\0';
+        wifi_list[wifi_count].rssi = rssi;
+        wifi_count++;
+    }
+}
+
+// 顯示 WiFi 列表
+void Display_WiFi_List(void)
+{
+    if (wifi_count == 0)
+    {
+        #if DEBUG_MODE
+            uint8_t msg[] = "No WiFi found\r\n";
+            HAL_UART_Transmit(&huart2, msg, sizeof(msg)-1, 100);
+        #endif
+        return;
+    }
+
+    #if DEBUG_MODE
+        char msg[128];
+        int len = snprintf(msg, sizeof(msg), "\r\n=== WiFi Scan (%d networks) ===\r\n", wifi_count);
+        HAL_UART_Transmit(&huart2, (uint8_t*)msg, len, 100);
+
+        for (int i = 0; i < wifi_count; i++)
+        {
+            len = snprintf(msg, sizeof(msg), "%d. %s: %d dBm\r\n",
+                          i+1, wifi_list[i].ssid, wifi_list[i].rssi);
+            HAL_UART_Transmit(&huart2, (uint8_t*)msg, len, 100);
+        }
+
+        uint8_t end[] = "============================\r\n\r\n";
+        HAL_UART_Transmit(&huart2, end, sizeof(end)-1, 100);
+    #endif
+
+    // 可選：顯示在 E-Paper 上
+    // SSD1680_Clear(&hepd, ColorWhite);
+    // char display_text[64];
+    // for (int i = 0; i < wifi_count && i < 3; i++)
+    // {
+    //     snprintf(display_text, sizeof(display_text), "%s: %ddBm",
+    //              wifi_list[i].ssid, wifi_list[i].rssi);
+    //     SSD1680_Text(&hepd, 0, i*16, display_text, &cp866_8x8);
+    // }
+    // SSD1680_Refresh(&hepd, FullRefresh);
+}
+
+// 處理 WiFi 數據
+void Process_WiFi_Data(void)
+{
+    // 將緩衝區轉為字串
+    WFBuffer[wf_idx] = '\0';
+
+    // 解析每一行
+    char* line_start = (char*)WFBuffer;
+    char* line_end;
+
+    while ((line_end = strchr(line_start, '\n')) != NULL)
+    {
+        *line_end = '\0'; // 結束當前行
+
+        // 檢查是否為 CWLAP 回應
+        if (strstr(line_start, "+CWLAP:") != NULL)
+        {
+            #if DEBUG_MODE
+                char msg[128];
+                int len = snprintf(msg, sizeof(msg), "WiFi: %s\r\n", line_start);
+                HAL_UART_Transmit(&huart2, (uint8_t*)msg, len, 100);
+            #endif
+
+            Parse_WiFi_Line(line_start);
+        }
+        else if (strstr(line_start, "OK") != NULL)
+        {
+            // 掃描完成，顯示結果
+            Display_WiFi_List();
+
+            // 清空列表準備下次掃描
+            wifi_count = 0;
+            memset(wifi_list, 0, sizeof(wifi_list));
+        }
+
+        line_start = line_end + 1;
+    }
+
+    // 清空緩衝區
+    wf_idx = 0;
+    memset(WFBuffer, 0, WIFI_BUF_SIZE);
+}
+
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-    if(htim->Instance == TIM2)
-    {
+	if(htim->Instance == TIM1)
+	{
+		HAL_GPIO_TogglePin(STA_LED_GPIO_Port, STA_LED_Pin);
+	}
+	else if(htim->Instance == TIM2)
+	{
+		// WiFi 掃描
 		#if DEBUG_MODE
-    		uint8_t text[] = "Sending command to ESP01s\n";
+			uint8_t text[] = "\r\n>>> Starting WiFi Scan <<<\r\n";
 			HAL_UART_Transmit(&huart2, text, sizeof(text)-1, 100);
-			uint8_t cmd[] = "AT+CWLAP\r\n";
-			HAL_UART_Transmit(&huart5, cmd, sizeof(cmd)-1, 100);
 		#endif
+
+		// 清空舊數據
+		wf_idx = 0;
+		wifi_count = 0;
+		memset(WFBuffer, 0, WIFI_BUF_SIZE);
+		memset(wifi_list, 0, sizeof(wifi_list));
+
+		// 發送掃描指令
+		uint8_t cmd[] = "AT+CWLAP\r\n";
+		HAL_UART_Transmit(&huart5, cmd, sizeof(cmd)-1, 100);
+
 		HAL_GPIO_TogglePin(WF_LED_GPIO_Port, WF_LED_Pin);
-    }
+	}
 }
 
 /* USER CODE END 4 */

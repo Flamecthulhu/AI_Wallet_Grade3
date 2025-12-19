@@ -1080,7 +1080,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(property "Reference" "STM32H7XX_M"
-			(at 0 -5.588 0)
+			(at -43.18 17.272 0)
 			(effects
 				(font
 					(size 5.08 5.08)
@@ -1089,7 +1089,7 @@
 			)
 		)
 		(property "Value" "STM32H7xx Dev Board"
-			(at 0 2.032 0)
+			(at -43.18 24.892 0)
 			(effects
 				(font
 					(size 2.54 2.54)
@@ -1097,7 +1097,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 0 0 0)
+			(at -43.18 22.86 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1106,7 +1106,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 0 0 0)
+			(at -43.18 22.86 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1115,7 +1115,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 0 0 0)
+			(at -43.18 22.86 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1125,8 +1125,8 @@
 		)
 		(symbol "STM32H7_Dev_Board_0_1"
 			(rectangle
-				(start -48.26 25.4)
-				(end 49.53 -25.4)
+				(start -91.44 48.26)
+				(end 6.35 -2.54)
 				(stroke
 					(width 0)
 					(type default)
@@ -1136,8 +1136,8 @@
 				)
 			)
 			(rectangle
-				(start 40.64 31.75)
-				(end 40.64 31.75)
+				(start -2.54 54.61)
+				(end -2.54 54.61)
 				(stroke
 					(width 0)
 					(type default)
@@ -1149,7 +1149,7 @@
 		)
 		(symbol "STM32H7_Dev_Board_1_1"
 			(pin bidirectional line
-				(at -50.8 19.05 0)
+				(at -93.98 41.91 0)
 				(length 2.54)
 				(name "PD15"
 					(effects
@@ -1158,7 +1158,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "63"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1167,7 +1167,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -50.8 16.51 0)
+				(at -93.98 39.37 0)
 				(length 2.54)
 				(name "PD14"
 					(effects
@@ -1176,7 +1176,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "62"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1185,7 +1185,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -50.8 13.97 0)
+				(at -93.98 36.83 0)
 				(length 2.54)
 				(name "PD13"
 					(effects
@@ -1194,7 +1194,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "61"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1203,7 +1203,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -50.8 11.43 0)
+				(at -93.98 34.29 0)
 				(length 2.54)
 				(name "PD12"
 					(effects
@@ -1212,7 +1212,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "60"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1221,7 +1221,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -50.8 8.89 0)
+				(at -93.98 31.75 0)
 				(length 2.54)
 				(name "PD11"
 					(effects
@@ -1230,7 +1230,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "59"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1239,7 +1239,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -50.8 6.35 0)
+				(at -93.98 29.21 0)
 				(length 2.54)
 				(name "PD10"
 					(effects
@@ -1248,7 +1248,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "58"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1257,7 +1257,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -50.8 3.81 0)
+				(at -93.98 26.67 0)
 				(length 2.54)
 				(name "PD9"
 					(effects
@@ -1266,7 +1266,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "57"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1275,7 +1275,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -50.8 1.27 0)
+				(at -93.98 24.13 0)
 				(length 2.54)
 				(name "PD8"
 					(effects
@@ -1284,7 +1284,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "56"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1293,7 +1293,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -50.8 -1.27 0)
+				(at -93.98 21.59 0)
 				(length 2.54)
 				(name "PD7"
 					(effects
@@ -1302,7 +1302,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "55"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1311,7 +1311,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -50.8 -3.81 0)
+				(at -93.98 19.05 0)
 				(length 2.54)
 				(name "PD6"
 					(effects
@@ -1320,7 +1320,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "54"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1329,7 +1329,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -50.8 -6.35 0)
+				(at -93.98 16.51 0)
 				(length 2.54)
 				(name "PD5"
 					(effects
@@ -1338,7 +1338,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "53"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1347,7 +1347,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -50.8 -8.89 0)
+				(at -93.98 13.97 0)
 				(length 2.54)
 				(name "PD4"
 					(effects
@@ -1356,7 +1356,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "52"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1365,7 +1365,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -50.8 -11.43 0)
+				(at -93.98 11.43 0)
 				(length 2.54)
 				(name "PD3"
 					(effects
@@ -1374,7 +1374,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "51"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1383,7 +1383,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -50.8 -13.97 0)
+				(at -93.98 8.89 0)
 				(length 2.54)
 				(name "PD2"
 					(effects
@@ -1392,7 +1392,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "50"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1401,7 +1401,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -50.8 -16.51 0)
+				(at -93.98 6.35 0)
 				(length 2.54)
 				(name "PD1"
 					(effects
@@ -1410,7 +1410,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "49"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1419,7 +1419,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -50.8 -19.05 0)
+				(at -93.98 3.81 0)
 				(length 2.54)
 				(name "PD0"
 					(effects
@@ -1428,7 +1428,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "48"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1437,7 +1437,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -39.37 -27.94 90)
+				(at -82.55 -5.08 90)
 				(length 2.54)
 				(name "PC15"
 					(effects
@@ -1446,7 +1446,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "47"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1455,7 +1455,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -38.1 27.94 270)
+				(at -81.28 50.8 270)
 				(length 2.54)
 				(name "PE0"
 					(effects
@@ -1464,7 +1464,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "64"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1473,7 +1473,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -36.83 -27.94 90)
+				(at -80.01 -5.08 90)
 				(length 2.54)
 				(name "PC14"
 					(effects
@@ -1482,7 +1482,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "46"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1491,7 +1491,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -35.56 27.94 270)
+				(at -78.74 50.8 270)
 				(length 2.54)
 				(name "PE1"
 					(effects
@@ -1500,7 +1500,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "65"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1509,7 +1509,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -34.29 -27.94 90)
+				(at -77.47 -5.08 90)
 				(length 2.54)
 				(name "PC13"
 					(effects
@@ -1518,7 +1518,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "45"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1527,7 +1527,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -33.02 27.94 270)
+				(at -76.2 50.8 270)
 				(length 2.54)
 				(name "PE2"
 					(effects
@@ -1536,7 +1536,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "66"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1545,7 +1545,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -31.75 -27.94 90)
+				(at -74.93 -5.08 90)
 				(length 2.54)
 				(name "PC12"
 					(effects
@@ -1554,7 +1554,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "44"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1563,7 +1563,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -30.48 27.94 270)
+				(at -73.66 50.8 270)
 				(length 2.54)
 				(name "PE3"
 					(effects
@@ -1572,7 +1572,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "67"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1581,7 +1581,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -29.21 -27.94 90)
+				(at -72.39 -5.08 90)
 				(length 2.54)
 				(name "PC11"
 					(effects
@@ -1590,7 +1590,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "43"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1599,7 +1599,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -27.94 27.94 270)
+				(at -71.12 50.8 270)
 				(length 2.54)
 				(name "PE4"
 					(effects
@@ -1608,7 +1608,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "68"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1617,7 +1617,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -26.67 -27.94 90)
+				(at -69.85 -5.08 90)
 				(length 2.54)
 				(name "PC10"
 					(effects
@@ -1626,7 +1626,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "42"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1635,7 +1635,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -25.4 27.94 270)
+				(at -68.58 50.8 270)
 				(length 2.54)
 				(name "PE5"
 					(effects
@@ -1644,7 +1644,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "69"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1653,7 +1653,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -24.13 -27.94 90)
+				(at -67.31 -5.08 90)
 				(length 2.54)
 				(name "PC9"
 					(effects
@@ -1662,7 +1662,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "41"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1671,7 +1671,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -22.86 27.94 270)
+				(at -66.04 50.8 270)
 				(length 2.54)
 				(name "PE6"
 					(effects
@@ -1680,7 +1680,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "70"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1689,7 +1689,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -21.59 -27.94 90)
+				(at -64.77 -5.08 90)
 				(length 2.54)
 				(name "PC8"
 					(effects
@@ -1698,7 +1698,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "40"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1707,7 +1707,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -20.32 27.94 270)
+				(at -63.5 50.8 270)
 				(length 2.54)
 				(name "PE7"
 					(effects
@@ -1716,7 +1716,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "71"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1725,7 +1725,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -19.05 -27.94 90)
+				(at -62.23 -5.08 90)
 				(length 2.54)
 				(name "PC7"
 					(effects
@@ -1734,7 +1734,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "39"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1743,7 +1743,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -17.78 27.94 270)
+				(at -60.96 50.8 270)
 				(length 2.54)
 				(name "PE8"
 					(effects
@@ -1752,7 +1752,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "72"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1761,7 +1761,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -16.51 -27.94 90)
+				(at -59.69 -5.08 90)
 				(length 2.54)
 				(name "PC6"
 					(effects
@@ -1770,7 +1770,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "38"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1779,7 +1779,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -15.24 27.94 270)
+				(at -58.42 50.8 270)
 				(length 2.54)
 				(name "PE9"
 					(effects
@@ -1788,7 +1788,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "73"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1797,7 +1797,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -13.97 -27.94 90)
+				(at -57.15 -5.08 90)
 				(length 2.54)
 				(name "PC5"
 					(effects
@@ -1806,7 +1806,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "37"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1815,7 +1815,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -12.7 27.94 270)
+				(at -55.88 50.8 270)
 				(length 2.54)
 				(name "PE10"
 					(effects
@@ -1824,7 +1824,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "74"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1833,7 +1833,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -11.43 -27.94 90)
+				(at -54.61 -5.08 90)
 				(length 2.54)
 				(name "PC4"
 					(effects
@@ -1842,7 +1842,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "36"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1851,7 +1851,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -10.16 27.94 270)
+				(at -53.34 50.8 270)
 				(length 2.54)
 				(name "PE11"
 					(effects
@@ -1860,7 +1860,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "75"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1869,7 +1869,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -8.89 -27.94 90)
+				(at -52.07 -5.08 90)
 				(length 2.54)
 				(name "PC3"
 					(effects
@@ -1878,7 +1878,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "35"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1887,7 +1887,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -7.62 27.94 270)
+				(at -50.8 50.8 270)
 				(length 2.54)
 				(name "PE12"
 					(effects
@@ -1896,7 +1896,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "76"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1905,7 +1905,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -6.35 -27.94 90)
+				(at -49.53 -5.08 90)
 				(length 2.54)
 				(name "PC2"
 					(effects
@@ -1914,7 +1914,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "34"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1923,7 +1923,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -5.08 27.94 270)
+				(at -48.26 50.8 270)
 				(length 2.54)
 				(name "PE13"
 					(effects
@@ -1932,7 +1932,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "77"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1941,7 +1941,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -3.81 -27.94 90)
+				(at -46.99 -5.08 90)
 				(length 2.54)
 				(name "PC1"
 					(effects
@@ -1950,7 +1950,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "33"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1959,7 +1959,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -2.54 27.94 270)
+				(at -45.72 50.8 270)
 				(length 2.54)
 				(name "PE14"
 					(effects
@@ -1968,7 +1968,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "78"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1977,7 +1977,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at -1.27 -27.94 90)
+				(at -44.45 -5.08 90)
 				(length 2.54)
 				(name "PC0"
 					(effects
@@ -1986,7 +1986,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "32"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1995,7 +1995,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 0 27.94 270)
+				(at -43.18 50.8 270)
 				(length 2.54)
 				(name "PE15"
 					(effects
@@ -2004,7 +2004,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "79"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2013,7 +2013,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 5.08 -27.94 90)
+				(at -38.1 -5.08 90)
 				(length 2.54)
 				(name "PB15"
 					(effects
@@ -2022,7 +2022,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "31"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2031,7 +2031,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 7.62 -27.94 90)
+				(at -35.56 -5.08 90)
 				(length 2.54)
 				(name "PB14"
 					(effects
@@ -2040,7 +2040,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "30"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2049,7 +2049,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 8.89 27.94 270)
+				(at -34.29 50.8 270)
 				(length 2.54)
 				(name "VREF"
 					(effects
@@ -2058,7 +2058,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "80"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2067,7 +2067,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 10.16 -27.94 90)
+				(at -33.02 -5.08 90)
 				(length 2.54)
 				(name "PB13"
 					(effects
@@ -2076,7 +2076,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "29"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2085,7 +2085,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 11.43 27.94 270)
+				(at -31.75 50.8 270)
 				(length 2.54)
 				(name "VDDA"
 					(effects
@@ -2094,7 +2094,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "81"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2103,7 +2103,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 12.7 -27.94 90)
+				(at -30.48 -5.08 90)
 				(length 2.54)
 				(name "PB12"
 					(effects
@@ -2112,7 +2112,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "28"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2121,7 +2121,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 13.97 27.94 270)
+				(at -29.21 50.8 270)
 				(length 2.54)
 				(name "VBAT"
 					(effects
@@ -2130,7 +2130,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "82"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2139,7 +2139,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 15.24 -27.94 90)
+				(at -27.94 -5.08 90)
 				(length 2.54)
 				(name "PB11"
 					(effects
@@ -2148,7 +2148,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "27"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2157,7 +2157,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 16.51 27.94 270)
+				(at -26.67 50.8 270)
 				(length 2.54)
 				(name "3v3"
 					(effects
@@ -2166,7 +2166,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "83"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2175,7 +2175,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 17.78 -27.94 90)
+				(at -25.4 -5.08 90)
 				(length 2.54)
 				(name "PB10"
 					(effects
@@ -2184,7 +2184,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "26"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2193,7 +2193,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 19.05 27.94 270)
+				(at -24.13 50.8 270)
 				(length 2.54)
 				(name "5v"
 					(effects
@@ -2202,7 +2202,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "84"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2211,7 +2211,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 20.32 -27.94 90)
+				(at -22.86 -5.08 90)
 				(length 2.54)
 				(name "PB9"
 					(effects
@@ -2220,7 +2220,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "25"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2229,7 +2229,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 21.59 27.94 270)
+				(at -21.59 50.8 270)
 				(length 2.54)
 				(name "GND"
 					(effects
@@ -2238,7 +2238,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "85"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2247,7 +2247,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 22.86 -27.94 90)
+				(at -20.32 -5.08 90)
 				(length 2.54)
 				(name "PB8"
 					(effects
@@ -2256,7 +2256,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "24"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2265,7 +2265,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 25.4 -27.94 90)
+				(at -17.78 -5.08 90)
 				(length 2.54)
 				(name "PB7"
 					(effects
@@ -2274,7 +2274,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "23"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2283,7 +2283,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 27.94 -27.94 90)
+				(at -15.24 -5.08 90)
 				(length 2.54)
 				(name "PB6"
 					(effects
@@ -2292,7 +2292,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "22"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2301,7 +2301,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 30.48 27.94 270)
+				(at -12.7 50.8 270)
 				(length 2.54)
 				(name "BT0"
 					(effects
@@ -2310,7 +2310,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "86"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2319,7 +2319,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 30.48 -27.94 90)
+				(at -12.7 -5.08 90)
 				(length 2.54)
 				(name "PB5"
 					(effects
@@ -2328,7 +2328,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "21"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2337,7 +2337,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 33.02 27.94 270)
+				(at -10.16 50.8 270)
 				(length 2.54)
 				(name "3v3"
 					(effects
@@ -2346,7 +2346,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "87"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2355,7 +2355,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 33.02 -27.94 90)
+				(at -10.16 -5.08 90)
 				(length 2.54)
 				(name "PB4"
 					(effects
@@ -2364,7 +2364,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "20"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2373,7 +2373,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 35.56 27.94 270)
+				(at -7.62 50.8 270)
 				(length 2.54)
 				(name "GND"
 					(effects
@@ -2382,7 +2382,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "88"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2391,7 +2391,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 35.56 -27.94 90)
+				(at -7.62 -5.08 90)
 				(length 2.54)
 				(name "PB3"
 					(effects
@@ -2409,7 +2409,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 38.1 27.94 270)
+				(at -5.08 50.8 270)
 				(length 2.54)
 				(name "DIO"
 					(effects
@@ -2418,7 +2418,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "89"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2427,7 +2427,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 38.1 -27.94 90)
+				(at -5.08 -5.08 90)
 				(length 2.54)
 				(name "PB2"
 					(effects
@@ -2436,7 +2436,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "19"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2445,7 +2445,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 40.64 27.94 270)
+				(at -2.54 50.8 270)
 				(length 2.54)
 				(name "CLK"
 					(effects
@@ -2454,7 +2454,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "90"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2463,7 +2463,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 40.64 -27.94 90)
+				(at -2.54 -5.08 90)
 				(length 2.54)
 				(name "PB1"
 					(effects
@@ -2472,7 +2472,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "18"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2481,7 +2481,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 43.18 -27.94 90)
+				(at 0 -5.08 90)
 				(length 2.54)
 				(name "PB0"
 					(effects
@@ -2490,7 +2490,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "17"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2499,7 +2499,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 52.07 21.59 180)
+				(at 8.89 44.45 180)
 				(length 2.54)
 				(name "PA0"
 					(effects
@@ -2508,7 +2508,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "1"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2517,7 +2517,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 52.07 19.05 180)
+				(at 8.89 41.91 180)
 				(length 2.54)
 				(name "PA1"
 					(effects
@@ -2526,7 +2526,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "2"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2535,7 +2535,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 52.07 16.51 180)
+				(at 8.89 39.37 180)
 				(length 2.54)
 				(name "PA2"
 					(effects
@@ -2544,7 +2544,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "3"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2553,7 +2553,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 52.07 13.97 180)
+				(at 8.89 36.83 180)
 				(length 2.54)
 				(name "PA3"
 					(effects
@@ -2562,7 +2562,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "4"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2571,7 +2571,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 52.07 11.43 180)
+				(at 8.89 34.29 180)
 				(length 2.54)
 				(name "PA4"
 					(effects
@@ -2580,7 +2580,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "5"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2589,7 +2589,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 52.07 8.89 180)
+				(at 8.89 31.75 180)
 				(length 2.54)
 				(name "PA5"
 					(effects
@@ -2598,7 +2598,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "6"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2607,7 +2607,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 52.07 6.35 180)
+				(at 8.89 29.21 180)
 				(length 2.54)
 				(name "PA6"
 					(effects
@@ -2616,7 +2616,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "7"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2625,7 +2625,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 52.07 3.81 180)
+				(at 8.89 26.67 180)
 				(length 2.54)
 				(name "PA7"
 					(effects
@@ -2634,7 +2634,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "8"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2643,7 +2643,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 52.07 1.27 180)
+				(at 8.89 24.13 180)
 				(length 2.54)
 				(name "PA8"
 					(effects
@@ -2652,7 +2652,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "9"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2661,7 +2661,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 52.07 -1.27 180)
+				(at 8.89 21.59 180)
 				(length 2.54)
 				(name "PA9"
 					(effects
@@ -2670,7 +2670,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "10"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2679,7 +2679,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 52.07 -3.81 180)
+				(at 8.89 19.05 180)
 				(length 2.54)
 				(name "PA10"
 					(effects
@@ -2688,7 +2688,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "11"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2697,7 +2697,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 52.07 -6.35 180)
+				(at 8.89 16.51 180)
 				(length 2.54)
 				(name "PA11"
 					(effects
@@ -2706,7 +2706,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "12"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2715,7 +2715,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 52.07 -8.89 180)
+				(at 8.89 13.97 180)
 				(length 2.54)
 				(name "PA12"
 					(effects
@@ -2724,7 +2724,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "13"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2733,7 +2733,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 52.07 -11.43 180)
+				(at 8.89 11.43 180)
 				(length 2.54)
 				(name "PA13"
 					(effects
@@ -2742,7 +2742,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "14"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2751,7 +2751,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 52.07 -13.97 180)
+				(at 8.89 8.89 180)
 				(length 2.54)
 				(name "PA14"
 					(effects
@@ -2760,7 +2760,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "15"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2769,7 +2769,7 @@
 				)
 			)
 			(pin bidirectional line
-				(at 52.07 -16.51 180)
+				(at 8.89 6.35 180)
 				(length 2.54)
 				(name "PA15"
 					(effects
@@ -2778,7 +2778,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "16"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2850,7 +2850,7 @@
 			)
 		)
 		(symbol "TP4056_Module_1_1"
-			(pin output line
+			(pin bidirectional line
 				(at -10.16 3.81 0)
 				(length 2.54)
 				(name "GND"
@@ -2860,7 +2860,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "1"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2868,7 +2868,7 @@
 					)
 				)
 			)
-			(pin output line
+			(pin bidirectional line
 				(at -10.16 -3.81 0)
 				(length 2.54)
 				(name "OUT-"
@@ -2878,7 +2878,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "2"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2896,7 +2896,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "3"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2914,7 +2914,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "4"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2932,7 +2932,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "6"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2950,7 +2950,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "5"
 					(effects
 						(font
 							(size 1.27 1.27)

@@ -1,0 +1,18 @@
+/*
+ * interfacev.h
+ *
+ *  Created on: Dec 19, 2025
+ *      Author: allan
+ */
+
+#ifndef INC_INTERFACEV_H_
+#define INC_INTERFACEV_H_
+
+extern const unsigned char startup[];
+extern const unsigned char exhomescreen[];
+extern const unsigned char exthsr[];
+extern const unsigned char extra[];
+extern const unsigned char easycard[];
+extern const unsigned char einvoicev[];
+
+#endif /* __INTERFACE_H */

@@ -1135,17 +1135,6 @@
 					(type none)
 				)
 			)
-			(rectangle
-				(start -2.54 54.61)
-				(end -2.54 54.61)
-				(stroke
-					(width 0)
-					(type default)
-				)
-				(fill
-					(type none)
-				)
-			)
 		)
 		(symbol "STM32H7_Dev_Board_1_1"
 			(pin bidirectional line
@@ -2850,7 +2839,7 @@
 			)
 		)
 		(symbol "TP4056_Module_1_1"
-			(pin output line
+			(pin bidirectional line
 				(at -10.16 3.81 0)
 				(length 2.54)
 				(name "GND"
@@ -2860,7 +2849,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "1"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2868,7 +2857,7 @@
 					)
 				)
 			)
-			(pin output line
+			(pin bidirectional line
 				(at -10.16 -3.81 0)
 				(length 2.54)
 				(name "OUT-"
@@ -2878,7 +2867,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "2"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2896,7 +2885,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "3"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2914,7 +2903,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "4"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2932,7 +2921,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "6"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2950,7 +2939,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "5"
 					(effects
 						(font
 							(size 1.27 1.27)

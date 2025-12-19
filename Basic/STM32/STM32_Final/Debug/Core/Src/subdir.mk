@@ -13,6 +13,8 @@ C_SRCS += \
 ../Core/Src/font_cp866_8x8_r.c \
 ../Core/Src/girl15.c \
 ../Core/Src/haruhi15.c \
+../Core/Src/interface.c \
+../Core/Src/interfacev.c \
 ../Core/Src/main.c \
 ../Core/Src/noragami15.c \
 ../Core/Src/stm32h7xx_hal_msp.c \
@@ -30,6 +32,8 @@ OBJS += \
 ./Core/Src/font_cp866_8x8_r.o \
 ./Core/Src/girl15.o \
 ./Core/Src/haruhi15.o \
+./Core/Src/interface.o \
+./Core/Src/interfacev.o \
 ./Core/Src/main.o \
 ./Core/Src/noragami15.o \
 ./Core/Src/stm32h7xx_hal_msp.o \
@@ -47,6 +51,8 @@ C_DEPS += \
 ./Core/Src/font_cp866_8x8_r.d \
 ./Core/Src/girl15.d \
 ./Core/Src/haruhi15.d \
+./Core/Src/interface.d \
+./Core/Src/interfacev.d \
 ./Core/Src/main.d \
 ./Core/Src/noragami15.d \
 ./Core/Src/stm32h7xx_hal_msp.d \
@@ -65,7 +71,7 @@ Core/Src/main.o: ../Core/Src/main.c Core/Src/subdir.mk
 clean: clean-Core-2f-Src
 
 clean-Core-2f-Src:
-	-$(RM) ./Core/Src/SSD1680.cyclo ./Core/Src/SSD1680.d ./Core/Src/SSD1680.o ./Core/Src/SSD1680.su ./Core/Src/font_cp866_8x14.cyclo ./Core/Src/font_cp866_8x14.d ./Core/Src/font_cp866_8x14.o ./Core/Src/font_cp866_8x14.su ./Core/Src/font_cp866_8x16.cyclo ./Core/Src/font_cp866_8x16.d ./Core/Src/font_cp866_8x16.o ./Core/Src/font_cp866_8x16.su ./Core/Src/font_cp866_8x16_r.cyclo ./Core/Src/font_cp866_8x16_r.d ./Core/Src/font_cp866_8x16_r.o ./Core/Src/font_cp866_8x16_r.su ./Core/Src/font_cp866_8x8.cyclo ./Core/Src/font_cp866_8x8.d ./Core/Src/font_cp866_8x8.o ./Core/Src/font_cp866_8x8.su ./Core/Src/font_cp866_8x8_r.cyclo ./Core/Src/font_cp866_8x8_r.d ./Core/Src/font_cp866_8x8_r.o ./Core/Src/font_cp866_8x8_r.su ./Core/Src/girl15.cyclo ./Core/Src/girl15.d ./Core/Src/girl15.o ./Core/Src/girl15.su ./Core/Src/haruhi15.cyclo ./Core/Src/haruhi15.d ./Core/Src/haruhi15.o ./Core/Src/haruhi15.su ./Core/Src/main.cyclo ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/noragami15.cyclo ./Core/Src/noragami15.d ./Core/Src/noragami15.o ./Core/Src/noragami15.su ./Core/Src/stm32h7xx_hal_msp.cyclo ./Core/Src/stm32h7xx_hal_msp.d ./Core/Src/stm32h7xx_hal_msp.o ./Core/Src/stm32h7xx_hal_msp.su ./Core/Src/stm32h7xx_it.cyclo ./Core/Src/stm32h7xx_it.d ./Core/Src/stm32h7xx_it.o ./Core/Src/stm32h7xx_it.su ./Core/Src/syscalls.cyclo ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.cyclo ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32h7xx.cyclo ./Core/Src/system_stm32h7xx.d ./Core/Src/system_stm32h7xx.o ./Core/Src/system_stm32h7xx.su
+	-$(RM) ./Core/Src/SSD1680.cyclo ./Core/Src/SSD1680.d ./Core/Src/SSD1680.o ./Core/Src/SSD1680.su ./Core/Src/font_cp866_8x14.cyclo ./Core/Src/font_cp866_8x14.d ./Core/Src/font_cp866_8x14.o ./Core/Src/font_cp866_8x14.su ./Core/Src/font_cp866_8x16.cyclo ./Core/Src/font_cp866_8x16.d ./Core/Src/font_cp866_8x16.o ./Core/Src/font_cp866_8x16.su ./Core/Src/font_cp866_8x16_r.cyclo ./Core/Src/font_cp866_8x16_r.d ./Core/Src/font_cp866_8x16_r.o ./Core/Src/font_cp866_8x16_r.su ./Core/Src/font_cp866_8x8.cyclo ./Core/Src/font_cp866_8x8.d ./Core/Src/font_cp866_8x8.o ./Core/Src/font_cp866_8x8.su ./Core/Src/font_cp866_8x8_r.cyclo ./Core/Src/font_cp866_8x8_r.d ./Core/Src/font_cp866_8x8_r.o ./Core/Src/font_cp866_8x8_r.su ./Core/Src/girl15.cyclo ./Core/Src/girl15.d ./Core/Src/girl15.o ./Core/Src/girl15.su ./Core/Src/haruhi15.cyclo ./Core/Src/haruhi15.d ./Core/Src/haruhi15.o ./Core/Src/haruhi15.su ./Core/Src/interface.cyclo ./Core/Src/interface.d ./Core/Src/interface.o ./Core/Src/interface.su ./Core/Src/interfacev.cyclo ./Core/Src/interfacev.d ./Core/Src/interfacev.o ./Core/Src/interfacev.su ./Core/Src/main.cyclo ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/noragami15.cyclo ./Core/Src/noragami15.d ./Core/Src/noragami15.o ./Core/Src/noragami15.su ./Core/Src/stm32h7xx_hal_msp.cyclo ./Core/Src/stm32h7xx_hal_msp.d ./Core/Src/stm32h7xx_hal_msp.o ./Core/Src/stm32h7xx_hal_msp.su ./Core/Src/stm32h7xx_it.cyclo ./Core/Src/stm32h7xx_it.d ./Core/Src/stm32h7xx_it.o ./Core/Src/stm32h7xx_it.su ./Core/Src/syscalls.cyclo ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.cyclo ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32h7xx.cyclo ./Core/Src/system_stm32h7xx.d ./Core/Src/system_stm32h7xx.o ./Core/Src/system_stm32h7xx.su
 
 .PHONY: clean-Core-2f-Src
 

@@ -101,6 +101,8 @@ void Error_Handler(void);
 #define DEBUG_TX_GPIO_Port GPIOD
 #define DEBUG_RX_Pin GPIO_PIN_6
 #define DEBUG_RX_GPIO_Port GPIOD
+#define EPD_EN_Pin GPIO_PIN_0
+#define EPD_EN_GPIO_Port GPIOE
 
 /* USER CODE BEGIN Private defines */
 

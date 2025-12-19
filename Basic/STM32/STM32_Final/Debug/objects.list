@@ -6,6 +6,8 @@
 "./Core/Src/font_cp866_8x8_r.o"
 "./Core/Src/girl15.o"
 "./Core/Src/haruhi15.o"
+"./Core/Src/interface.o"
+"./Core/Src/interfacev.o"
 "./Core/Src/main.o"
 "./Core/Src/noragami15.o"
 "./Core/Src/stm32h7xx_hal_msp.o"

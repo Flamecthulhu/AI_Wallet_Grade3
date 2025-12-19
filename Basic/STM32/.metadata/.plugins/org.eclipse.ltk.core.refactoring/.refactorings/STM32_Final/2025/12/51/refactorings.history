@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;STM32_Final/Core/Inc/interface&apos; to &apos;interface.h&apos;" description="Rename resource &apos;interface&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="Core/Inc/interface" name="interface.h" stamp="1766148741133" updateReferences="true"/>
+</session>
