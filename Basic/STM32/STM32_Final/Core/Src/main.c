@@ -30,6 +30,8 @@
 #include "fonts.h"
 
 #include "interfacev.h"
+
+//#include "model_weights.c"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -39,7 +41,12 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define DEBUG_MODE 1
 
+#define INPUT_DIM  9
+#define HIDDEN_1   64
+#define HIDDEN_2   32
+#define OUTPUT_DIM 5
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -78,6 +85,10 @@ static void MX_USART2_UART_Init(void);
 void parse_gpgga(uint8_t *line);
 void HM10_Process(uint8_t byte);
 void Handle_BT_Command(char* cmd);
+void Process_WiFi_Data(void);
+
+int mlp_forward_pass(float *current_lat, float *current_lon, uint8_t hour_of_day, uint16_t min_of_day, uint8_t day_of_week, int time_to_dept, uint8_t is_ticket_reg, uint8_t is_entering, uint8_t is_exiting);
+
 
 SPI_HandleTypeDef hspi1;
 SSD1680_HandleTypeDef hepd;
@@ -88,8 +99,6 @@ static void MX_SSD1680_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-#define DEBUG_MODE 1
-
 uint16_t idx = 0;
 uint8_t BTBuffer[1];
 
@@ -161,19 +170,6 @@ int main(void)
   SSD1680_Clear(&hepd, ColorWhite);
   SSD1680_Refresh(&hepd, FullRefresh);
 
-  uint8_t scale[176 / 8 * 4 ] = {
-      0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55,
-      0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F,
-      0x7F, 0xFF, 0x7F, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0x7F, 0x7F,
-      0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
-    };
-
-  SSD1680_SetRegion(&hepd, 0, 0, 152, 4, scale, NULL);
-
-  SSD1680_Text(&hepd, 0, 16, "Font 8x8", &cp866_8x8);
-  SSD1680_Text(&hepd, 0, 24, "Font 8x14", &cp866_8x14);
-  SSD1680_Text(&hepd, 0, 38, "Font 8x16", &cp866_8x16);
-
   HAL_NVIC_SetPriority(TIM1_UP_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(TIM1_UP_IRQn);
   HAL_TIM_Base_Start_IT(&htim1);
@@ -220,28 +216,30 @@ int main(void)
 
   uint8_t msg[] = "STM32 is now on\n";
 
-  HAL_UART_Transmit(&huart2, msg, sizeof(msg)-1, 1000);
+  if (1)
+  {
+	  HAL_UART_Transmit(&huart2, msg, sizeof(msg)-1, 1000);
+	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
+	  SSD1680_Clear(&hepd, ColorWhite);
+	  SSD1680_DrawBitmap(&hepd, 0, 0, startupv, 152, 296);
+	  SSD1680_Refresh(&hepd, FullRefresh);
+	  HAL_Delay(2000);
+	  SSD1680_DrawBitmap(&hepd, 0, 0, einvoicev, 152, 296);
+	  HAL_Delay(1000);
+	  SSD1680_DrawBitmap(&hepd, 0, 0, easycardv, 152, 296);
+	  HAL_Delay(1000);
+	  SSD1680_DrawBitmap(&hepd, 0, 0, exhomescreen, 152, 296);
+	  HAL_Delay(1000);
+	  SSD1680_DrawBitmap(&hepd, 0, 0, extra, 152, 296);
+	  HAL_Delay(1000);
+	  SSD1680_DrawBitmap(&hepd, 0, 0, exthsr, 152, 296);
+	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
+  }
 
-
-  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
-  SSD1680_Clear(&hepd, ColorWhite);
-  SSD1680_DrawBitmap(&hepd, 0, 0, startupv, 152, 296);
-  SSD1680_Refresh(&hepd, FullRefresh);
-  HAL_Delay(2000);
-  SSD1680_DrawBitmap(&hepd, 0, 0, einvoicev, 152, 296);
-  HAL_Delay(1000);
-  SSD1680_DrawBitmap(&hepd, 0, 0, easycardv, 152, 296);
-  HAL_Delay(1000);
-  SSD1680_DrawBitmap(&hepd, 0, 0, exhomescreen, 152, 296);
-  HAL_Delay(1000);
-  SSD1680_DrawBitmap(&hepd, 0, 0, extra, 152, 296);
-  HAL_Delay(1000);
-  SSD1680_DrawBitmap(&hepd, 0, 0, exthsr, 152, 296);
-  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
   while (1)
   {
     /* USER CODE END WHILE */
-	  //Nothing here
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -821,15 +819,43 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     }
 }
 
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	if(htim->Instance == TIM1)
+	{
+		HAL_GPIO_TogglePin(STA_LED_GPIO_Port, STA_LED_Pin);
+	}
+	else if(htim->Instance == TIM2)
+	{
+		// WiFi 掃描
+		#if DEBUG_MODE
+			uint8_t text[] = "\r\n>>> Starting WiFi Scan <<<\r\n";
+			HAL_UART_Transmit(&huart2, text, sizeof(text)-1, 100);
+		#endif
+
+		// 清空舊數據
+		wf_idx = 0;
+		wifi_count = 0;
+		memset(WFBuffer, 0, WIFI_BUF_SIZE);
+		memset(wifi_list, 0, sizeof(wifi_list));
+
+		// 發送掃描指令
+		uint8_t cmd[] = "AT+CWLAP\r\n";
+		HAL_UART_Transmit(&huart5, cmd, sizeof(cmd)-1, 100);
+
+		HAL_GPIO_TogglePin(WF_LED_GPIO_Port, WF_LED_Pin);
+	}
+}
+
 void parse_gpgga(uint8_t *line)
 {
-    if (strncmp(line, "$GPGGA", 6) != 0 && strncmp(line, "$GNGGA", 6) != 0)
+	if (strncmp((const char *)line, "$GPGGA", 6) != 0 && strncmp((const char *)line, "$GNGGA", 6) != 0)
     {
         return;
     }
 
     int i = 0;
-    char *token = strtok(line, ",");
+    char *token = strtok((char *)line, ",");
 
     while (token != NULL && i < 15) {
         size_t len = strlen(token);
@@ -1080,17 +1106,6 @@ void Display_WiFi_List(void)
         uint8_t end[] = "============================\r\n\r\n";
         HAL_UART_Transmit(&huart2, end, sizeof(end)-1, 100);
     #endif
-
-    // 可選：顯示在 E-Paper 上
-    // SSD1680_Clear(&hepd, ColorWhite);
-    // char display_text[64];
-    // for (int i = 0; i < wifi_count && i < 3; i++)
-    // {
-    //     snprintf(display_text, sizeof(display_text), "%s: %ddBm",
-    //              wifi_list[i].ssid, wifi_list[i].rssi);
-    //     SSD1680_Text(&hepd, 0, i*16, display_text, &cp866_8x8);
-    // }
-    // SSD1680_Refresh(&hepd, FullRefresh);
 }
 
 // 處理 WiFi 數據
@@ -1136,34 +1151,93 @@ void Process_WiFi_Data(void)
     memset(WFBuffer, 0, WIFI_BUF_SIZE);
 }
 
-
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time,
+						char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price)
 {
-	if(htim->Instance == TIM1)
-	{
-		HAL_GPIO_TogglePin(STA_LED_GPIO_Port, STA_LED_Pin);
-	}
-	else if(htim->Instance == TIM2)
-	{
-		// WiFi 掃描
-		#if DEBUG_MODE
-			uint8_t text[] = "\r\n>>> Starting WiFi Scan <<<\r\n";
-			HAL_UART_Transmit(&huart2, text, sizeof(text)-1, 100);
-		#endif
 
-		// 清空舊數據
-		wf_idx = 0;
-		wifi_count = 0;
-		memset(WFBuffer, 0, WIFI_BUF_SIZE);
-		memset(wifi_list, 0, sizeof(wifi_list));
-
-		// 發送掃描指令
-		uint8_t cmd[] = "AT+CWLAP\r\n";
-		HAL_UART_Transmit(&huart5, cmd, sizeof(cmd)-1, 100);
-
-		HAL_GPIO_TogglePin(WF_LED_GPIO_Port, WF_LED_Pin);
-	}
 }
+
+void relu(float *data, int size) {
+    for (int i = 0; i < size; i++) {
+        if (data[i] < 0.0f) data[i] = 0.0f;
+    }
+}
+
+// Softmax 函式 (計算預測機率)
+void softmax(float *data, int size) {
+    float max_val = data[0];
+    for (int i = 1; i < size; i++) if (data[i] > max_val) max_val = data[i];
+    float sum = 0.0f;
+    for (int i = 0; i < size; i++) {
+        data[i] = expf(data[i] - max_val);
+        sum += data[i];
+    }
+    for (int i = 0; i < size; i++) data[i] /= sum;
+}
+
+/*
+int mlp_forward_pass(float *current_lat, float *current_lon, uint8_t hour_of_day, uint16_t min_of_day, uint8_t day_of_week, int time_to_dept, uint8_t is_ticket_reg, uint8_t is_entering, uint8_t is_exiting)
+{
+    // 1. 將輸入參數組合成向量 (對齊 INPUT_DIM = 9)
+    float x[INPUT_DIM];
+    x[0] = *current_lat;
+    x[1] = *current_lon;
+    x[2] = (float)hour_of_day;
+    x[3] = (float)min_of_day;
+    x[4] = (float)day_of_week;
+    x[5] = (float)time_to_dept;
+    x[6] = (float)is_ticket_reg;
+    x[7] = (float)is_entering;
+    x[8] = (float)is_exiting;
+
+    // 定義各層輸出暫存區
+    float h1[HIDDEN_1];
+    float h2[HIDDEN_2];
+    float out[OUTPUT_DIM];
+
+    // 2. 第一層前向傳播 (9 -> 64)
+    for (int i = 0; i < HIDDEN_1; i++) {
+        float sum = fc1_bias[i];
+        for (int j = 0; j < INPUT_DIM; j++) {
+            sum += x[j] * fc1_weight[i][j];
+        }
+        h1[i] = sum;
+    }
+    relu(h1, HIDDEN_1);
+
+    // 3. 第二層前向傳播 (64 -> 32)
+    for (int i = 0; i < HIDDEN_2; i++) {
+        float sum = fc2_bias[i];
+        for (int j = 0; j < HIDDEN_1; j++) {
+            sum += h1[j] * fc2_weight[i][j];
+        }
+        h2[i] = sum;
+    }
+    relu(h2, HIDDEN_2);
+
+    // 4. 第三層前向傳播 (32 -> 5)
+    for (int i = 0; i < OUTPUT_DIM; i++) {
+        float sum = fc3_bias[i];
+        for (int j = 0; j < HIDDEN_2; j++) {
+            sum += h2[j] * fc3_weight[i][j];
+        }
+        out[i] = sum;
+    }
+
+    // 5. 使用 Softmax 轉換為機率並挑選最大值
+    softmax(out, OUTPUT_DIM);
+
+    int best_class = 0;
+    float max_p = out[0];
+    for (int i = 1; i < OUTPUT_DIM; i++) {
+        if (out[i] > max_p) {
+            max_p = out[i];
+            best_class = i;
+        }
+    }
+
+    return best_class; // 回傳預測類別 (0~4)
+}*/
 
 /* USER CODE END 4 */
 
@@ -1195,6 +1269,8 @@ void MPU_Config(void)
   HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
 
 }
+
+
 
 /**
   * @brief  This function is executed in case of error occurrence.

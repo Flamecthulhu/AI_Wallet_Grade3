@@ -5,7 +5,7 @@ import random
 
 x = []
 
-with open('training_data.csv', newline='') as csvfile:
+with open('AI_Wallet_Grade3\\Data\\training_data.csv', newline='') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
     next(spamreader)
     for row in spamreader:
