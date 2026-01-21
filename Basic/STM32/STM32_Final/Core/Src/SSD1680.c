@@ -682,7 +682,7 @@ HAL_StatusTypeDef SSD1680_DrawBitmap(SSD1680_HandleTypeDef *hepd, const uint8_t 
         return status;
     }
 
-    return SSD1680_Refresh(hepd, FullRefresh);
+    return 0;
 }
 
 /*

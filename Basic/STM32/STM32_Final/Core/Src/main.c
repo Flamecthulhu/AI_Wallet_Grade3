@@ -48,6 +48,7 @@
 #define HIDDEN_1   64
 #define HIDDEN_2   32
 #define OUTPUT_DIM 5
+#define REFRESH_MODE 199
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -88,7 +89,10 @@ void HM10_Process(uint8_t byte);
 void Handle_BT_Command(char* cmd);
 void Process_WiFi_Data(void);
 void debug_disp(void);
-int mlp_forward_pass(double current_lat, double current_lon, uint8_t hour_of_day, uint16_t min_of_day, uint8_t day_of_week, int time_to_dept, uint8_t is_ticket_reg, uint8_t is_entering, uint8_t is_exiting);
+int mlp_forward_pass(double current_lat, double current_lon, uint8_t hour_of_day, uint16_t min_of_day, uint8_t day_of_week,
+					 int time_to_dept, uint8_t is_ticket_reg, uint8_t is_entering, uint8_t is_exiting);
+void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time,
+						char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price);
 
 SPI_HandleTypeDef hspi1;
 SSD1680_HandleTypeDef hepd;
@@ -170,7 +174,7 @@ int main(void)
 
   SSD1680_Border(&hepd, ColorWhite);
   SSD1680_Clear(&hepd, ColorWhite);
-  SSD1680_Refresh(&hepd, FullRefresh);
+  SSD1680_Refresh(&hepd, REFRESH_MODE);
 
   HAL_NVIC_SetPriority(TIM1_UP_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(TIM1_UP_IRQn);
@@ -218,7 +222,21 @@ int main(void)
 
   // Start Define Variable
   uint8_t msg[] = "STM32 is now on\n";
-  char *input_train_type, *input_train_kind;
+  char *input_train_type, *input_train_kind, *input_train_num, *input_date, *input_dept_time,
+  *input_dept_sta, *input_arr_time, *input_arr_sta, *input_car, *input_seat, *input_price;
+
+  input_train_type = NULL;
+  input_train_kind = NULL;
+  input_train_num = NULL;
+  input_date = NULL;
+  input_dept_time = NULL;
+  input_dept_sta = NULL;
+  input_arr_time = NULL;
+  input_arr_sta = NULL;
+  input_car = NULL;
+  input_seat = NULL;
+  input_price = NULL;
+  //(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time, char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price)
 
   double debug_array[9] = {24.167680, 120.653612, 17, 1072, 5, 1, 0, 0, 1};
   char *debug_ticket[4] = {"A50111562576561ZZZZ33003230ZZZZZ6ZP7UNxP7UNx15VNA000V7UF0F07", //台中->豐原
@@ -231,36 +249,53 @@ int main(void)
 
   if (!DEBUG_MODE)
   {
-	  HAL_UART_Transmit(&huart2, msg, sizeof(msg)-1, 1000);
 	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
+	  HAL_Delay(100);
 	  SSD1680_Clear(&hepd, ColorWhite);
 	  SSD1680_DrawBitmap(&hepd, 0, 0, startupv, 152, 296);
-	  SSD1680_Refresh(&hepd, FullRefresh);
+	  SSD1680_Refresh(&hepd, REFRESH_MODE);
 	  HAL_Delay(2000);
 	  SSD1680_DrawBitmap(&hepd, 0, 0, einvoicev, 152, 296);
+	  SSD1680_Refresh(&hepd, REFRESH_MODE);
 	  HAL_Delay(1000);
 	  SSD1680_DrawBitmap(&hepd, 0, 0, easycardv, 152, 296);
+	  SSD1680_Refresh(&hepd, REFRESH_MODE);
 	  HAL_Delay(1000);
 	  SSD1680_DrawBitmap(&hepd, 0, 0, exhomescreen, 152, 296);
+	  SSD1680_Refresh(&hepd, REFRESH_MODE);
 	  HAL_Delay(1000);
 	  SSD1680_DrawBitmap(&hepd, 0, 0, extra, 152, 296);
+	  SSD1680_Refresh(&hepd, REFRESH_MODE);
 	  HAL_Delay(1000);
 	  SSD1680_DrawBitmap(&hepd, 0, 0, exthsr, 152, 296);
+	  SSD1680_Refresh(&hepd, REFRESH_MODE);
+	  HAL_Delay(3000);
 	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
   }
 
   else if (DEBUG_MODE)
   {
+	  	HAL_UART_Transmit(&huart2, msg, sizeof(msg)-1, 1000);
+
 	    result = mlp_forward_pass(debug_array[0], debug_array[1], debug_array[2], debug_array[3], debug_array[4], debug_array[5], debug_array[6], debug_array[7],debug_array[8]);
 
 	    for (int i = 0; i < sizeof(debug_ticket); i++)
 	    {
-	    	if (isalpha((unsigned)debug_ticket[i][0])) input_train_type = "TRA";
-	    	else input_train_type = "THSR";
+	    	if (isalpha((unsigned)debug_ticket[i][0]))
+	    	{
+	    		input_train_type = "TRA";
+	    		if (debug_ticket[0][0] == 'A')  input_train_kind = "Local";
+	    		else if (debug_ticket[0][0] == 'N')  input_train_kind = "T.C.Exp.";
+	    	}
+	    	else
+	    	{
+	    		input_train_type = "THSR";
 
+	    	}
 
 	    	//(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time, char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price)
-	    	epd_ticket_handler(input_train_type);
+	    	epd_ticket_handler(input_train_type, input_train_kind, input_train_num, input_date, input_dept_time, input_dept_sta,
+	    			input_arr_time, input_arr_sta, input_car, input_seat, input_price);
 	    	debug_disp();
 	    	HAL_Delay(3000);
 	    }
@@ -1168,9 +1203,10 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 {
 	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
 	HAL_Delay(100);
-	if (strcmp(train_type, "THSR"))  SSD1680_Text(&hepd, 16, 0, "THSR", &cp866_8x16);
-	else if (strcmp(train_type, "TRA"))  SSD1680_Text(&hepd,  16, 0, "TRA", &cp866_8x16);
-	SSD1680_Refresh(&hepd, FastFullRefresh);
+	if (strcmp(train_type, "THSR"))  SSD1680_Text(&hepd, 64, 0, "THSR", &cp866_8x16);
+	else if (strcmp(train_type, "TRA"))  SSD1680_Text(&hepd, 64, 0, "TRA ", &cp866_8x16);
+	SSD1680_Refresh(&hepd, REFRESH_MODE);
+	HAL_Delay(1000);
 	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
 }
 
@@ -1178,12 +1214,13 @@ void debug_disp(void)
 {
 	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
 	HAL_Delay(100);
-	SSD1680_Text(&hepd,  0, 0, "Predict:", &cp866_8x16);
+	SSD1680_Text(&hepd,  0, 280, "Predict:", &cp866_8x16);
 	char predict_str[12];
 	sprintf(predict_str, "%d", result);
-	SSD1680_Text(&hepd,  72, 0, predict_str, &cp866_8x16);
-	SSD1680_Refresh(&hepd, FastFullRefresh);
-	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
+	SSD1680_Text(&hepd,  72, 280, predict_str, &cp866_8x16);
+	SSD1680_Refresh(&hepd, REFRESH_MODE);
+	HAL_Delay(1000);
+	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
 }
 
 void relu(float *data, int size) {
