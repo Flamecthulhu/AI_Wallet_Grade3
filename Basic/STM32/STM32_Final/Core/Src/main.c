@@ -93,7 +93,7 @@ int mlp_forward_pass(double current_lat, double current_lon, uint8_t hour_of_day
 					 int time_to_dept, uint8_t is_ticket_reg, uint8_t is_entering, uint8_t is_exiting);
 void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time,
 						char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price);
-
+char* train_code_decoder(char *sta_code);
 SPI_HandleTypeDef hspi1;
 SSD1680_HandleTypeDef hepd;
 
@@ -238,6 +238,7 @@ int main(void)
   input_price = NULL;
   //(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time, char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price)
 
+  char *dept_sta_code, *arr_sta_code, *seat_code;
   double debug_array[9] = {24.167680, 120.653612, 17, 1072, 5, 1, 0, 0, 1};
   char *debug_ticket[4] = {"A50111562576561ZZZZ33003230ZZZZZ6ZP7UNxP7UNx15VNA000V7UF0F07", //台中->豐原
 	  "N50049351999418ZZZZ10803300ZZZZZ3ZP1VLUP1VNI161NA004y1VHEA49", //桃園->台中
@@ -287,10 +288,18 @@ int main(void)
 	    		if (debug_ticket[0][0] == 'A')  input_train_kind = "Local";
 	    		else if (debug_ticket[0][0] == 'N')  input_train_kind = "T.C.Exp.";
 	    	}
+
 	    	else
 	    	{
 	    		input_train_type = "THSR";
-
+	    		strncpy(input_train_num, debug_ticket[i] + 25, 4); // Train number
+	    		strncpy(dept_sta_code, debug_ticket[i] + 30, 1);   // Depart station code
+	    		strncpy(input_date, debug_ticket[i] + 32, 8);      // Date
+	    		strncpy(input_dept_time, debug_ticket[i] + 40, 4); // Departure time
+	    		strncpy(arr_sta_code, debug_ticket[i] + 47, 1);    // Arrive station code
+	    		strncpy(input_arr_time, debug_ticket[i] + 57, 4);  // Arrival time
+	    		strncpy(seat_code, debug_ticket[i] + 77, 2);       // Seat
+	    		strncpy(arr_sta_code, debug_ticket[i] + 91, 1);    // Price
 	    	}
 
 	    	//(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time, char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price)
@@ -1221,6 +1230,53 @@ void debug_disp(void)
 	SSD1680_Refresh(&hepd, REFRESH_MODE);
 	HAL_Delay(1000);
 	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
+}
+
+char* train_code_decoder(char *sta_code)
+{
+	int sta_code_int = atoi(sta_code);
+	switch (sta_code_int)
+	{
+	    case 1:
+	        return "Nangang";
+	        break;
+	    case 2:
+	        return "Taipei";
+	        break;
+	    case 3:
+	        return "Banqiao";
+	        break;
+	    case 4:
+	        return "Taoyuan";
+	        break;
+	    case 5:
+	        return "Hsinchu";
+	        break;
+	    case 6:
+	        return "Miaoli";
+	        break;
+	    case 7:
+	        return "Taichung";
+	        break;
+	    case 8:
+	        return "Changhua";
+	        break;
+	    case 9:
+	        return "Yunlin";
+	        break;
+	    case 10:
+	        return "Chiayi";
+	        break;
+	    case 11:
+	        return "Tainan";
+	        break;
+	    case 12:
+	        return "Zuoying";
+	        break;
+	    default:
+	        return "Unknown";
+	        break;
+	}
 }
 
 void relu(float *data, int size) {
