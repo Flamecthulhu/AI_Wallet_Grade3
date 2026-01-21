@@ -86,7 +86,7 @@ void parse_gpgga(uint8_t *line);
 void HM10_Process(uint8_t byte);
 void Handle_BT_Command(char* cmd);
 void Process_WiFi_Data(void);
-
+void debug_disp(void);
 int mlp_forward_pass(double current_lat, double current_lon, uint8_t hour_of_day, uint16_t min_of_day, uint8_t day_of_week, int time_to_dept, uint8_t is_ticket_reg, uint8_t is_entering, uint8_t is_exiting);
 
 
@@ -122,6 +122,8 @@ static char btrecv[BT_BUF_SIZE];
 static uint8_t bt_idx = 0;
 
 char parts[15][16];
+
+int result;
 /* USER CODE END 0 */
 
 /**
@@ -237,15 +239,8 @@ int main(void)
   }
   else if (DEBUG_MODE)
   {
-	  int result = mlp_forward_pass(24.167680,120.653612,17,1072,5,1,0,0,1);
-	    char str[12];
-	    sprintf(str, "%d", result);
-	    HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
-	    HAL_Delay(100);
-	    SSD1680_Text(&hepd, 0, 0, str, &cp866_8x16);
-	    SSD1680_Refresh(&hepd, FastFullRefresh);
-
-	    HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
+	    result = mlp_forward_pass(24.167680,120.653612,17,1072,5,1,0,0,1);
+	    debug_disp();
   }
 
   while (1)
@@ -1149,18 +1144,24 @@ void Process_WiFi_Data(void)
 void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time,
 						char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price)
 {
-
+	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
+	HAL_Delay(100);
+	if (strcmp(train_type, "THSR"))  SSD1680_Text(&hepd, 16, 0, "THSR", &cp866_8x16);
+	else if (strcmp(train_type, "TRA"))  SSD1680_Text(&hepd,  16, 0, "TRA", &cp866_8x16);
+	SSD1680_Refresh(&hepd, FastFullRefresh);
+	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
 }
 
 void debug_disp(void)
 {
 	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
 	HAL_Delay(100);
-	if (strcmp(train_type, "THSR"))  SSD1680_Text(&hepd, 16, 0, "THSR", &cp866_8x16);
-	else if (strcmp(train_type, "TRA"))  SSD1680_Text(&hepd,  16, 0, "TRA", &cp866_8x16);
-	SSD1680_Text(&hepd, 0, 0, str, &cp866_8x16);
+	SSD1680_Text(&hepd,  0, 0, "Predict:", &cp866_8x16);
+	char predict_str[12];
+	sprintf(predict_str, "%d", result);
+	SSD1680_Text(&hepd,  72, 0, predict_str, &cp866_8x16);
 	SSD1680_Refresh(&hepd, FastFullRefresh);
-	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
 }
 
 void relu(float *data, int size) {
@@ -1184,7 +1185,6 @@ void softmax(float *data, int size) {
 
 int mlp_forward_pass(double current_lat, double current_lon, uint8_t hour_of_day, uint16_t min_of_day, uint8_t day_of_week, int time_to_dept, uint8_t is_ticket_reg, uint8_t is_entering, uint8_t is_exiting)
 {
-    // 1. 將輸入參數組合成向量 (對齊 INPUT_DIM = 9)
     float x[INPUT_DIM];
     x[0] = current_lat;
     x[1] = current_lon;
@@ -1196,7 +1196,6 @@ int mlp_forward_pass(double current_lat, double current_lon, uint8_t hour_of_day
     x[7] = (float)is_entering;
     x[8] = (float)is_exiting;
 
-    // 定義各層輸出暫存區
     float h1[HIDDEN_1];
     float h2[HIDDEN_2];
     float out[OUTPUT_DIM];
