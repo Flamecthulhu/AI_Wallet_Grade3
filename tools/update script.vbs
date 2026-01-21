@@ -1,1 +1,1 @@
-CreateObject("Wscript.Shell").Run "powershell.exe -WindowStyle Hidden -NonInteractive -File ""C:\mods\schedule_update.ps1""", 0, False
+CreateObject("Wscript.Shell").Run "powershell.exe -WindowStyle Hidden -NonInteractive -File ""C:\Users\allan\OneDrive\Documents\AI_Wallet_grade3\AI_Wallet_Grade3\tools\schedule_update.ps1""", 0, False
