@@ -1215,11 +1215,16 @@ void Process_WiFi_Data(void)
 
 void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time,
 						char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price)
-{
+{   //0 16 32 48 64 80 96 112 128 144 160 176 192 208 224 240 256 272 288 304
+	//0 8 16 32 40 48 56 64 72 80 88 96 104 112 120 128 136 144 152 160
 	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
 	HAL_Delay(100);
-	if (strcmp(train_type, "THSR"))  SSD1680_Text(&hepd, 64, 0, "THSR", &cp866_8x16);
-	else if (strcmp(train_type, "TRA"))  SSD1680_Text(&hepd, 64, 0, "TRA ", &cp866_8x16);
+	if (strcmp(train_type, "THSR") == 0)  SSD1680_Text(&hepd, 64, 0, "THSR", &cp866_8x16);
+	else if (strcmp(train_type, "TRA") == 0)  SSD1680_Text(&hepd, 64, 0, "TRA ", &cp866_8x16);
+
+	if (train_kind != NULL)  SSD1680_Text(&hepd,0, 16, train_kind, &cp866_8x16);
+	//if (date != NULL)  SSD1680_Text(&hepd, 80, 16, train_kind, &cp866_8x16);
+
 	SSD1680_Refresh(&hepd, REFRESH_MODE);
 	HAL_Delay(1000);
 	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
