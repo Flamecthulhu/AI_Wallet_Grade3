@@ -1152,6 +1152,17 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 
 }
 
+void debug_disp(void)
+{
+	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
+	HAL_Delay(100);
+	if (strcmp(train_type, "THSR"))  SSD1680_Text(&hepd, 16, 0, "THSR", &cp866_8x16);
+	else if (strcmp(train_type, "TRA"))  SSD1680_Text(&hepd,  16, 0, "TRA", &cp866_8x16);
+	SSD1680_Text(&hepd, 0, 0, str, &cp866_8x16);
+	SSD1680_Refresh(&hepd, FastFullRefresh);
+	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
+}
+
 void relu(float *data, int size) {
     for (int i = 0; i < size; i++) {
         if (data[i] < 0.0f) data[i] = 0.0f;
