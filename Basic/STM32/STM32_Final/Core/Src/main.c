@@ -281,7 +281,7 @@ int main(void)
 
 	    result = mlp_forward_pass(debug_array[0], debug_array[1], debug_array[2], debug_array[3], debug_array[4], debug_array[5], debug_array[6], debug_array[7],debug_array[8]);
 
-	    for (int i = 0; i < sizeof(debug_ticket); i++)
+	    for (int i = 0; i < (sizeof(debug_ticket) / sizeof(debug_ticket[0])); i++)
 	    {
 	    	if (isalpha((unsigned)debug_ticket[i][0]))
 	    	{
@@ -294,15 +294,18 @@ int main(void)
 	    	{
 	    		input_train_type = "THSR";
 	    		input_train_kind = "Standard";
-	    		strncpy(input_train_num, debug_ticket[i] + 25, 4); // Train number
-	    		strncpy(dept_sta_code, debug_ticket[i] + 30, 1);   // Depart station code
+	    		char tmp_train_num[10] = {0};
+	    		strncpy(tmp_train_num, debug_ticket[i] + 25, 4); // Train number
+	    		input_train_num = tmp_train_num;
+	    		strncpy(dept_sta_code, debug_ticket[i] + 30, 2);   // Departure station code
 	    		input_dept_sta = sta_code_decoder(dept_sta_code);
 	    		strncpy(input_date, debug_ticket[i] + 32, 8);      // Date
 	    		strncpy(input_dept_time, debug_ticket[i] + 40, 4); // Departure time
-	    		strncpy(arr_sta_code, debug_ticket[i] + 47, 1);    // Arrive station code
+	    		strncpy(arr_sta_code, debug_ticket[i] + 47, 2);    // Arrival station code
 	    		input_arr_sta = sta_code_decoder(arr_sta_code);
 	    		strncpy(input_arr_time, debug_ticket[i] + 57, 4);  // Arrival time
-	    		strncpy(seat_code, debug_ticket[i] + 77, 2);       // Seat
+	    		strncpy(input_car, debug_ticket[i] + 77, 2);       // Car
+	    		strncpy(input_seat, debug_ticket[i] + 80, 5);      // Seat
 	    		strncpy(arr_sta_code, debug_ticket[i] + 91, 1);    // Price
 	    	}
 
