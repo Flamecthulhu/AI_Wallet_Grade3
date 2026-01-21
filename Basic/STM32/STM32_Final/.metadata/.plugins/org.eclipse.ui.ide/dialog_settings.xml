@@ -9,14 +9,15 @@
 		<item key="SmartImportRootWizardPage.STORE_NESTED_PROJECTS" value="true"/>
 		<item key="SmartImportRootWizardPage.STORE_CONFIGURE_NATURES" value="true"/>
 		<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
+			<item value="C:\Users\allan\OneDrive\Documents\Basic\STM32\STM32_Final"/>
 			<item value="C:\Users\allan\OneDrive\Documents\AI_Wallet_grade3\AI_Wallet_Grade3\Basic\STM32\STM32_Final"/>
 		</list>
 		<section name="SmartImportWizard.dialogBounds">
-			<item key="DIALOG_X_ORIGIN" value="939"/>
-			<item key="DIALOG_Y_ORIGIN" value="363"/>
-			<item key="DIALOG_WIDTH" value="1107"/>
-			<item key="DIALOG_HEIGHT" value="726"/>
-			<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|5|0|Segoe UI"/>
+			<item key="DIALOG_X_ORIGIN" value="853"/>
+			<item key="DIALOG_Y_ORIGIN" value="476"/>
+			<item key="DIALOG_WIDTH" value="1324"/>
+			<item key="DIALOG_HEIGHT" value="772"/>
+			<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-18|0|0|0|400|0|0|0|1|0|0|5|0|Segoe UI"/>
 		</section>
 	</section>
 </section>

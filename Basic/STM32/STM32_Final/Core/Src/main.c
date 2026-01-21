@@ -30,7 +30,7 @@
 #include "fonts.h"
 
 #include "interfacev.h"
-
+#include "fc_weights.h"
 //#include "model_weights.c"
 /* USER CODE END Includes */
 
@@ -87,7 +87,7 @@ void HM10_Process(uint8_t byte);
 void Handle_BT_Command(char* cmd);
 void Process_WiFi_Data(void);
 
-int mlp_forward_pass(float *current_lat, float *current_lon, uint8_t hour_of_day, uint16_t min_of_day, uint8_t day_of_week, int time_to_dept, uint8_t is_ticket_reg, uint8_t is_entering, uint8_t is_exiting);
+int mlp_forward_pass(double current_lat, double current_lon, uint8_t hour_of_day, uint16_t min_of_day, uint8_t day_of_week, int time_to_dept, uint8_t is_ticket_reg, uint8_t is_entering, uint8_t is_exiting);
 
 
 SPI_HandleTypeDef hspi1;
@@ -216,7 +216,7 @@ int main(void)
 
   uint8_t msg[] = "STM32 is now on\n";
 
-  if (1)
+  if (!DEBUG_MODE)
   {
 	  HAL_UART_Transmit(&huart2, msg, sizeof(msg)-1, 1000);
 	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
@@ -234,6 +234,18 @@ int main(void)
 	  HAL_Delay(1000);
 	  SSD1680_DrawBitmap(&hepd, 0, 0, exthsr, 152, 296);
 	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
+  }
+  else if (DEBUG_MODE)
+  {
+	  int result = mlp_forward_pass(24.167680,120.653612,17,1072,5,1,0,0,1);
+	    char str[12];
+	    sprintf(str, "%d", result);
+	    HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
+	    HAL_Delay(100);
+	    SSD1680_Text(&hepd, 0, 0, str, &cp866_8x16);
+	    SSD1680_Refresh(&hepd, FastFullRefresh);
+
+	    HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
   }
 
   while (1)
@@ -927,23 +939,6 @@ void Handle_BT_Command(char* cmd)
         int len = snprintf(msg, sizeof(msg), "\r\n[CMD] %s\r\n", cmd);
         HAL_UART_Transmit(&huart2, (uint8_t*)msg, len, 100);
     #endif
-
-    if (strcmp(cmd, "relay") == 0)
-    {
-        HAL_GPIO_TogglePin(EC_RELAY_GPIO_Port, EC_RELAY_Pin);
-        HAL_GPIO_TogglePin(EC_LED_GPIO_Port, EC_LED_Pin);
-    }
-    else if (strcmp(cmd, "cls") == 0)
-    {
-        SSD1680_Clear(&hepd, ColorWhite);
-        SSD1680_Refresh(&hepd, FullRefresh);
-    }
-    else if (strcmp(cmd, "test") == 0)
-    {
-        SSD1680_Clear(&hepd, ColorWhite);
-        SSD1680_Text(&hepd, 0, 0, "BT Test OK", &cp866_8x8);
-        SSD1680_Refresh(&hepd, FullRefresh);
-    }
 }
 
 void HM10_Process(uint8_t byte)
@@ -1175,13 +1170,13 @@ void softmax(float *data, int size) {
     for (int i = 0; i < size; i++) data[i] /= sum;
 }
 
-/*
-int mlp_forward_pass(float *current_lat, float *current_lon, uint8_t hour_of_day, uint16_t min_of_day, uint8_t day_of_week, int time_to_dept, uint8_t is_ticket_reg, uint8_t is_entering, uint8_t is_exiting)
+
+int mlp_forward_pass(double current_lat, double current_lon, uint8_t hour_of_day, uint16_t min_of_day, uint8_t day_of_week, int time_to_dept, uint8_t is_ticket_reg, uint8_t is_entering, uint8_t is_exiting)
 {
     // 1. 將輸入參數組合成向量 (對齊 INPUT_DIM = 9)
     float x[INPUT_DIM];
-    x[0] = *current_lat;
-    x[1] = *current_lon;
+    x[0] = current_lat;
+    x[1] = current_lon;
     x[2] = (float)hour_of_day;
     x[3] = (float)min_of_day;
     x[4] = (float)day_of_week;
@@ -1237,7 +1232,7 @@ int mlp_forward_pass(float *current_lat, float *current_lon, uint8_t hour_of_day
     }
 
     return best_class; // 回傳預測類別 (0~4)
-}*/
+}
 
 /* USER CODE END 4 */
 
