@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "stm32h7xx_hal.h"
 #include "SSD1680.h"
@@ -88,7 +89,6 @@ void Handle_BT_Command(char* cmd);
 void Process_WiFi_Data(void);
 void debug_disp(void);
 int mlp_forward_pass(double current_lat, double current_lon, uint8_t hour_of_day, uint16_t min_of_day, uint8_t day_of_week, int time_to_dept, uint8_t is_ticket_reg, uint8_t is_entering, uint8_t is_exiting);
-
 
 SPI_HandleTypeDef hspi1;
 SSD1680_HandleTypeDef hepd;
@@ -216,7 +216,18 @@ int main(void)
   HAL_UART_Receive_IT(&huart5, WFBuffer, 1);
   HAL_UART_Receive_IT(&huart7, (uint8_t*)GPSBuffer, 1);
 
+  // Start Define Variable
   uint8_t msg[] = "STM32 is now on\n";
+  char *input_train_type, *input_train_kind;
+
+  double debug_array[9] = {24.167680, 120.653612, 17, 1072, 5, 1, 0, 0, 1};
+  char *debug_ticket[4] = {"A50111562576561ZZZZ33003230ZZZZZ6ZP7UNxP7UNx15VNA000V7UF0F07", //台中->豐原
+	  "N50049351999418ZZZZ10803300ZZZZZ3ZP1VLUP1VNI161NA004y1VHEA49", //桃園->台中
+	  "0720412420244007936860000849004202508301834470072025083019154701000000300000030030030000000540006001INTIRS000020250830109ABE", //桃園->台中
+	  "0421511450742087503470000333004202505252215520072025052522475201000000100000080020010000000540006000INTETS000020250525101909"  //台中->板橋
+  };
+
+  // End Define Variable
 
   if (!DEBUG_MODE)
   {
@@ -237,10 +248,22 @@ int main(void)
 	  SSD1680_DrawBitmap(&hepd, 0, 0, exthsr, 152, 296);
 	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
   }
+
   else if (DEBUG_MODE)
   {
-	    result = mlp_forward_pass(24.167680,120.653612,17,1072,5,1,0,0,1);
-	    debug_disp();
+	    result = mlp_forward_pass(debug_array[0], debug_array[1], debug_array[2], debug_array[3], debug_array[4], debug_array[5], debug_array[6], debug_array[7],debug_array[8]);
+
+	    for (int i = 0; i < sizeof(debug_ticket); i++)
+	    {
+	    	if (isalpha((unsigned)debug_ticket[i][0])) input_train_type = "TRA";
+	    	else input_train_type = "THSR";
+
+
+	    	//(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time, char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price)
+	    	epd_ticket_handler(input_train_type);
+	    	debug_disp();
+	    	HAL_Delay(3000);
+	    }
   }
 
   while (1)
@@ -1136,7 +1159,6 @@ void Process_WiFi_Data(void)
         line_start = line_end + 1;
     }
 
-    // 清空緩衝區
     wf_idx = 0;
     memset(WFBuffer, 0, WIFI_BUF_SIZE);
 }
@@ -1170,7 +1192,6 @@ void relu(float *data, int size) {
     }
 }
 
-// Softmax 函式 (計算預測機率)
 void softmax(float *data, int size) {
     float max_val = data[0];
     for (int i = 1; i < size; i++) if (data[i] > max_val) max_val = data[i];
