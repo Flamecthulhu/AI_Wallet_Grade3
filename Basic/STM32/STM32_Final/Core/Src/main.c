@@ -237,6 +237,20 @@ int main(void)
   input_seat = NULL;
   input_price = NULL;
 
+  /*
+   *   input_train_type = "Unknown";
+  input_train_kind = "Unknown";
+  input_train_num = "Unknown";
+  input_date = "Unknown";
+  input_dept_time = "Unknown";
+  input_dept_sta = "Unknown";
+  input_arr_time = "Unknown";
+  input_arr_sta = "Unknown";
+  input_car = "Unknown";
+  input_seat = "Unknown";
+  input_price = "Unknown";
+   */
+
   //(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time, char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price)
 
   char dept_sta_code[5], arr_sta_code[5], seat_code[9];
@@ -295,7 +309,7 @@ int main(void)
 	    		input_train_type = "THSR";
 	    		input_train_kind = "Standard";
 	    		char tmp_train_num[10] = {0};
-	    		strncpy(tmp_train_num, debug_ticket[i] + 25, 4); // Train number
+	    		strncpy(input_train_num, debug_ticket[i] + 25, 4); // Train number
 	    		input_train_num = tmp_train_num;
 	    		strncpy(dept_sta_code, debug_ticket[i] + 30, 2);   // Departure station code
 	    		input_dept_sta = sta_code_decoder(dept_sta_code);
@@ -1227,8 +1241,8 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 
 	if (date != NULL)  SSD1680_Text(&hepd, 0, 16, train_kind, &cp866_8x16);
 	if (train_kind != NULL && strcmp(train_type, "TRA") == 0)  SSD1680_Text(&hepd, 88, 16, train_kind, &cp866_8x16);
-	else if (train_kind != NULL && strcmp(train_type, "THSR") == 0) SSD1680_Text(&hepd, 88, 16, train_kind, &cp866_8x8);
-	else if (train_num != NULL && strcmp(train_type, "THSR") == 0) SSD1680_Text(&hepd, 88, 24, train_num, &cp866_8x8);
+	else if (train_kind != NULL && (strcmp(train_type, "THSR") == 0)) SSD1680_Text(&hepd, 88, 16, train_kind, &cp866_8x8);
+	else if (train_num != NULL && (strcmp(train_type, "THSR") == 0)) SSD1680_Text(&hepd, 88, 24, train_num, &cp866_8x8);
 
 
 	SSD1680_Refresh(&hepd, REFRESH_MODE);

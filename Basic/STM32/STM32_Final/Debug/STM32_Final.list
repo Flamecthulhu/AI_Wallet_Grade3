@@ -33,11 +33,11 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  14 .debug_macro  00039309  00000000  00000000  000397c8  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_line   000210ee  00000000  00000000  00072ad1  2**0
+ 15 .debug_line   000210f0  00000000  00000000  00072ad1  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_str    0016b3ef  00000000  00000000  00093bbf  2**0
+ 16 .debug_str    0016b3ef  00000000  00000000  00093bc1  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .comment      00000043  00000000  00000000  001fefae  2**0
+ 17 .comment      00000043  00000000  00000000  001fefb0  2**0
                   CONTENTS, READONLY
  18 .debug_frame  00006c00  00000000  00000000  001feff4  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
@@ -2377,6 +2377,7 @@ int main(void)
   input_price = NULL;
  8001598:	2300      	movs	r3, #0
  800159a:	f8c7 30ec 	str.w	r3, [r7, #236]	@ 0xec
+   */
 
   //(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time, char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price)
 
@@ -2458,7 +2459,7 @@ int main(void)
 	    for (int i = 0; i < (sizeof(debug_ticket) / sizeof(debug_ticket[0])); i++)
  8001660:	2300      	movs	r3, #0
  8001662:	f8c7 3104 	str.w	r3, [r7, #260]	@ 0x104
- 8001666:	e12a      	b.n	80018be <main+0x486>
+ 8001666:	e129      	b.n	80018bc <main+0x484>
 	    {
 	    	if (isalpha((unsigned)debug_ticket[i][0]))
  8001668:	f507 7390 	add.w	r3, r7, #288	@ 0x120
@@ -2494,10 +2495,10 @@ int main(void)
  80016b8:	f853 3022 	ldr.w	r3, [r3, r2, lsl #2]
  80016bc:	781b      	ldrb	r3, [r3, #0]
  80016be:	2b4e      	cmp	r3, #78	@ 0x4e
- 80016c0:	f040 80d5 	bne.w	800186e <main+0x436>
+ 80016c0:	f040 80d4 	bne.w	800186c <main+0x434>
  80016c4:	4b13      	ldr	r3, [pc, #76]	@ (8001714 <main+0x2dc>)
  80016c6:	f8c7 3114 	str.w	r3, [r7, #276]	@ 0x114
- 80016ca:	e0d0      	b.n	800186e <main+0x436>
+ 80016ca:	e0cf      	b.n	800186c <main+0x434>
  80016cc:	24000564 	.word	0x24000564
  80016d0:	2400027c 	.word	0x2400027c
  80016d4:	240002c8 	.word	0x240002c8
@@ -2534,150 +2535,151 @@ int main(void)
  800172e:	601a      	str	r2, [r3, #0]
  8001730:	605a      	str	r2, [r3, #4]
  8001732:	811a      	strh	r2, [r3, #8]
-	    		strncpy(tmp_train_num, debug_ticket[i] + 25, 4); // Train number
+	    		strncpy(input_train_num, debug_ticket[i] + 25, 4); // Train number
  8001734:	f507 7390 	add.w	r3, r7, #288	@ 0x120
  8001738:	f5a3 7384 	sub.w	r3, r3, #264	@ 0x108
  800173c:	f8d7 2104 	ldr.w	r2, [r7, #260]	@ 0x104
  8001740:	f853 3022 	ldr.w	r3, [r3, r2, lsl #2]
- 8001744:	f103 0119 	add.w	r1, r3, #25
- 8001748:	f107 030c 	add.w	r3, r7, #12
- 800174c:	2204      	movs	r2, #4
- 800174e:	4618      	mov	r0, r3
- 8001750:	f00d fe62 	bl	800f418 <strncpy>
+ 8001744:	3319      	adds	r3, #25
+ 8001746:	2204      	movs	r2, #4
+ 8001748:	4619      	mov	r1, r3
+ 800174a:	f8d7 0110 	ldr.w	r0, [r7, #272]	@ 0x110
+ 800174e:	f00d fe63 	bl	800f418 <strncpy>
 	    		input_train_num = tmp_train_num;
- 8001754:	f107 030c 	add.w	r3, r7, #12
- 8001758:	f8c7 3110 	str.w	r3, [r7, #272]	@ 0x110
+ 8001752:	f107 030c 	add.w	r3, r7, #12
+ 8001756:	f8c7 3110 	str.w	r3, [r7, #272]	@ 0x110
 	    		strncpy(dept_sta_code, debug_ticket[i] + 30, 2);   // Departure station code
- 800175c:	f507 7390 	add.w	r3, r7, #288	@ 0x120
- 8001760:	f5a3 7384 	sub.w	r3, r3, #264	@ 0x108
- 8001764:	f8d7 2104 	ldr.w	r2, [r7, #260]	@ 0x104
- 8001768:	f853 3022 	ldr.w	r3, [r3, r2, lsl #2]
- 800176c:	f103 011e 	add.w	r1, r3, #30
- 8001770:	f107 0388 	add.w	r3, r7, #136	@ 0x88
- 8001774:	2202      	movs	r2, #2
- 8001776:	4618      	mov	r0, r3
- 8001778:	f00d fe4e 	bl	800f418 <strncpy>
+ 800175a:	f507 7390 	add.w	r3, r7, #288	@ 0x120
+ 800175e:	f5a3 7384 	sub.w	r3, r3, #264	@ 0x108
+ 8001762:	f8d7 2104 	ldr.w	r2, [r7, #260]	@ 0x104
+ 8001766:	f853 3022 	ldr.w	r3, [r3, r2, lsl #2]
+ 800176a:	f103 011e 	add.w	r1, r3, #30
+ 800176e:	f107 0388 	add.w	r3, r7, #136	@ 0x88
+ 8001772:	2202      	movs	r2, #2
+ 8001774:	4618      	mov	r0, r3
+ 8001776:	f00d fe4f 	bl	800f418 <strncpy>
 	    		input_dept_sta = sta_code_decoder(dept_sta_code);
- 800177c:	f107 0388 	add.w	r3, r7, #136	@ 0x88
- 8001780:	4618      	mov	r0, r3
- 8001782:	f001 fad3 	bl	8002d2c <sta_code_decoder>
- 8001786:	f8c7 010c 	str.w	r0, [r7, #268]	@ 0x10c
+ 800177a:	f107 0388 	add.w	r3, r7, #136	@ 0x88
+ 800177e:	4618      	mov	r0, r3
+ 8001780:	f001 fad4 	bl	8002d2c <sta_code_decoder>
+ 8001784:	f8c7 010c 	str.w	r0, [r7, #268]	@ 0x10c
 	    		strncpy(input_date, debug_ticket[i] + 32, 8);      // Date
- 800178a:	f507 7390 	add.w	r3, r7, #288	@ 0x120
- 800178e:	f5a3 7384 	sub.w	r3, r3, #264	@ 0x108
- 8001792:	f8d7 2104 	ldr.w	r2, [r7, #260]	@ 0x104
- 8001796:	f853 3022 	ldr.w	r3, [r3, r2, lsl #2]
- 800179a:	3320      	adds	r3, #32
- 800179c:	2208      	movs	r2, #8
- 800179e:	4619      	mov	r1, r3
- 80017a0:	f8d7 0100 	ldr.w	r0, [r7, #256]	@ 0x100
- 80017a4:	f00d fe38 	bl	800f418 <strncpy>
+ 8001788:	f507 7390 	add.w	r3, r7, #288	@ 0x120
+ 800178c:	f5a3 7384 	sub.w	r3, r3, #264	@ 0x108
+ 8001790:	f8d7 2104 	ldr.w	r2, [r7, #260]	@ 0x104
+ 8001794:	f853 3022 	ldr.w	r3, [r3, r2, lsl #2]
+ 8001798:	3320      	adds	r3, #32
+ 800179a:	2208      	movs	r2, #8
+ 800179c:	4619      	mov	r1, r3
+ 800179e:	f8d7 0100 	ldr.w	r0, [r7, #256]	@ 0x100
+ 80017a2:	f00d fe39 	bl	800f418 <strncpy>
 	    		strncpy(input_dept_time, debug_ticket[i] + 40, 4); // Departure time
- 80017a8:	f507 7390 	add.w	r3, r7, #288	@ 0x120
- 80017ac:	f5a3 7384 	sub.w	r3, r3, #264	@ 0x108
- 80017b0:	f8d7 2104 	ldr.w	r2, [r7, #260]	@ 0x104
- 80017b4:	f853 3022 	ldr.w	r3, [r3, r2, lsl #2]
- 80017b8:	3328      	adds	r3, #40	@ 0x28
- 80017ba:	2204      	movs	r2, #4
- 80017bc:	4619      	mov	r1, r3
- 80017be:	f8d7 00fc 	ldr.w	r0, [r7, #252]	@ 0xfc
- 80017c2:	f00d fe29 	bl	800f418 <strncpy>
+ 80017a6:	f507 7390 	add.w	r3, r7, #288	@ 0x120
+ 80017aa:	f5a3 7384 	sub.w	r3, r3, #264	@ 0x108
+ 80017ae:	f8d7 2104 	ldr.w	r2, [r7, #260]	@ 0x104
+ 80017b2:	f853 3022 	ldr.w	r3, [r3, r2, lsl #2]
+ 80017b6:	3328      	adds	r3, #40	@ 0x28
+ 80017b8:	2204      	movs	r2, #4
+ 80017ba:	4619      	mov	r1, r3
+ 80017bc:	f8d7 00fc 	ldr.w	r0, [r7, #252]	@ 0xfc
+ 80017c0:	f00d fe2a 	bl	800f418 <strncpy>
 	    		strncpy(arr_sta_code, debug_ticket[i] + 47, 2);    // Arrival station code
- 80017c6:	f507 7390 	add.w	r3, r7, #288	@ 0x120
- 80017ca:	f5a3 7384 	sub.w	r3, r3, #264	@ 0x108
- 80017ce:	f8d7 2104 	ldr.w	r2, [r7, #260]	@ 0x104
- 80017d2:	f853 3022 	ldr.w	r3, [r3, r2, lsl #2]
- 80017d6:	f103 012f 	add.w	r1, r3, #47	@ 0x2f
- 80017da:	f107 0380 	add.w	r3, r7, #128	@ 0x80
- 80017de:	2202      	movs	r2, #2
- 80017e0:	4618      	mov	r0, r3
- 80017e2:	f00d fe19 	bl	800f418 <strncpy>
+ 80017c4:	f507 7390 	add.w	r3, r7, #288	@ 0x120
+ 80017c8:	f5a3 7384 	sub.w	r3, r3, #264	@ 0x108
+ 80017cc:	f8d7 2104 	ldr.w	r2, [r7, #260]	@ 0x104
+ 80017d0:	f853 3022 	ldr.w	r3, [r3, r2, lsl #2]
+ 80017d4:	f103 012f 	add.w	r1, r3, #47	@ 0x2f
+ 80017d8:	f107 0380 	add.w	r3, r7, #128	@ 0x80
+ 80017dc:	2202      	movs	r2, #2
+ 80017de:	4618      	mov	r0, r3
+ 80017e0:	f00d fe1a 	bl	800f418 <strncpy>
 	    		input_arr_sta = sta_code_decoder(arr_sta_code);
- 80017e6:	f107 0380 	add.w	r3, r7, #128	@ 0x80
- 80017ea:	4618      	mov	r0, r3
- 80017ec:	f001 fa9e 	bl	8002d2c <sta_code_decoder>
- 80017f0:	f8c7 0108 	str.w	r0, [r7, #264]	@ 0x108
+ 80017e4:	f107 0380 	add.w	r3, r7, #128	@ 0x80
+ 80017e8:	4618      	mov	r0, r3
+ 80017ea:	f001 fa9f 	bl	8002d2c <sta_code_decoder>
+ 80017ee:	f8c7 0108 	str.w	r0, [r7, #264]	@ 0x108
 	    		strncpy(input_arr_time, debug_ticket[i] + 57, 4);  // Arrival time
- 80017f4:	f507 7390 	add.w	r3, r7, #288	@ 0x120
- 80017f8:	f5a3 7384 	sub.w	r3, r3, #264	@ 0x108
- 80017fc:	f8d7 2104 	ldr.w	r2, [r7, #260]	@ 0x104
- 8001800:	f853 3022 	ldr.w	r3, [r3, r2, lsl #2]
- 8001804:	3339      	adds	r3, #57	@ 0x39
- 8001806:	2204      	movs	r2, #4
- 8001808:	4619      	mov	r1, r3
- 800180a:	f8d7 00f8 	ldr.w	r0, [r7, #248]	@ 0xf8
- 800180e:	f00d fe03 	bl	800f418 <strncpy>
+ 80017f2:	f507 7390 	add.w	r3, r7, #288	@ 0x120
+ 80017f6:	f5a3 7384 	sub.w	r3, r3, #264	@ 0x108
+ 80017fa:	f8d7 2104 	ldr.w	r2, [r7, #260]	@ 0x104
+ 80017fe:	f853 3022 	ldr.w	r3, [r3, r2, lsl #2]
+ 8001802:	3339      	adds	r3, #57	@ 0x39
+ 8001804:	2204      	movs	r2, #4
+ 8001806:	4619      	mov	r1, r3
+ 8001808:	f8d7 00f8 	ldr.w	r0, [r7, #248]	@ 0xf8
+ 800180c:	f00d fe04 	bl	800f418 <strncpy>
 	    		strncpy(input_car, debug_ticket[i] + 77, 2);       // Car
- 8001812:	f507 7390 	add.w	r3, r7, #288	@ 0x120
- 8001816:	f5a3 7384 	sub.w	r3, r3, #264	@ 0x108
- 800181a:	f8d7 2104 	ldr.w	r2, [r7, #260]	@ 0x104
- 800181e:	f853 3022 	ldr.w	r3, [r3, r2, lsl #2]
- 8001822:	334d      	adds	r3, #77	@ 0x4d
- 8001824:	2202      	movs	r2, #2
- 8001826:	4619      	mov	r1, r3
- 8001828:	f8d7 00f4 	ldr.w	r0, [r7, #244]	@ 0xf4
- 800182c:	f00d fdf4 	bl	800f418 <strncpy>
+ 8001810:	f507 7390 	add.w	r3, r7, #288	@ 0x120
+ 8001814:	f5a3 7384 	sub.w	r3, r3, #264	@ 0x108
+ 8001818:	f8d7 2104 	ldr.w	r2, [r7, #260]	@ 0x104
+ 800181c:	f853 3022 	ldr.w	r3, [r3, r2, lsl #2]
+ 8001820:	334d      	adds	r3, #77	@ 0x4d
+ 8001822:	2202      	movs	r2, #2
+ 8001824:	4619      	mov	r1, r3
+ 8001826:	f8d7 00f4 	ldr.w	r0, [r7, #244]	@ 0xf4
+ 800182a:	f00d fdf5 	bl	800f418 <strncpy>
 	    		strncpy(input_seat, debug_ticket[i] + 80, 5);      // Seat
- 8001830:	f507 7390 	add.w	r3, r7, #288	@ 0x120
- 8001834:	f5a3 7384 	sub.w	r3, r3, #264	@ 0x108
- 8001838:	f8d7 2104 	ldr.w	r2, [r7, #260]	@ 0x104
- 800183c:	f853 3022 	ldr.w	r3, [r3, r2, lsl #2]
- 8001840:	3350      	adds	r3, #80	@ 0x50
- 8001842:	2205      	movs	r2, #5
- 8001844:	4619      	mov	r1, r3
- 8001846:	f8d7 00f0 	ldr.w	r0, [r7, #240]	@ 0xf0
- 800184a:	f00d fde5 	bl	800f418 <strncpy>
+ 800182e:	f507 7390 	add.w	r3, r7, #288	@ 0x120
+ 8001832:	f5a3 7384 	sub.w	r3, r3, #264	@ 0x108
+ 8001836:	f8d7 2104 	ldr.w	r2, [r7, #260]	@ 0x104
+ 800183a:	f853 3022 	ldr.w	r3, [r3, r2, lsl #2]
+ 800183e:	3350      	adds	r3, #80	@ 0x50
+ 8001840:	2205      	movs	r2, #5
+ 8001842:	4619      	mov	r1, r3
+ 8001844:	f8d7 00f0 	ldr.w	r0, [r7, #240]	@ 0xf0
+ 8001848:	f00d fde6 	bl	800f418 <strncpy>
 	    		strncpy(arr_sta_code, debug_ticket[i] + 91, 1);    // Price
- 800184e:	f507 7390 	add.w	r3, r7, #288	@ 0x120
- 8001852:	f5a3 7384 	sub.w	r3, r3, #264	@ 0x108
- 8001856:	f8d7 2104 	ldr.w	r2, [r7, #260]	@ 0x104
- 800185a:	f853 3022 	ldr.w	r3, [r3, r2, lsl #2]
- 800185e:	f103 015b 	add.w	r1, r3, #91	@ 0x5b
- 8001862:	f107 0380 	add.w	r3, r7, #128	@ 0x80
- 8001866:	2201      	movs	r2, #1
- 8001868:	4618      	mov	r0, r3
- 800186a:	f00d fdd5 	bl	800f418 <strncpy>
+ 800184c:	f507 7390 	add.w	r3, r7, #288	@ 0x120
+ 8001850:	f5a3 7384 	sub.w	r3, r3, #264	@ 0x108
+ 8001854:	f8d7 2104 	ldr.w	r2, [r7, #260]	@ 0x104
+ 8001858:	f853 3022 	ldr.w	r3, [r3, r2, lsl #2]
+ 800185c:	f103 015b 	add.w	r1, r3, #91	@ 0x5b
+ 8001860:	f107 0380 	add.w	r3, r7, #128	@ 0x80
+ 8001864:	2201      	movs	r2, #1
+ 8001866:	4618      	mov	r0, r3
+ 8001868:	f00d fdd6 	bl	800f418 <strncpy>
 	    	}
 
 	    	//(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time, char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price)
 	    	epd_ticket_handler(input_train_type, input_train_kind, input_train_num, input_date, input_dept_time, input_dept_sta,
- 800186e:	f8d7 30ec 	ldr.w	r3, [r7, #236]	@ 0xec
- 8001872:	9306      	str	r3, [sp, #24]
- 8001874:	f8d7 30f0 	ldr.w	r3, [r7, #240]	@ 0xf0
- 8001878:	9305      	str	r3, [sp, #20]
- 800187a:	f8d7 30f4 	ldr.w	r3, [r7, #244]	@ 0xf4
- 800187e:	9304      	str	r3, [sp, #16]
- 8001880:	f8d7 3108 	ldr.w	r3, [r7, #264]	@ 0x108
- 8001884:	9303      	str	r3, [sp, #12]
- 8001886:	f8d7 30f8 	ldr.w	r3, [r7, #248]	@ 0xf8
- 800188a:	9302      	str	r3, [sp, #8]
- 800188c:	f8d7 310c 	ldr.w	r3, [r7, #268]	@ 0x10c
- 8001890:	9301      	str	r3, [sp, #4]
- 8001892:	f8d7 30fc 	ldr.w	r3, [r7, #252]	@ 0xfc
- 8001896:	9300      	str	r3, [sp, #0]
- 8001898:	f8d7 3100 	ldr.w	r3, [r7, #256]	@ 0x100
- 800189c:	f8d7 2110 	ldr.w	r2, [r7, #272]	@ 0x110
- 80018a0:	f8d7 1114 	ldr.w	r1, [r7, #276]	@ 0x114
- 80018a4:	f8d7 0118 	ldr.w	r0, [r7, #280]	@ 0x118
- 80018a8:	f001 f9ac 	bl	8002c04 <epd_ticket_handler>
+ 800186c:	f8d7 30ec 	ldr.w	r3, [r7, #236]	@ 0xec
+ 8001870:	9306      	str	r3, [sp, #24]
+ 8001872:	f8d7 30f0 	ldr.w	r3, [r7, #240]	@ 0xf0
+ 8001876:	9305      	str	r3, [sp, #20]
+ 8001878:	f8d7 30f4 	ldr.w	r3, [r7, #244]	@ 0xf4
+ 800187c:	9304      	str	r3, [sp, #16]
+ 800187e:	f8d7 3108 	ldr.w	r3, [r7, #264]	@ 0x108
+ 8001882:	9303      	str	r3, [sp, #12]
+ 8001884:	f8d7 30f8 	ldr.w	r3, [r7, #248]	@ 0xf8
+ 8001888:	9302      	str	r3, [sp, #8]
+ 800188a:	f8d7 310c 	ldr.w	r3, [r7, #268]	@ 0x10c
+ 800188e:	9301      	str	r3, [sp, #4]
+ 8001890:	f8d7 30fc 	ldr.w	r3, [r7, #252]	@ 0xfc
+ 8001894:	9300      	str	r3, [sp, #0]
+ 8001896:	f8d7 3100 	ldr.w	r3, [r7, #256]	@ 0x100
+ 800189a:	f8d7 2110 	ldr.w	r2, [r7, #272]	@ 0x110
+ 800189e:	f8d7 1114 	ldr.w	r1, [r7, #276]	@ 0x114
+ 80018a2:	f8d7 0118 	ldr.w	r0, [r7, #280]	@ 0x118
+ 80018a6:	f001 f9ad 	bl	8002c04 <epd_ticket_handler>
 	    			input_arr_time, input_arr_sta, input_car, input_seat, input_price);
 	    	//debug_disp();
 	    	HAL_Delay(3000);
- 80018ac:	f640 30b8 	movw	r0, #3000	@ 0xbb8
- 80018b0:	f002 fa06 	bl	8003cc0 <HAL_Delay>
+ 80018aa:	f640 30b8 	movw	r0, #3000	@ 0xbb8
+ 80018ae:	f002 fa07 	bl	8003cc0 <HAL_Delay>
 	    for (int i = 0; i < (sizeof(debug_ticket) / sizeof(debug_ticket[0])); i++)
- 80018b4:	f8d7 3104 	ldr.w	r3, [r7, #260]	@ 0x104
- 80018b8:	3301      	adds	r3, #1
- 80018ba:	f8c7 3104 	str.w	r3, [r7, #260]	@ 0x104
- 80018be:	f8d7 3104 	ldr.w	r3, [r7, #260]	@ 0x104
- 80018c2:	2b03      	cmp	r3, #3
- 80018c4:	f67f aed0 	bls.w	8001668 <main+0x230>
+ 80018b2:	f8d7 3104 	ldr.w	r3, [r7, #260]	@ 0x104
+ 80018b6:	3301      	adds	r3, #1
+ 80018b8:	f8c7 3104 	str.w	r3, [r7, #260]	@ 0x104
+ 80018bc:	f8d7 3104 	ldr.w	r3, [r7, #260]	@ 0x104
+ 80018c0:	2b03      	cmp	r3, #3
+ 80018c2:	f67f aed1 	bls.w	8001668 <main+0x230>
 	    }
   }
 
   while (1)
- 80018c8:	bf00      	nop
- 80018ca:	e7fd      	b.n	80018c8 <main+0x490>
+ 80018c6:	bf00      	nop
+ 80018c8:	e7fd      	b.n	80018c6 <main+0x48e>
+ 80018ca:	bf00      	nop
  80018cc:	08012018 	.word	0x08012018
  80018d0:	08012020 	.word	0x08012020
 
@@ -5579,7 +5581,7 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
  8002c9c:	481d      	ldr	r0, [pc, #116]	@ (8002d14 <epd_ticket_handler+0x110>)
  8002c9e:	f7fe facd 	bl	800123c <SSD1680_Text>
  8002ca2:	e024      	b.n	8002cee <epd_ticket_handler+0xea>
-	else if (train_kind != NULL && strcmp(train_type, "THSR") == 0) SSD1680_Text(&hepd, 88, 16, train_kind, &cp866_8x8);
+	else if (train_kind != NULL && (strcmp(train_type, "THSR") == 0)) SSD1680_Text(&hepd, 88, 16, train_kind, &cp866_8x8);
  8002ca4:	68bb      	ldr	r3, [r7, #8]
  8002ca6:	2b00      	cmp	r3, #0
  8002ca8:	d00f      	beq.n	8002cca <epd_ticket_handler+0xc6>
@@ -5597,7 +5599,7 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
  8002cc2:	4814      	ldr	r0, [pc, #80]	@ (8002d14 <epd_ticket_handler+0x110>)
  8002cc4:	f7fe faba 	bl	800123c <SSD1680_Text>
  8002cc8:	e011      	b.n	8002cee <epd_ticket_handler+0xea>
-	else if (train_num != NULL && strcmp(train_type, "THSR") == 0) SSD1680_Text(&hepd, 88, 24, train_num, &cp866_8x8);
+	else if (train_num != NULL && (strcmp(train_type, "THSR") == 0)) SSD1680_Text(&hepd, 88, 24, train_num, &cp866_8x8);
  8002cca:	687b      	ldr	r3, [r7, #4]
  8002ccc:	2b00      	cmp	r3, #0
  8002cce:	d00e      	beq.n	8002cee <epd_ticket_handler+0xea>
