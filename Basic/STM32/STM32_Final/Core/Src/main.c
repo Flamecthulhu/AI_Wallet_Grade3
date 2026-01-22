@@ -51,9 +51,10 @@
 #define OUTPUT_DIM 5
 #define REFRESH_MODE 199
 
-#define SRC_DIM 29
-#define DEST_DIM 145
-#define DEST_BYTE_WIDTH (DEST_DIM / 8)
+#define SRC_DIM 29       // 原始寬度
+#define SCALE 5          // 放大 5 倍
+#define TGT_DIM 152      // 目標寬度
+#define OFFSET 3
 
 /* USER CODE END PD */
 
@@ -99,7 +100,7 @@ int mlp_forward_pass(double current_lat, double current_lon, uint8_t hour_of_day
 					 int time_to_dept, uint8_t is_ticket_reg, uint8_t is_entering, uint8_t is_exiting);
 void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time,
 						char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price);
-void unpack_to_epd_format(const unsigned char *src);
+void generate_upscaled_qr();
 char* sta_code_decoder(char *sta_code);
 SPI_HandleTypeDef hspi1;
 SSD1680_HandleTypeDef hepd;
@@ -134,8 +135,8 @@ static uint8_t bt_idx = 0;
 
 char parts[15][16];
 
-int result;
-static uint8_t epd_buffer[DEST_BYTE_WIDTH * DEST_DIM];
+int result; //MLP
+uint8_t out_buffer[2888]; //QR Upscale
 const unsigned char version3[128] = {
 0XFF,0X52,0X0E,0XFF,0X81,0X29,0XEE,0X81,0XB9,0X12,0XDE,0X9D,0XBD,0X11,0XF4,0XBD,
 0XBD,0X60,0XC0,0XBD,0XBD,0X78,0XCA,0XBD,0X81,0X13,0XA6,0X81,0XFF,0X54,0XAA,0XFF,
@@ -326,8 +327,8 @@ int main(void)
   {
 	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
 	  HAL_Delay(100);
-	  unpack_to_epd_format(version3);
-	  SSD1680_SetRegion(&hepd, 0, 0, 152, 152, epd_buffer, NULL);
+	  generate_upscaled_qr();
+	  SSD1680_SetRegion(&hepd, 0, 0, 144, 144, out_buffer, NULL);
 	  SSD1680_Refresh(&hepd, FullRefresh);
 	  HAL_Delay(3000);
 	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
@@ -1327,9 +1328,7 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 	SSD1680_Text(&hepd, 88, 118, convert_arr_time, &cp866_8x16);
 	SSD1680_Text(&hepd, 8, 112, sta_code_decoder(arr_sta), &cp866_8x16);
 
-	static uint8_t my_new_array[DEST_DIM][DEST_DIM];
-	unpack_to_buffer(version3, my_new_array);
-	SSD1680_SetRegion(&hepd, 0, 0, 145, 145, (uint8_t *)my_new_array, NULL);
+
 
 	SSD1680_Refresh(&hepd, REFRESH_MODE);
 	HAL_Delay(1000);
@@ -1349,27 +1348,44 @@ void debug_disp(void)
 	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
 }
 
-void unpack_to_epd_format(const unsigned char *src) {
-    // 初始化背景為白色 (電子紙通常 1 是白, 0 是黑，或反之，視硬體定義)
-    memset(epd_buffer, 0xFF, sizeof(epd_buffer));
+void generate_upscaled_qr() {
+    // 1. 清空 Buffer (設為 0x00 白色)
+    memset(out_buffer, 0x00, sizeof(out_buffer));
 
-    for (int y = 0; y < DEST_DIM; y++) {
-        for (int x = 0; x < DEST_DIM; x++) {
-            // 使用「最近鄰插值」找到對應的原始 QR 坐標
-            int src_x = x * SRC_DIM / DEST_DIM;
-            int src_y = y * SRC_DIM / DEST_DIM;
+    // 2. 遍歷原始 29x29 資料
+    for (int y = 0; y < SRC_DIM; y++) {
+        // 取得該行的原始指標 (每行 4 bytes)
+        const uint8_t* row_ptr = &version3[y * 4];
 
-            // 從原始 116 bytes 中提取位元
-            int byte_idx = (src_y * 4) + (src_x / 8);
-            int bit_pos  = 7 - (src_x % 8);
-            int is_dark  = (src[byte_idx] >> bit_pos) & 1;
+        for (int x = 0; x < SRC_DIM; x++) {
+            // 解析原始 Bit (假設 MSB First)
+            int byte_idx = x / 8;
+            int bit_idx = 7 - (x % 8);
+            int is_black = (row_ptr[byte_idx] >> bit_idx) & 1;
 
-            if (is_dark) {
-                // 將對應的位元設為 0 (黑色)
-                // 這裡假設 SSD1680 的 0 是黑色，1 是白色
-                int target_byte_idx = (y * DEST_BYTE_WIDTH) + (x / 8);
-                int target_bit_pos  = 7 - (x % 8);
-                epd_buffer[target_byte_idx] &= ~(1 << target_bit_pos);
+            if (is_black) {
+                // 3. 計算放大後的 5x5 區塊座標
+                int start_x = OFFSET + (x * SCALE); // X 從 3 開始
+                int start_y = OFFSET + (y * SCALE); // Y 從 3 開始
+
+                // 4. 繪製 5x5 黑塊
+                for (int dy = 0; dy < SCALE; dy++) {
+                    int draw_y = start_y + dy;
+
+                    // 優化：不需要每次重算 y_offset，每行算一次即可
+                    int row_offset = draw_y * (TGT_DIM / 8); // 152/8 = 19 bytes width
+
+                    for (int dx = 0; dx < SCALE; dx++) {
+                        int draw_x = start_x + dx;
+
+                        // 計算在 Buffer 中的位置
+                        int buf_idx = row_offset + (draw_x / 8);
+                        int bit_pos = 7 - (draw_x % 8);
+
+                        // 設定 Bit 為 1 (黑)
+                        out_buffer[buf_idx] |= (1 << bit_pos);
+                    }
+                }
             }
         }
     }
