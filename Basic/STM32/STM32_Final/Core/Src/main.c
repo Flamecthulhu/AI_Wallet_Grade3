@@ -163,18 +163,14 @@ const unsigned char version7[270] = {
 0X9F,0XAF,0XAF,0XAA,0XBA,0XE8,0X55,0X5F,0X01,0X65,0X4A,0XE8,0XAA,0XE9,0XDA,0XA8,
 0XBA,0XE8,0X40,0X81,0X58,0XDF,0X6A,0X08,0XFA,0XEC,0XA3,0X6E,0X2B,0XF8,};
 
-const unsigned char arrow[162] = {
-0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,
-0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,
-0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,
-0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,
-0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,
-0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,
-0XFF,0X00,0X00,0XFF,0X00,0X20,0XFF,0X00,0X70,0XFF,0X00,0XF8,0XFF,0X01,0XFC,0XFF,
-0X03,0XFE,0XFF,0X07,0XFF,0XFF,0X0F,0XFE,0XFF,0X1F,0XFC,0XFF,0X3F,0XF8,0XFF,0X7F,
-0XF0,0XFF,0XFF,0XE0,0XFF,0XFF,0XC0,0XFF,0XFF,0X80,0XFF,0XFF,0X00,0XFF,0XFE,0X00,
-0XFF,0XFC,0X00,0XFF,0XF8,0X00,0XFF,0XF0,0X00,0XFF,0XE0,0X00,0XFF,0XC0,0X00,0XFF,
-0X80,0X00,};
+const unsigned char arrow[72] = {
+0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,
+0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,
+0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XF7,0X07,0XE3,
+0X07,0XC1,0X07,0X80,0X07,0X01,0X06,0X03,0X04,0X07,0X00,0X0F,0X00,0X1F,0X00,0X3F,
+0X00,0X7F,0X00,0XFF,0X01,0XFF,0X03,0XFF,};
+
+
 
 
 
@@ -1315,7 +1311,7 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 	SSD1680_Text(&hepd, 88, 56, convert_dept_time, &cp866_8x16);
 	SSD1680_Text(&hepd, 8, 40, sta_code_decoder(dept_sta), &cp866_8x16);
 
-	SSD1680_SetRegion(&hepd, 24, 72, 24, 54, arrow, NULL);
+	SSD1680_SetRegion(&hepd, 32, 68, 16, 36, arrow, NULL);
 
 	SSD1680_Text(&hepd, 88, 72, "Car", &cp866_8x16);
 	if (car[0] == '0') SSD1680_Text(&hepd, 128, 72, car + 1, &cp866_8x16);
@@ -1406,22 +1402,22 @@ void generate_upscaled_qr(uint16_t height, uint16_t width, uint8_t scale,const u
 
 void generate_v7_upscale()
 {
-    // 1. 先將整張畫布清空為白色 (0x00)
-    // 這樣我們就不需要處理 "留白" 的邏輯，剩下的 9px 自動會是白的
 	memset(out_buffer, 0xFF, 2592);
 
 	    for (int y = 0; y < 45; y++) {
-
-	        // 【關鍵】每一行的開頭位置
-	        // 如果來源有 Padding，這裡必須跳過正確的 byte 數
-	        const uint8_t* row_ptr = &version7[y * 5];
+	        // 使用 6 Bytes Stride (既然 8 是全錯的，那 6 應該是對的)
+	        const uint8_t* row_ptr = &version7[y * 6];
 
 	        for (int x = 0; x < 45; x++) {
 
-	            // 讀取 Bit (如果不對，試著換回 MSB: >> (7 - (x & 7)))
-	            int is_black = (row_ptr[x >> 3] >> (7 - (x & 7))) & 1;
+	            // --- 【關鍵修改】 ---
+	            // 原本是 MSB: (row_ptr[x >> 3] >> (7 - (x & 7))) & 1;
+	            // 改成 LSB 試試看 (從低位元讀起)：
+	            int is_black = (row_ptr[x >> 3] >> (x & 7)) & 1;
+	            // ------------------
 
 	            if (is_black) {
+	                // 放大 3 倍
 	                int start_x = x * 3;
 	                int start_y = y * 3;
 
@@ -1430,7 +1426,8 @@ void generate_v7_upscale()
 	                    for (int dx = 0; dx < 3; dx++) {
 	                        int draw_x = start_x + dx;
 
-	                        // 寫入 Buffer (把 bit 清成 0 代表黑色)
+	                        // 寫入 Output Buffer
+	                        // 注意：Output 給螢幕通常還是維持 MSB (7 - bit)，除非螢幕也是反的
 	                        out_buffer[row_offset + (draw_x >> 3)] &= ~(1 << (7 - (draw_x & 7)));
 	                    }
 	                }
