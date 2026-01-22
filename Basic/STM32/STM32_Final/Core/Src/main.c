@@ -44,14 +44,14 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define DEBUG_MODE 1
-#define DEMO_MODE 0
+#define DEBUG_MODE 0
+#define DEMO_MODE 1
 
 #define INPUT_DIM  9
 #define HIDDEN_1   64
 #define HIDDEN_2   32
 #define OUTPUT_DIM 5
-#define REFRESH_MODE FullRefresh //FullRefresh 247
+#define REFRESH_MODE FastFullRefresh //FullRefresh 247
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -139,8 +139,6 @@ const unsigned char arrow[72] = {
 0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XF7,0X07,0XE3,
 0X07,0XC1,0X07,0X80,0X07,0X01,0X06,0X03,0X04,0X07,0X00,0X0F,0X00,0X1F,0X00,0X3F,
 0X00,0X7F,0X00,0XFF,0X01,0XFF,0X03,0XFF,};
-
-
 
 /* USER CODE END PV */
 
@@ -273,7 +271,7 @@ int main(void)
   HAL_UART_Receive_IT(&huart4, BTBuffer, 1);
   HAL_UART_Receive_IT(&huart5, WFBuffer, 1);
   //HAL_UART_Receive_IT(&huart7, (uint8_t*)GPSBuffer, 1);
-  HAL_UART_Receive_DMA(&huart3, (uint8_t *)p, 1);
+  //HAL_UART_Receive_DMA(&huart3, (uint8_t *)p, 1);
 
   // Start Define Variable
   uint8_t msg[] = "STM32 is now on\n";
@@ -296,16 +294,15 @@ int main(void)
 	  "0720412420244007936860000849004202508301834470072025083019154701000000300000030030030000000540006001INTIRS000020250830109ABE",  //台中->板橋
 	  "0421511450742087503470000333004202505252215520072025052522475201000000100000080020010000000540006000INTETS000020250525101909",  //桃園->台中
 	  "2902100093118070992280000845007202601091817000082026010918270001000000100000040100050000000130006001INTETS000020260109105067",
-
   };
 
   // End Define Variable
 
   if (DEMO_MODE)
   {
-	  	HAL_UART_Transmit(&huart2, msg, sizeof(msg)-1, 1000);
+	  	//HAL_UART_Transmit(&huart2, msg, sizeof(msg)-1, 1000);
 
-	    result = mlp_forward_pass(debug_array[0], debug_array[1], debug_array[2], debug_array[3], debug_array[4], debug_array[5], debug_array[6], debug_array[7],debug_array[8]);
+	    //result = mlp_forward_pass(debug_array[0], debug_array[1], debug_array[2], debug_array[3], debug_array[4], debug_array[5], debug_array[6], debug_array[7],debug_array[8]);
 
 	    for (int i = 0; i < (sizeof(debug_ticket) / sizeof(debug_ticket[0])); i++)
 	    {
@@ -319,21 +316,21 @@ int main(void)
 	    	}
 
 	    	else
-	    	{
-	    		strcpy(input_train_type, "THSR");
-	    		strcpy(input_train_kind, "Standard");
-	    		strncpy(input_train_num, debug_ticket[i] + 24 , 4); // Train number
-	    		strncpy(input_dept_sta, debug_ticket[i] + 29, 2);   // Departure station code
-	    		input_dept_sta[2] = '\0';
-	    		strncpy(input_date, debug_ticket[i] + 31, 8);       // Date
-	    		strncpy(input_dept_time, debug_ticket[i] + 39, 4);  // Departure time
-	    		strncpy(input_arr_sta, debug_ticket[i] + 46, 2);    // Arrival station code
-	    		input_arr_sta[2] = '\0';
-	    		strncpy(input_arr_time, debug_ticket[i] + 56, 4);   // Arrival time
-	    		strncpy(input_car, debug_ticket[i] + 76, 2);        // Car
-	    		strncpy(input_seat, debug_ticket[i] + 79, 5);       // Seat
-	    		strncpy(input_arr_sta, debug_ticket[i] + 90, 1);    // Price
-	    	}
+			{
+				strcpy(input_train_type, "THSR");
+				strcpy(input_train_kind, "Standard");
+				strncpy(input_train_num, debug_ticket[i] + 24 , 4); // Train number
+				strncpy(input_dept_sta, debug_ticket[i] + 29, 2);   // Departure station code
+				input_dept_sta[2] = '\0';
+				strncpy(input_date, debug_ticket[i] + 31, 8);       // Date
+				strncpy(input_dept_time, debug_ticket[i] + 39, 4);  // Departure time
+				strncpy(input_arr_sta, debug_ticket[i] + 46, 2);    // Arrival station code
+				input_arr_sta[2] = '\0';
+				strncpy(input_arr_time, debug_ticket[i] + 56, 4);   // Arrival time
+				strncpy(input_car, debug_ticket[i] + 76, 2);        // Car
+				strncpy(input_seat, debug_ticket[i] + 79, 5);       // Seat
+				strncpy(input_arr_sta, debug_ticket[i] + 90, 1);    // Price
+			}
 
 	    	//(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time, char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price)
 	    	epd_ticket_handler(input_train_type, input_train_kind, input_train_num, input_date, input_dept_time, input_dept_sta,
@@ -344,10 +341,9 @@ int main(void)
 	    }
   }
 
-
+  if (DEBUG_MODE){
     HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
 	HAL_Delay(100);
-
 	SSD1680_Clear(&hepd, ColorWhite);
 	SSD1680_DrawBitmap(&hepd,  0, 0, easycard, 152, 296);
 	SSD1680_Refresh(&hepd, REFRESH_MODE);
@@ -356,7 +352,7 @@ int main(void)
 	SSD1680_DrawBitmap(&hepd,  0, 0, einvoice, 152, 296);
 	SSD1680_Refresh(&hepd, REFRESH_MODE);
 	HAL_Delay(2000);
-	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);}
   while (1)
   {
     /* USER CODE END WHILE */
@@ -1004,31 +1000,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
         HAL_UART_Receive_IT(&huart7, (uint8_t*)&GPSBuffer[0], 1);
     }
 
-    else if (huart->Instance == USART3)
-    {
-    	p++;
-    	HAL_UART_Receive_DMA(&huart3, (uint8_t *)p, 256);
-    	if (*(p - 2) == 0x0D)
-    	{
-    		memcpy(send_buf + 7, GPSBuffer, p - GPSBuffer);
-    		HAL_UART_Transmit_DMA(&huart2, (uint8_t *)send_buf, p - GPSBuffer + 7);
-    		p = GPSBuffer;
-
-    	}
-    }
 }
 
-/* 注意：函式名多了一個 Ex，且名稱是 RxEventCallback */
-void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
-{
-    if (huart->Instance == USART3) // 假設 GPS 在 UART3
-    {
-        GPSBuffer[Size] = '\0'; // 正確使用 Size 來補結束符
 
-        // 重新啟動接收
-        HAL_UARTEx_ReceiveToIdle_DMA(&huart3, GPSBuffer, sizeof(GPSBuffer));
-    }
-}
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
@@ -1349,18 +1323,17 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
 	HAL_Delay(100);
 	SSD1680_Clear(&hepd, ColorWhite);
-
 	if (strcmp(train_type, "THSR") == 0)
 	{
 		SSD1680_Text(&hepd, 64, 0, "THSR", &cp866_8x16);
-		generate_upscaled_qr(145, 144, 4, version7);
+		//generate_upscaled_qr(145, 144, 4, version7);
 		SSD1680_SetRegion(&hepd, 8, 152, 144, 145, out_buffer, NULL);
 	}
 
-	else if (strcmp(train_type, "TRA") == 0)
+	if (strcmp(train_type, "TRA") == 0)
 	{
 		SSD1680_Text(&hepd, 64, 0, "TRA ", &cp866_8x16);
-		generate_upscaled_qr(145, 144, 5, version3);
+		//generate_upscaled_qr(145, 144, 5, version3);
 		SSD1680_SetRegion(&hepd, 8, 152, 144, 145, out_buffer, NULL);
 	}
 
@@ -1460,7 +1433,7 @@ void debug_disp(void)
 	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
 }
 
-void generate_upscaled_qr(uint16_t height, uint16_t width, uint8_t scale,const unsigned char qrcode[])
+void generate_upscaled_qr(uint16_t height, uint16_t width, uint8_t scale, const unsigned char qrcode[])
 {
 	memset(out_buffer, 0x00, sizeof(out_buffer));
 	for (int i = 0; i < 4; i++)  out_buffer[i] = 0xFF;
