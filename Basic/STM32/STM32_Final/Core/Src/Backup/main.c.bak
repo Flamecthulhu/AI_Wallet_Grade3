@@ -72,44 +72,9 @@ UART_HandleTypeDef huart3;
 DMA_HandleTypeDef hdma_usart3_rx;
 
 /* USER CODE BEGIN PV */
+uint8_t GPSBuffer[256];
+uint8_t *p = GPSBuffer;
 
-/* USER CODE END PV */
-
-/* Private function prototypes -----------------------------------------------*/
-void SystemClock_Config(void);
-static void MPU_Config(void);
-static void MX_GPIO_Init(void);
-static void MX_DMA_Init(void);
-static void MX_SPI1_Init(void);
-static void MX_TIM1_Init(void);
-static void MX_TIM2_Init(void);
-static void MX_UART4_Init(void);
-static void MX_UART5_Init(void);
-static void MX_UART7_Init(void);
-static void MX_USART2_UART_Init(void);
-static void MX_USART3_UART_Init(void);
-/* USER CODE BEGIN PFP */
-void parse_gpgga(uint8_t *line);
-void HM10_Process(uint8_t byte);
-void Handle_BT_Command(char* cmd);
-void Process_WiFi_Data(void);
-void debug_disp(void);
-int mlp_forward_pass(double current_lat, double current_lon, uint8_t hour_of_day, uint16_t min_of_day, uint8_t day_of_week,
-					 int time_to_dept, uint8_t is_ticket_reg, uint8_t is_entering, uint8_t is_exiting);
-void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time,
-						char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price);
-void generate_upscaled_qr(uint16_t height, uint16_t width, uint8_t scale,const unsigned char qrcode[]);
-void generate_v7_upscale();
-char* sta_code_decoder(char *sta_code);
-SPI_HandleTypeDef hspi1;
-SSD1680_HandleTypeDef hepd;
-
-static void MX_SSD1680_Init(void);
-
-/* USER CODE END PFP */
-
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
 uint16_t idx = 0;
 uint8_t BTBuffer[1];
 
@@ -117,7 +82,6 @@ uint8_t BTBuffer[1];
 static uint8_t WFBuffer[WIFI_BUF_SIZE];
 static uint16_t wf_idx = 0;
 
-uint8_t GPSBuffer[20] = {0};
 
 typedef struct {
     char ssid[32];
@@ -176,7 +140,43 @@ const unsigned char arrow[72] = {
 
 
 
+/* USER CODE END PV */
 
+/* Private function prototypes -----------------------------------------------*/
+void SystemClock_Config(void);
+static void MPU_Config(void);
+static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
+static void MX_SPI1_Init(void);
+static void MX_TIM1_Init(void);
+static void MX_TIM2_Init(void);
+static void MX_UART4_Init(void);
+static void MX_UART5_Init(void);
+static void MX_UART7_Init(void);
+static void MX_USART2_UART_Init(void);
+static void MX_USART3_UART_Init(void);
+/* USER CODE BEGIN PFP */
+void parse_gpgga(uint8_t *line);
+void HM10_Process(uint8_t byte);
+void Handle_BT_Command(char* cmd);
+void Process_WiFi_Data(void);
+void debug_disp(void);
+int mlp_forward_pass(double current_lat, double current_lon, uint8_t hour_of_day, uint16_t min_of_day, uint8_t day_of_week,
+					 int time_to_dept, uint8_t is_ticket_reg, uint8_t is_entering, uint8_t is_exiting);
+void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time,
+						char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price);
+void generate_upscaled_qr(uint16_t height, uint16_t width, uint8_t scale,const unsigned char qrcode[]);
+void generate_v7_upscale();
+char* sta_code_decoder(char *sta_code);
+SPI_HandleTypeDef hspi1;
+SSD1680_HandleTypeDef hepd;
+
+static void MX_SSD1680_Init(void);
+
+/* USER CODE END PFP */
+
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
 
@@ -271,7 +271,7 @@ int main(void)
   HAL_UART_Receive_IT(&huart4, BTBuffer, 1);
   HAL_UART_Receive_IT(&huart5, WFBuffer, 1);
   //HAL_UART_Receive_IT(&huart7, (uint8_t*)GPSBuffer, 1);
-  HAL_UART_Receive_DMA(&huart3, GPSBuffer, sizeof(GPSBuffer));
+  HAL_UART_Receive_DMA(&huart3, (uint8_t *)p, 1);
 
   // Start Define Variable
   uint8_t msg[] = "STM32 is now on\n";
@@ -342,25 +342,27 @@ int main(void)
 	    }
   }
 
-  if (DEBUG_MODE)
-  {
-	    HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
-	  	HAL_Delay(100);
-	  	SSD1680_Text(&hepd,  0, 0, "GPS:", &cp866_8x16);
-	  	SSD1680_Text(&hepd,  0, 40, (char *)GPSBuffer, &cp866_8x8);
-	  	SSD1680_Text(&hepd,  0, 280, "Predict:", &cp866_8x16);
-	  	char predict_str[12];
-	  	sprintf(predict_str, "%d", result);
-	  	SSD1680_Text(&hepd,  72, 280, predict_str, &cp866_8x16);
-	  	SSD1680_Refresh(&hepd, REFRESH_MODE);
-	  	HAL_Delay(1000);
-	  	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
-  }
+
 
   while (1)
   {
     /* USER CODE END WHILE */
-
+	if (DEBUG_MODE)
+	{
+		HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
+		HAL_Delay(100);
+		SSD1680_Clear(&hepd, ColorWhite);
+		SSD1680_Text(&hepd,  0, 0, "GPS:", &cp866_8x16);
+		SSD1680_Text(&hepd,  40, 0, (char *)GPSBuffer, &cp866_8x8);
+		SSD1680_Text(&hepd,  0, 280, "Predict:", &cp866_8x16);
+		char predict_str[12];
+		sprintf(predict_str, "%d", result);
+		SSD1680_Text(&hepd,  72, 280, predict_str, &cp866_8x16);
+		SSD1680_Refresh(&hepd, REFRESH_MODE);
+		HAL_Delay(1000);
+		HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
+	}
+	HAL_Delay(5000);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -918,6 +920,7 @@ static void MX_SSD1680_Init(void)
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
+	uint8_t send_buf[256] = "Echo:";
     if (huart->Instance == UART4) // BT
     {
 		HM10_Process(BTBuffer[0]);
@@ -1005,9 +1008,15 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
     else if (huart->Instance == USART3)
     {
-    	HAL_GPIO_TogglePin(EC_LED_GPIO_Port, EC_LED_Pin);
-    	HAL_UART_Transmit(&huart2, GPSBuffer, sizeof(GPSBuffer), 100);
-    	HAL_UART_Receive_DMA(&huart3, GPSBuffer, sizeof(GPSBuffer));
+    	p++;
+    	HAL_UART_Receive_DMA(&huart3, (uint8_t *)p, 256);
+    	if (*(p - 2) == 0x0D)
+    	{
+    		memcpy(send_buf + 7, GPSBuffer, p - GPSBuffer);
+    		HAL_UART_Transmit_DMA(&huart2, (uint8_t *)send_buf, p - GPSBuffer + 7);
+    		p = GPSBuffer;
+
+    	}
     }
 }
 
