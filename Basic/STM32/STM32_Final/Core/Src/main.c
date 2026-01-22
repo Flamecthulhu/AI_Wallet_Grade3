@@ -43,7 +43,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define DEBUG_MODE 1
+#define DEBUG_MODE 0
 
 #define INPUT_DIM  9
 #define HIDDEN_1   64
@@ -327,6 +327,15 @@ int main(void)
   {
 	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
 	  HAL_Delay(100);
+	  uint8_t my_new_array[DEST_DIM][DEST_DIM];
+	  unpack_to_buffer(version3, my_new_array);
+	  SSD1680_DrawBitmap(&hepd, 0, 0, (uint8_t *)my_new_array, 145, 145);
+	  SSD1680_Refresh(&hepd, REFRESH_MODE);
+	  HAL_Delay(3000);
+	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
+	  /*
+	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
+	  HAL_Delay(100);
 	  SSD1680_Clear(&hepd, ColorWhite);
 	  SSD1680_DrawBitmap(&hepd, 0, 0, startupv, 152, 296);
 	  SSD1680_Refresh(&hepd, REFRESH_MODE);
@@ -346,7 +355,7 @@ int main(void)
 	  SSD1680_DrawBitmap(&hepd, 0, 0, exthsr, 152, 296);
 	  SSD1680_Refresh(&hepd, REFRESH_MODE);
 	  HAL_Delay(3000);
-	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
+	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);*/
   }
 
   while (1)
@@ -1322,7 +1331,7 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 
 	static uint8_t my_new_array[DEST_DIM][DEST_DIM];
 	unpack_to_buffer(version3, my_new_array);
-	SSD1680_SetRegion(&hepd, 0, 144, 145, 145, my_new_array, NULL);
+	SSD1680_SetRegion(&hepd, 0, 0, 145, 145, (uint8_t *)my_new_array, NULL);
 
 	SSD1680_Refresh(&hepd, REFRESH_MODE);
 	HAL_Delay(1000);
