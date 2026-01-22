@@ -238,8 +238,8 @@ int main(void)
   double debug_array[9] = {24.167680, 120.653612, 17, 1072, 5, 1, 0, 0, 1};
   char *debug_ticket[4] = {"A50111562576561ZZZZ33003230ZZZZZ6ZP7UNxP7UNx15VNA000V7UF0F07", //台中->豐原
 	  "N50049351999418ZZZZ10803300ZZZZZ3ZP1VLUP1VNI161NA004y1VHEA49", //桃園->台中
-	  "0720412420244007936860000849004202508301834470072025083019154701000000300000030030030000000540006001INTIRS000020250830109ABE", //桃園->台中
-	  "0421511450742087503470000333004202505252215520072025052522475201000000100000080020010000000540006000INTETS000020250525101909"  //台中->板橋
+	  "0720412420244007936860000849004202508301834470072025083019154701000000300000030030030000000540006001INTIRS000020250830109ABE",  //台中->板橋
+	  "0421511450742087503470000333004202505252215520072025052522475201000000100000080020010000000540006000INTETS000020250525101909"   //桃園->台中
   };
 
   // End Define Variable
@@ -264,7 +264,7 @@ int main(void)
 	    		strcpy(input_train_type, "THSR");
 	    		strcpy(input_train_kind, "Standard");
 	    		strncpy(input_train_num, debug_ticket[i] + 24 , 4); // Train number
-	    		strncpy(input_dept_sta, debug_ticket[i] + 30, 2);   // Departure station code
+	    		strncpy(input_dept_sta, debug_ticket[i] + 29, 2);   // Departure station code
 	    		//input_dept_sta = sta_code_decoder(dept_sta_code);
 	    		char raw_date[9] = {0};
 	    		strncpy(raw_date, debug_ticket[i] + 31, 8);      // Date
@@ -1240,10 +1240,16 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 	}
 
 	SSD1680_Text(&hepd, 88, 32, "Depart", &cp866_8x14);
+	SSD1680_Text(&hepd, 88, 46, sta_code_decoder(dept_sta), &cp866_8x16);
 
-	SSD1680_Text(&hepd, 88, 46, sta_code_decoder(dept_sta), &cp866_8x14);
-	SSD1680_Text(&hepd, 88, 60, "Arrive", &cp866_8x14);
-	SSD1680_Text(&hepd, 88, 72, sta_code_decoder(arr_sta), &cp866_8x14);
+	SSD1680_Text(&hepd, 88, 62, "Car", &cp866_8x16);
+	SSD1680_Text(&hepd, 88, 78, car, &cp866_8x16);
+
+	SSD1680_Text(&hepd, 88, 96, "Seat", &cp866_8x16);
+	SSD1680_Text(&hepd, 88, 112, seat, &cp866_8x16);
+
+	SSD1680_Text(&hepd, 88, 128, "Arrive", &cp866_8x14);
+	SSD1680_Text(&hepd, 88, 144, sta_code_decoder(arr_sta), &cp866_8x16);
 
 	SSD1680_Refresh(&hepd, REFRESH_MODE);
 	HAL_Delay(1000);
@@ -1326,7 +1332,6 @@ void softmax(float *data, int size) {
     }
     for (int i = 0; i < size; i++) data[i] /= sum;
 }
-
 
 int mlp_forward_pass(double current_lat, double current_lon, uint8_t hour_of_day, uint16_t min_of_day, uint8_t day_of_week, int time_to_dept, uint8_t is_ticket_reg, uint8_t is_entering, uint8_t is_exiting)
 {
