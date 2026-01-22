@@ -49,6 +49,7 @@
 #define HIDDEN_2   32
 #define OUTPUT_DIM 5
 #define REFRESH_MODE 199
+#define TIME_MODE 12 // 12&24 Hour mode
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -1242,6 +1243,14 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 	}
 
 	SSD1680_Text(&hepd, 88, 32, "Depart", &cp866_8x14);
+	char convert_dept_time[6] = {0};
+	for (int i = 0; i < 5; i++)
+	{
+		if (i == 2) convert_dept_time[i] = ':';
+		else convert_dept_time[i] = dept_time[i];
+	}
+	convert_dept_time[5] = '\0';
+	SSD1680_Text(&hepd, 88, 46, convert_dept_time, &cp866_8x16);
 	SSD1680_Text(&hepd, 8, 46, sta_code_decoder(dept_sta), &cp866_8x16);
 
 	SSD1680_Text(&hepd, 88, 62, "Car", &cp866_8x16);
@@ -1277,6 +1286,14 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 	else SSD1680_Text(&hepd, 128, 78, seat_decoded, &cp866_8x16);
 
 	SSD1680_Text(&hepd, 88, 94, "Arrive", &cp866_8x14);
+	char convert_arr_time[7] = {0};
+	for (int i = 0; i < 6; i++)
+	{
+		if (i == 2) convert_arr_time[i] = ':';
+		else convert_arr_time[i] = arr_time[i];
+	}
+	convert_arr_time[6] = '\0';
+	SSD1680_Text(&hepd, 88, 108, convert_arr_time, &cp866_8x16);
 	SSD1680_Text(&hepd, 8, 110, sta_code_decoder(arr_sta), &cp866_8x16);
 
 	SSD1680_Refresh(&hepd, REFRESH_MODE);
