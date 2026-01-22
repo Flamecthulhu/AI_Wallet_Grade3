@@ -273,10 +273,10 @@ int main(void)
 	    		input_date[1] = raw_date[1];
 	    		input_date[2] = raw_date[2];
 	    		input_date[3] = raw_date[3];
-	    		input_date[4] = ':';
+	    		input_date[4] = '-';
 	    		input_date[5] = raw_date[4];
 	    		input_date[6] = raw_date[5];
-	    		input_date[7] = ':';
+	    		input_date[7] = '-';
 	    		input_date[8] = raw_date[6];
 	    		input_date[9] = raw_date[7];
 	    		input_date[10] = '\0';
@@ -1234,9 +1234,8 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 
 	if (date != NULL)  SSD1680_Text(&hepd, 0, 16, date, &cp866_8x16);
 	if (train_kind != NULL && strcmp(train_type, "TRA") == 0)  SSD1680_Text(&hepd, 88, 16, train_kind, &cp866_8x16);
-	else if (train_kind != NULL && (strcmp(train_type, "THSR") == 0)) SSD1680_Text(&hepd, 88, 16, train_kind, &cp866_8x8);
-	else if (train_num != NULL && (strcmp(train_type, "THSR") == 0)) SSD1680_Text(&hepd, 88, 24, train_num, &cp866_8x8);
-
+	if (train_kind != NULL && (strcmp(train_type, "THSR") == 0)) SSD1680_Text(&hepd, 88, 16, train_kind, &cp866_8x8);
+	if (train_num != NULL && (strcmp(train_type, "THSR") == 0)) SSD1680_Text(&hepd, 88, 24, train_num, &cp866_8x8);
 
 	SSD1680_Refresh(&hepd, REFRESH_MODE);
 	HAL_Delay(1000);
