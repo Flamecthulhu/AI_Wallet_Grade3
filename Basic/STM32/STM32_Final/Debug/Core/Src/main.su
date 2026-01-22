@@ -17,7 +17,7 @@
 ../Core/Src/main.c:1102:6:Parse_WiFi_Line	72	static
 ../Core/Src/main.c:1155:6:Display_WiFi_List	216	static
 ../Core/Src/main.c:1184:6:Process_WiFi_Data	152	static
-../Core/Src/main.c:1225:6:epd_ticket_handler	64	static
+../Core/Src/main.c:1225:6:epd_ticket_handler	56	static
 ../Core/Src/main.c:1304:6:debug_disp	32	static
 ../Core/Src/main.c:1317:7:sta_code_decoder	24	static
 ../Core/Src/main.c:1364:6:relu	24	static

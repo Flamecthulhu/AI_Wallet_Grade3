@@ -1242,22 +1242,22 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 		else  SSD1680_Text(&hepd, 88, 24, train_num, &cp866_8x8);
 	}
 
-	SSD1680_Text(&hepd, 88, 32, "Depart", &cp866_8x14);
+	SSD1680_Text(&hepd, 88, 40, "Depart", &cp866_8x14);
 	char convert_dept_time[6] = {0};
-	for (int i = 0; i < 5; i++)
-	{
-		if (i == 2) convert_dept_time[i] = ':';
-		else convert_dept_time[i] = dept_time[i];
-	}
+	convert_dept_time[0] = dept_time[0];
+	convert_dept_time[1] = dept_time[1];
+	convert_dept_time[2] = ':';
+	convert_dept_time[3] = dept_time[2];
+	convert_dept_time[4] = dept_time[3];
 	convert_dept_time[5] = '\0';
-	SSD1680_Text(&hepd, 88, 46, convert_dept_time, &cp866_8x16);
-	SSD1680_Text(&hepd, 8, 46, sta_code_decoder(dept_sta), &cp866_8x16);
+	SSD1680_Text(&hepd, 88, 56, convert_dept_time, &cp866_8x16);
+	SSD1680_Text(&hepd, 8, 40, sta_code_decoder(dept_sta), &cp866_8x16);
 
-	SSD1680_Text(&hepd, 88, 62, "Car", &cp866_8x16);
-	if (car[0] == '0') SSD1680_Text(&hepd, 128, 62, car + 1, &cp866_8x16);
-	else SSD1680_Text(&hepd, 128, 62, car, &cp866_8x16);
+	SSD1680_Text(&hepd, 88, 72, "Car", &cp866_8x16);
+	if (car[0] == '0') SSD1680_Text(&hepd, 128, 72, car + 1, &cp866_8x16);
+	else SSD1680_Text(&hepd, 128, 72, car, &cp866_8x16);
 
-	SSD1680_Text(&hepd, 88, 78, "Seat", &cp866_8x16);
+	SSD1680_Text(&hepd, 88, 88, "Seat", &cp866_8x16);
 	char seat_decoded[4] = {0};
 	seat_decoded[0] = seat[0];
 	seat_decoded[1] = seat[1];
@@ -1282,19 +1282,19 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 			seat_decoded[2] = 0;
 	}
 	seat_decoded[3] = '\0';
-	if (seat_decoded[0] == '0')  SSD1680_Text(&hepd, 128, 78, seat_decoded + 1, &cp866_8x16);
-	else SSD1680_Text(&hepd, 128, 78, seat_decoded, &cp866_8x16);
+	if (seat_decoded[0] == '0')  SSD1680_Text(&hepd, 128, 88, seat_decoded + 1, &cp866_8x16);
+	else SSD1680_Text(&hepd, 128, 88, seat_decoded, &cp866_8x16);
 
-	SSD1680_Text(&hepd, 88, 94, "Arrive", &cp866_8x14);
-	char convert_arr_time[7] = {0};
-	for (int i = 0; i < 6; i++)
-	{
-		if (i == 2) convert_arr_time[i] = ':';
-		else convert_arr_time[i] = arr_time[i];
-	}
-	convert_arr_time[6] = '\0';
-	SSD1680_Text(&hepd, 88, 108, convert_arr_time, &cp866_8x16);
-	SSD1680_Text(&hepd, 8, 110, sta_code_decoder(arr_sta), &cp866_8x16);
+	SSD1680_Text(&hepd, 88, 104, "Arrive", &cp866_8x14);
+	char convert_arr_time[6] = {0};
+	convert_arr_time[0] = arr_time[0];
+	convert_arr_time[1] = arr_time[1];
+	convert_arr_time[2] = ':';
+	convert_arr_time[3] = arr_time[2];
+	convert_arr_time[4] = arr_time[3];
+	convert_arr_time[5] = '\0';
+	SSD1680_Text(&hepd, 88, 118, convert_arr_time, &cp866_8x16);
+	SSD1680_Text(&hepd, 8, 112, sta_code_decoder(arr_sta), &cp866_8x16);
 
 	SSD1680_Refresh(&hepd, REFRESH_MODE);
 	HAL_Delay(1000);

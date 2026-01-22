@@ -17,7 +17,7 @@
 ../Core/Src/main.c:1102:6:Parse_WiFi_Line	9
 ../Core/Src/main.c:1155:6:Display_WiFi_List	3
 ../Core/Src/main.c:1184:6:Process_WiFi_Data	4
-../Core/Src/main.c:1225:6:epd_ticket_handler	22
+../Core/Src/main.c:1225:6:epd_ticket_handler	18
 ../Core/Src/main.c:1304:6:debug_disp	1
 ../Core/Src/main.c:1317:7:sta_code_decoder	13
 ../Core/Src/main.c:1364:6:relu	3
