@@ -51,10 +51,10 @@
 #define OUTPUT_DIM 5
 #define REFRESH_MODE 199
 
-#define SRC_DIM 29       // 原始寬度
-#define SCALE 5          // 放大 5 倍
-#define TGT_DIM 152      // 目標寬度
-#define OFFSET 3
+#define SRC_DIM 29
+#define SCALE 4
+#define TARGET_WIDTH 144  // 強制截斷寬度 (18 bytes)
+#define TARGET_HEIGHT 145
 
 /* USER CODE END PD */
 
@@ -136,17 +136,17 @@ static uint8_t bt_idx = 0;
 char parts[15][16];
 
 int result; //MLP
-uint8_t out_buffer[2888]; //QR Upscale
-const unsigned char version3[128] = {
-0XFF,0X52,0X0E,0XFF,0X81,0X29,0XEE,0X81,0XB9,0X12,0XDE,0X9D,0XBD,0X11,0XF4,0XBD,
-0XBD,0X60,0XC0,0XBD,0XBD,0X78,0XCA,0XBD,0X81,0X13,0XA6,0X81,0XFF,0X54,0XAA,0XFF,
-0X00,0X40,0X42,0X00,0XE7,0XFF,0XD3,0X84,0X06,0X6C,0XC9,0X4D,0X85,0XEE,0X07,0X9E,
-0X82,0X90,0X56,0X0A,0X8C,0X3F,0X2B,0X87,0XC0,0XAB,0XD4,0X08,0X04,0X55,0XD8,0XF4,
-0X06,0X55,0XD8,0X64,0X4A,0X31,0XC4,0X6F,0XF3,0X7E,0X20,0XEF,0X59,0X8B,0XDF,0X6F,
-0XC6,0XD2,0XDC,0XB6,0X5A,0XAE,0X21,0X7C,0X1F,0XD0,0X23,0XE4,0X44,0X4A,0X5A,0X00,
-0XC5,0X53,0XEA,0XFF,0X5C,0X70,0XC4,0X81,0XF7,0XE9,0XDC,0X9D,0XE7,0X69,0XC4,0X9D,
-0X18,0X77,0XC6,0X9D,0XC7,0X1F,0X56,0X9D,0X52,0X6B,0X0C,0X81,0XE4,0X5D,0XF4,0XFF,
-};
+uint8_t out_buffer[TARGET_WIDTH * TARGET_HEIGHT / 8];
+const unsigned char version3[116] = {
+0X01,0X5B,0XC4,0X00,0X7D,0XAC,0X45,0XF0,0X45,0XDA,0X85,0X10,0X45,0X3C,0X2D,0X10,
+0X45,0X0E,0XD5,0X10,0X7D,0XD9,0X65,0XF0,0X01,0X55,0X54,0X00,0XFF,0X7E,0XF7,0XF8,
+0X10,0X00,0XB1,0XD8,0XF3,0X26,0XDA,0X90,0X74,0X23,0XE1,0X08,0X6A,0XDE,0XA7,0XA8,
+0X77,0X81,0X51,0XC0,0X1E,0XAA,0XAF,0XB8,0XF3,0X54,0X9C,0X58,0XAB,0X9C,0XEE,0X88,
+0X19,0X03,0X7C,0X80,0XAC,0XE8,0X82,0X80,0X32,0X5A,0X8D,0X48,0XAA,0XA3,0X7A,0X18,
+0XE0,0X5F,0X70,0XD8,0XB7,0X6A,0X97,0XF8,0X35,0X58,0X54,0X00,0XA7,0X1E,0XED,0XF0,
+0X10,0X2C,0X8D,0X10,0XEF,0X10,0X6D,0X10,0X31,0XC2,0XA5,0X10,0XAB,0X29,0XCD,0XF0,
+0X17,0X44,0X2C,0X00,};
+
 
 /* USER CODE END 0 */
 
@@ -1349,46 +1349,38 @@ void debug_disp(void)
 }
 
 void generate_upscaled_qr() {
-    // 1. 清空 Buffer (設為 0x00 白色)
-    memset(out_buffer, 0x00, sizeof(out_buffer));
+	memset(out_buffer, 0x00, sizeof(out_buffer));
 
-    // 2. 遍歷原始 29x29 資料
-    for (int y = 0; y < SRC_DIM; y++) {
-        // 取得該行的原始指標 (每行 4 bytes)
-        const uint8_t* row_ptr = &version3[y * 4];
+	    // y 跑滿 5 倍 (0 ~ 144)
+	    for (int y = 0; y < TARGET_HEIGHT; y++) {
 
-        for (int x = 0; x < SRC_DIM; x++) {
-            // 解析原始 Bit (假設 MSB First)
-            int byte_idx = x / 8;
-            int bit_idx = 7 - (x % 8);
-            int is_black = (row_ptr[byte_idx] >> bit_idx) & 1;
+	        // 找出原始資料的第幾列 (y / 5)
+	        int src_y = y / SCALE;
+	        const uint8_t* row_ptr = &version3[src_y * 4];
 
-            if (is_black) {
-                // 3. 計算放大後的 5x5 區塊座標
-                int start_x = OFFSET + (x * SCALE); // X 從 3 開始
-                int start_y = OFFSET + (y * SCALE); // Y 從 3 開始
+	        // x 只跑到 143 (共144點)，第 145 點 (index 144) 直接不跑
+	        for (int x = 0; x < TARGET_WIDTH; x++) {
 
-                // 4. 繪製 5x5 黑塊
-                for (int dy = 0; dy < SCALE; dy++) {
-                    int draw_y = start_y + dy;
+	            // 找出原始資料的第幾欄 (x / 5)
+	            // 當 x=140~143 時，src_x 都是 28 (最後一欄)，這沒問題
+	            int src_x = x / SCALE;
 
-                    // 優化：不需要每次重算 y_offset，每行算一次即可
-                    int row_offset = draw_y * (TGT_DIM / 8); // 152/8 = 19 bytes width
+	            // 取出原始 bit
+	            int byte_idx = src_x / 8;
+	            int bit_idx = 7 - (src_x % 8);
+	            int is_black = (row_ptr[byte_idx] >> bit_idx) & 1;
 
-                    for (int dx = 0; dx < SCALE; dx++) {
-                        int draw_x = start_x + dx;
+	            if (is_black) {
+	                // 直接寫入 buffer
+	                // 因為寬度是 144 (18 bytes)，計算非常整齊
+	                int row_offset = y * (TARGET_WIDTH / 8);
+	                int buf_idx = row_offset + (x / 8);
+	                int bit_pos = 7 - (x % 8);
 
-                        // 計算在 Buffer 中的位置
-                        int buf_idx = row_offset + (draw_x / 8);
-                        int bit_pos = 7 - (draw_x % 8);
-
-                        // 設定 Bit 為 1 (黑)
-                        out_buffer[buf_idx] |= (1 << bit_pos);
-                    }
-                }
-            }
-        }
-    }
+	                out_buffer[buf_idx] |= (1 << bit_pos);
+	            }
+	        }
+	    }
 }
 
 char* sta_code_decoder(char *sta_code)

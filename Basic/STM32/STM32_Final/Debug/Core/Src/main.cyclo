@@ -20,10 +20,10 @@
 ../Core/Src/main.c:1257:6:epd_ticket_handler	18
 ../Core/Src/main.c:1338:6:debug_disp	1
 ../Core/Src/main.c:1351:6:generate_upscaled_qr	8
-../Core/Src/main.c:1394:7:sta_code_decoder	164
-../Core/Src/main.c:1727:6:relu	3
-../Core/Src/main.c:1733:6:softmax	5
-../Core/Src/main.c:1744:5:mlp_forward_pass	9
-../Core/Src/main.c:1809:6:MPU_Config	1
-../Core/Src/main.c:1842:6:Error_Handler	1
-../Core/Src/main.c:1861:6:assert_failed	1
+../Core/Src/main.c:1386:7:sta_code_decoder	164
+../Core/Src/main.c:1719:6:relu	3
+../Core/Src/main.c:1725:6:softmax	5
+../Core/Src/main.c:1736:5:mlp_forward_pass	9
+../Core/Src/main.c:1801:6:MPU_Config	1
+../Core/Src/main.c:1834:6:Error_Handler	1
+../Core/Src/main.c:1853:6:assert_failed	1
