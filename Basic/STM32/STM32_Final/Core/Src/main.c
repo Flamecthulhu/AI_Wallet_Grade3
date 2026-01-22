@@ -236,12 +236,12 @@ int main(void)
   //(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time, char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price)
 
   double debug_array[9] = {24.167680, 120.653612, 17, 1072, 5, 1, 0, 0, 1};
-  char *debug_ticket[6] = {"A50111562576561ZZZZ33003230ZZZZZ6ZP7UNxP7UNx15VNA000V7UF0F07", //台中->豐原
+  char *debug_ticket[5] = {"A50111562576561ZZZZ33003230ZZZZZ6ZP7UNxP7UNx15VNA000V7UF0F07", //台中->豐原
 	  "N50049351999418ZZZZ10803300ZZZZZ3ZP1VLUP1VNI161NA004y1VHEA49", //桃園->台中
 	  "0720412420244007936860000849004202508301834470072025083019154701000000300000030030030000000540006001INTIRS000020250830109ABE",  //台中->板橋
 	  "0421511450742087503470000333004202505252215520072025052522475201000000100000080020010000000540006000INTETS000020250525101909",  //桃園->台中
 	  "2902100093118070992280000845007202601091817000082026010918270001000000100000040100050000000130006001INTETS000020260109105067",
-	  "0720412420241007936860000616007202508300932470042025083010094701000000200000100140030000000540006001INTIRS00002025083010701D"
+
   };
 
   // End Define Variable
@@ -286,7 +286,7 @@ int main(void)
 	    		strncpy(input_arr_sta, debug_ticket[i] + 46, 2);    // Arrival station code
 	    		strncpy(input_arr_time, debug_ticket[i] + 56, 4);  // Arrival time
 	    		strncpy(input_car, debug_ticket[i] + 76, 2);       // Car
-	    		strncpy(input_seat, debug_ticket[i] + 80, 5);      // Seat
+	    		strncpy(input_seat, debug_ticket[i] + 79, 5);      // Seat
 	    		strncpy(input_arr_sta, debug_ticket[i] + 90, 1);    // Price
 	    	}
 
@@ -1246,12 +1246,12 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 
 	SSD1680_Text(&hepd, 88, 62, "Car", &cp866_8x16);
 	if (car[0] == '0') SSD1680_Text(&hepd, 128, 62, car + 1, &cp866_8x16);
-	else SSD1680_Text(&hepd, 120, 62, car, &cp866_8x16);
+	else SSD1680_Text(&hepd, 128, 62, car, &cp866_8x16);
 
-	//SSD1680_Text(&hepd, 88, 78, "Seat", &cp866_8x16);
+	SSD1680_Text(&hepd, 88, 78, "Seat", &cp866_8x16);
 	char seat_decoded[4] = {0};
-	seat_decoded[0] = seat[1];
-	seat_decoded[1] = seat[2];
+	seat_decoded[0] = seat[0];
+	seat_decoded[1] = seat[1];
 	switch (seat[4])
 	{
 		case '1':
@@ -1272,7 +1272,9 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 		default:
 			seat_decoded[2] = 0;
 	}
-	SSD1680_Text(&hepd, 120, 78, seat, &cp866_8x16);
+	seat_decoded[3] = '\0';
+	if (seat_decoded[0] == '0')  SSD1680_Text(&hepd, 128, 78, seat_decoded + 1, &cp866_8x16);
+	else SSD1680_Text(&hepd, 128, 78, seat_decoded, &cp866_8x16);
 
 	SSD1680_Text(&hepd, 88, 94, "Arrive", &cp866_8x14);
 	SSD1680_Text(&hepd, 8, 110, sta_code_decoder(arr_sta), &cp866_8x16);
