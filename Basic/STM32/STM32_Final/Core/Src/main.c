@@ -222,35 +222,16 @@ int main(void)
 
   // Start Define Variable
   uint8_t msg[] = "STM32 is now on\n";
-  char *input_train_type, *input_train_kind, *input_train_num, *input_date, *input_dept_time,
-  *input_dept_sta, *input_arr_time, *input_arr_sta, *input_car, *input_seat, *input_price;
-
-  input_train_type = NULL;
-  input_train_kind = NULL;
-  input_train_num = NULL;
-  input_date = NULL;
-  input_dept_time = NULL;
-  input_dept_sta = NULL;
-  input_arr_time = NULL;
-  input_arr_sta = NULL;
-  input_car = NULL;
-  input_seat = NULL;
-  input_price = NULL;
-
-  /*
-   *   input_train_type = "Unknown";
-  input_train_kind = "Unknown";
-  input_train_num = "Unknown";
-  input_date = "Unknown";
-  input_dept_time = "Unknown";
-  input_dept_sta = "Unknown";
-  input_arr_time = "Unknown";
-  input_arr_sta = "Unknown";
-  input_car = "Unknown";
-  input_seat = "Unknown";
-  input_price = "Unknown";
-   */
-
+  char input_train_type[10] = {0};
+  char input_train_kind[20] = {0};
+  char input_train_num[10] = {0};
+  char input_date[16] = {0};
+  char input_dept_time[10] = {0};
+  char input_arr_time[10] = {0};
+  char input_arr_sta[20] = {0};
+  char input_car[10] = {0};
+  char input_seat[10] = {0};
+  char input_price[10] = {0};
   //(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time, char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price)
 
   char dept_sta_code[5], arr_sta_code[5], seat_code[9];
@@ -263,33 +244,7 @@ int main(void)
 
   // End Define Variable
 
-  if (!DEBUG_MODE)
-  {
-	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
-	  HAL_Delay(100);
-	  SSD1680_Clear(&hepd, ColorWhite);
-	  SSD1680_DrawBitmap(&hepd, 0, 0, startupv, 152, 296);
-	  SSD1680_Refresh(&hepd, REFRESH_MODE);
-	  HAL_Delay(2000);
-	  SSD1680_DrawBitmap(&hepd, 0, 0, einvoicev, 152, 296);
-	  SSD1680_Refresh(&hepd, REFRESH_MODE);
-	  HAL_Delay(1000);
-	  SSD1680_DrawBitmap(&hepd, 0, 0, easycardv, 152, 296);
-	  SSD1680_Refresh(&hepd, REFRESH_MODE);
-	  HAL_Delay(1000);
-	  SSD1680_DrawBitmap(&hepd, 0, 0, exhomescreen, 152, 296);
-	  SSD1680_Refresh(&hepd, REFRESH_MODE);
-	  HAL_Delay(1000);
-	  SSD1680_DrawBitmap(&hepd, 0, 0, extra, 152, 296);
-	  SSD1680_Refresh(&hepd, REFRESH_MODE);
-	  HAL_Delay(1000);
-	  SSD1680_DrawBitmap(&hepd, 0, 0, exthsr, 152, 296);
-	  SSD1680_Refresh(&hepd, REFRESH_MODE);
-	  HAL_Delay(3000);
-	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
-  }
-
-  else if (DEBUG_MODE)
+  if (DEBUG_MODE)
   {
 	  	HAL_UART_Transmit(&huart2, msg, sizeof(msg)-1, 1000);
 
@@ -329,6 +284,32 @@ int main(void)
 	    	//debug_disp();
 	    	HAL_Delay(3000);
 	    }
+  }
+
+  else if (!DEBUG_MODE)
+  {
+	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
+	  HAL_Delay(100);
+	  SSD1680_Clear(&hepd, ColorWhite);
+	  SSD1680_DrawBitmap(&hepd, 0, 0, startupv, 152, 296);
+	  SSD1680_Refresh(&hepd, REFRESH_MODE);
+	  HAL_Delay(2000);
+	  SSD1680_DrawBitmap(&hepd, 0, 0, einvoicev, 152, 296);
+	  SSD1680_Refresh(&hepd, REFRESH_MODE);
+	  HAL_Delay(1000);
+	  SSD1680_DrawBitmap(&hepd, 0, 0, easycardv, 152, 296);
+	  SSD1680_Refresh(&hepd, REFRESH_MODE);
+	  HAL_Delay(1000);
+	  SSD1680_DrawBitmap(&hepd, 0, 0, exhomescreen, 152, 296);
+	  SSD1680_Refresh(&hepd, REFRESH_MODE);
+	  HAL_Delay(1000);
+	  SSD1680_DrawBitmap(&hepd, 0, 0, extra, 152, 296);
+	  SSD1680_Refresh(&hepd, REFRESH_MODE);
+	  HAL_Delay(1000);
+	  SSD1680_DrawBitmap(&hepd, 0, 0, exthsr, 152, 296);
+	  SSD1680_Refresh(&hepd, REFRESH_MODE);
+	  HAL_Delay(3000);
+	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
   }
 
   while (1)
@@ -1239,7 +1220,7 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 	if (strcmp(train_type, "THSR") == 0)  SSD1680_Text(&hepd, 64, 0, "THSR", &cp866_8x16);
 	else if (strcmp(train_type, "TRA") == 0)  SSD1680_Text(&hepd, 64, 0, "TRA ", &cp866_8x16);
 
-	if (date != NULL)  SSD1680_Text(&hepd, 0, 16, train_kind, &cp866_8x16);
+	if (date != NULL)  SSD1680_Text(&hepd, 0, 16, date, &cp866_8x16);
 	if (train_kind != NULL && strcmp(train_type, "TRA") == 0)  SSD1680_Text(&hepd, 88, 16, train_kind, &cp866_8x16);
 	else if (train_kind != NULL && (strcmp(train_type, "THSR") == 0)) SSD1680_Text(&hepd, 88, 16, train_kind, &cp866_8x8);
 	else if (train_num != NULL && (strcmp(train_type, "THSR") == 0)) SSD1680_Text(&hepd, 88, 24, train_num, &cp866_8x8);

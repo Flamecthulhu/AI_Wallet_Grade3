@@ -5552,13 +5552,13 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
  8002c62:	482c      	ldr	r0, [pc, #176]	@ (8002d14 <epd_ticket_handler+0x110>)
  8002c64:	f7fe faea 	bl	800123c <SSD1680_Text>
 
-	if (date != NULL)  SSD1680_Text(&hepd, 0, 16, train_kind, &cp866_8x16);
+	if (date != NULL)  SSD1680_Text(&hepd, 0, 16, date, &cp866_8x16);
  8002c68:	683b      	ldr	r3, [r7, #0]
  8002c6a:	2b00      	cmp	r3, #0
  8002c6c:	d007      	beq.n	8002c7e <epd_ticket_handler+0x7a>
  8002c6e:	4b2b      	ldr	r3, [pc, #172]	@ (8002d1c <epd_ticket_handler+0x118>)
  8002c70:	9300      	str	r3, [sp, #0]
- 8002c72:	68bb      	ldr	r3, [r7, #8]
+ 8002c72:	683b      	ldr	r3, [r7, #0]
  8002c74:	2210      	movs	r2, #16
  8002c76:	2100      	movs	r1, #0
  8002c78:	4826      	ldr	r0, [pc, #152]	@ (8002d14 <epd_ticket_handler+0x110>)
