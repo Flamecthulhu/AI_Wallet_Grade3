@@ -21,10 +21,10 @@
 ../Core/Src/main.c:1353:6:debug_disp	32	static
 ../Core/Src/main.c:1366:6:generate_upscaled_qr	72	static
 ../Core/Src/main.c:1392:6:generate_v7_upscale	48	static
-../Core/Src/main.c:1428:7:sta_code_decoder	24	static
-../Core/Src/main.c:1761:6:relu	24	static
-../Core/Src/main.c:1767:6:softmax	48	static
-../Core/Src/main.c:1778:5:mlp_forward_pass	528	static
-../Core/Src/main.c:1843:6:MPU_Config	24	static
-../Core/Src/main.c:1876:6:Error_Handler	4	static,ignoring_inline_asm
-../Core/Src/main.c:1895:6:assert_failed	16	static
+../Core/Src/main.c:1419:7:sta_code_decoder	24	static
+../Core/Src/main.c:1752:6:relu	24	static
+../Core/Src/main.c:1758:6:softmax	48	static
+../Core/Src/main.c:1769:5:mlp_forward_pass	528	static
+../Core/Src/main.c:1834:6:MPU_Config	24	static
+../Core/Src/main.c:1867:6:Error_Handler	4	static,ignoring_inline_asm
+../Core/Src/main.c:1886:6:assert_failed	16	static

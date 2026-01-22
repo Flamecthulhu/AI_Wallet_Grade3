@@ -33,11 +33,11 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  14 .debug_macro  00039376  00000000  00000000  0003bca6  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_line   0002176c  00000000  00000000  0007501c  2**0
+ 15 .debug_line   0002176a  00000000  00000000  0007501c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_str    0016b4cd  00000000  00000000  00096788  2**0
+ 16 .debug_str    0016b4cd  00000000  00000000  00096786  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .comment      00000043  00000000  00000000  00201c55  2**0
+ 17 .comment      00000043  00000000  00000000  00201c53  2**0
                   CONTENTS, READONLY
  18 .debug_frame  00006c4c  00000000  00000000  00201c98  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
@@ -6250,12 +6250,12 @@ void generate_v7_upscale()
  80031f8:	483a      	ldr	r0, [pc, #232]	@ (80032e4 <generate_v7_upscale+0xf8>)
  80031fa:	f00d fc72 	bl	8010ae2 <memset>
 
-	    // 2. 遍歷原始矩陣
-	    for (int y = 0; y < 45; y++) {
+	    // 2. 正常產生 (同上一版程式碼)
+	for (int y = 0; y < 45; y++) {
  80031fe:	2300      	movs	r3, #0
  8003200:	627b      	str	r3, [r7, #36]	@ 0x24
  8003202:	e066      	b.n	80032d2 <generate_v7_upscale+0xe6>
-	        const uint8_t* row_ptr = &version7[y * 6];
+		const uint8_t* row_ptr = &version7[y * 6];
  8003204:	6a7a      	ldr	r2, [r7, #36]	@ 0x24
  8003206:	4613      	mov	r3, r2
  8003208:	005b      	lsls	r3, r3, #1
@@ -6265,13 +6265,11 @@ void generate_v7_upscale()
  8003210:	4b35      	ldr	r3, [pc, #212]	@ (80032e8 <generate_v7_upscale+0xfc>)
  8003212:	4413      	add	r3, r2
  8003214:	617b      	str	r3, [r7, #20]
-
-	        for (int x = 0; x < 45; x++) {
+		for (int x = 0; x < 45; x++) {
  8003216:	2300      	movs	r3, #0
  8003218:	623b      	str	r3, [r7, #32]
  800321a:	e054      	b.n	80032c6 <generate_v7_upscale+0xda>
-	            // 解析原始 Bit
-	            int is_black = (row_ptr[x >> 3] >> (7 - (x & 7))) & 1;
+			int is_black = (row_ptr[x >> 3] >> (7 - (x & 7))) & 1;
  800321c:	6a3b      	ldr	r3, [r7, #32]
  800321e:	10db      	asrs	r3, r3, #3
  8003220:	461a      	mov	r2, r3
@@ -6285,32 +6283,27 @@ void generate_v7_upscale()
  8003232:	fa42 f303 	asr.w	r3, r2, r3
  8003236:	f003 0301 	and.w	r3, r3, #1
  800323a:	613b      	str	r3, [r7, #16]
-
-	            if (is_black) {
+			if (is_black) {
  800323c:	693b      	ldr	r3, [r7, #16]
  800323e:	2b00      	cmp	r3, #0
  8003240:	d03e      	beq.n	80032c0 <generate_v7_upscale+0xd4>
-	                // 3. 計算放大後的座標 (移除偏移量，由 0 開始)
-	                int start_x = x * 3; // 3倍放大
+				int start_x = x * 3;
  8003242:	6a3a      	ldr	r2, [r7, #32]
  8003244:	4613      	mov	r3, r2
  8003246:	005b      	lsls	r3, r3, #1
  8003248:	4413      	add	r3, r2
  800324a:	60fb      	str	r3, [r7, #12]
-	                int start_y = y * 3;
+				int start_y = y * 3;
  800324c:	6a7a      	ldr	r2, [r7, #36]	@ 0x24
  800324e:	4613      	mov	r3, r2
  8003250:	005b      	lsls	r3, r3, #1
  8003252:	4413      	add	r3, r2
  8003254:	60bb      	str	r3, [r7, #8]
-
-	                // 4. 繪製 3x3 像素
-	                for (int dy = 0; dy < 3; dy++) {
+				for (int dy = 0; dy < 3; dy++) {
  8003256:	2300      	movs	r3, #0
  8003258:	61fb      	str	r3, [r7, #28]
  800325a:	e02e      	b.n	80032ba <generate_v7_upscale+0xce>
-	                    // 計算行開頭 (Target Width 144 = 18 bytes)
-	                    int row_offset = (start_y + dy) * 18;
+					int row_offset = (start_y + dy) * 18;
  800325c:	68ba      	ldr	r2, [r7, #8]
  800325e:	69fb      	ldr	r3, [r7, #28]
  8003260:	441a      	add	r2, r3
@@ -6319,19 +6312,16 @@ void generate_v7_upscale()
  8003266:	4413      	add	r3, r2
  8003268:	005b      	lsls	r3, r3, #1
  800326a:	607b      	str	r3, [r7, #4]
-
-	                    for (int dx = 0; dx < 3; dx++) {
+					for (int dx = 0; dx < 3; dx++) {
  800326c:	2300      	movs	r3, #0
  800326e:	61bb      	str	r3, [r7, #24]
  8003270:	e01d      	b.n	80032ae <generate_v7_upscale+0xc2>
-	                        int draw_x = start_x + dx;
+						int draw_x = start_x + dx;
  8003272:	68fa      	ldr	r2, [r7, #12]
  8003274:	69bb      	ldr	r3, [r7, #24]
  8003276:	4413      	add	r3, r2
  8003278:	603b      	str	r3, [r7, #0]
-
-	                        // 直接填入，因為沒有 Offset，第一個點就是 buffer[0] 的 bit 7
-	                        out_buffer[row_offset + (draw_x >> 3)] |= (0x80 >> (draw_x & 7));
+						out_buffer[row_offset + (draw_x >> 3)] |= (0x80 >> (draw_x & 7));
  800327a:	683b      	ldr	r3, [r7, #0]
  800327c:	10da      	asrs	r2, r3, #3
  800327e:	687b      	ldr	r3, [r7, #4]
@@ -6353,39 +6343,39 @@ void generate_v7_upscale()
  80032a2:	b2c9      	uxtb	r1, r1
  80032a4:	4a0f      	ldr	r2, [pc, #60]	@ (80032e4 <generate_v7_upscale+0xf8>)
  80032a6:	54d1      	strb	r1, [r2, r3]
-	                    for (int dx = 0; dx < 3; dx++) {
+					for (int dx = 0; dx < 3; dx++) {
  80032a8:	69bb      	ldr	r3, [r7, #24]
  80032aa:	3301      	adds	r3, #1
  80032ac:	61bb      	str	r3, [r7, #24]
  80032ae:	69bb      	ldr	r3, [r7, #24]
  80032b0:	2b02      	cmp	r3, #2
  80032b2:	ddde      	ble.n	8003272 <generate_v7_upscale+0x86>
-	                for (int dy = 0; dy < 3; dy++) {
+				for (int dy = 0; dy < 3; dy++) {
  80032b4:	69fb      	ldr	r3, [r7, #28]
  80032b6:	3301      	adds	r3, #1
  80032b8:	61fb      	str	r3, [r7, #28]
  80032ba:	69fb      	ldr	r3, [r7, #28]
  80032bc:	2b02      	cmp	r3, #2
  80032be:	ddcd      	ble.n	800325c <generate_v7_upscale+0x70>
-	        for (int x = 0; x < 45; x++) {
+		for (int x = 0; x < 45; x++) {
  80032c0:	6a3b      	ldr	r3, [r7, #32]
  80032c2:	3301      	adds	r3, #1
  80032c4:	623b      	str	r3, [r7, #32]
  80032c6:	6a3b      	ldr	r3, [r7, #32]
  80032c8:	2b2c      	cmp	r3, #44	@ 0x2c
  80032ca:	dda7      	ble.n	800321c <generate_v7_upscale+0x30>
-	    for (int y = 0; y < 45; y++) {
+	for (int y = 0; y < 45; y++) {
  80032cc:	6a7b      	ldr	r3, [r7, #36]	@ 0x24
  80032ce:	3301      	adds	r3, #1
  80032d0:	627b      	str	r3, [r7, #36]	@ 0x24
  80032d2:	6a7b      	ldr	r3, [r7, #36]	@ 0x24
  80032d4:	2b2c      	cmp	r3, #44	@ 0x2c
  80032d6:	dd95      	ble.n	8003204 <generate_v7_upscale+0x18>
-	                    }
-	                }
-	            }
-	        }
-	    }
+				}
+			}
+		}
+	}
+
 }
  80032d8:	bf00      	nop
  80032da:	bf00      	nop

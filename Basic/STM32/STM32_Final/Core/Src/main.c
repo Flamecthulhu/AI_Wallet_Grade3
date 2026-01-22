@@ -145,23 +145,23 @@ const unsigned char version3[116] = {
 0X17,0X44,0X2C,0X00,};
 
 const unsigned char version7[270] = {
-0X01,0X63,0X8E,0XFD,0XEC,0X00,0X01,0X22,0X80,0XA4,0X24,0X10,0X45,0XAE,0X88,0XB3,
-0X75,0X10,0X45,0X3E,0X0C,0XB3,0X25,0X10,0X45,0X0E,0X30,0X12,0X45,0X10,0X45,0X06,
-0X20,0X02,0X45,0X10,0X01,0X55,0X45,0X55,0X54,0X00,0X01,0X55,0X55,0X5D,0X46,0X28,
-0X94,0XA4,0X40,0X68,0X39,0X00,0X31,0XDC,0XAB,0X24,0X97,0XC0,0X08,0XDC,0X89,0X06,
-0X98,0X08,0X5C,0XD3,0X7F,0X2B,0X83,0X58,0X6E,0XE6,0X01,0X9C,0XB8,0X00,0X1E,0X02,
-0XAC,0XF2,0X5B,0XA0,0X17,0XE5,0X1F,0XFA,0XC8,0X98,0XE0,0XC4,0XDA,0X6F,0X7B,0X40,
-0XB7,0X2A,0X2F,0X01,0X30,0X90,0X30,0XF6,0X9F,0X3A,0XB3,0X68,0X56,0X4B,0X7B,0X9F,
-0X15,0X30,0XBB,0X77,0XF3,0X44,0XB2,0XE8,0X20,0X75,0XB0,0X05,0X50,0X60,0X07,0X1A,
-0X87,0X4C,0X07,0X48,0X75,0X00,0X85,0X7B,0X95,0X30,0X67,0X57,0X17,0X28,0X07,0X08,
-0X90,0X19,0X10,0X6D,0X20,0X70,0X76,0X39,0X2A,0X82,0X76,0XE0,0X75,0X35,0XA9,0X72,
-0X7C,0X40,0XDA,0XE6,0XA4,0X8E,0X0E,0XA8,0X0C,0X35,0X5C,0X67,0XF5,0X50,0XAA,0X9B,
-0X0B,0X3A,0XB2,0XA0,0X17,0X6C,0X63,0X65,0X54,0X40,0X6E,0XAA,0XD3,0X8A,0XAF,0X60,
-0X5B,0X56,0X4A,0X65,0X55,0X90,0XA2,0X9B,0X26,0XB9,0X6A,0XA8,0X75,0X4F,0X65,0X62,
-0X65,0X78,0XF2,0XAA,0X82,0X89,0X8B,0X08,0X10,0X55,0X40,0X45,0X65,0X30,0XA7,0X2A,
-0XA7,0X32,0X8F,0XF8,0X05,0X15,0X55,0X75,0X74,0X00,0XB7,0X2F,0XA7,0X2A,0X8D,0XF0,
-0X60,0X50,0X50,0X55,0X45,0X10,0XAA,0XA0,0XFE,0X9A,0XB5,0X10,0X55,0X16,0X25,0X57,
-0X45,0X10,0XBF,0X7E,0XA7,0X20,0X95,0XF0,0X05,0X13,0X5C,0X91,0XD4,0X00,};
+		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
+		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
+		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
+		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
+		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
+		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
+		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
+		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
+		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
+		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
+		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
+		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
+		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
+		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
+		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
+		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
+		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,};
 
 
 
@@ -1395,34 +1395,25 @@ void generate_v7_upscale()
     // 這樣我們就不需要處理 "留白" 的邏輯，剩下的 9px 自動會是白的
 	memset(out_buffer, 0x00, 2592);
 
-	    // 2. 遍歷原始矩陣
-	    for (int y = 0; y < 45; y++) {
-	        const uint8_t* row_ptr = &version7[y * 6];
+	    // 2. 正常產生 (同上一版程式碼)
+	for (int y = 0; y < 45; y++) {
+		const uint8_t* row_ptr = &version7[y * 6];
+		for (int x = 0; x < 45; x++) {
+			int is_black = (row_ptr[x >> 3] >> (7 - (x & 7))) & 1;
+			if (is_black) {
+				int start_x = x * 3;
+				int start_y = y * 3;
+				for (int dy = 0; dy < 3; dy++) {
+					int row_offset = (start_y + dy) * 18;
+					for (int dx = 0; dx < 3; dx++) {
+						int draw_x = start_x + dx;
+						out_buffer[row_offset + (draw_x >> 3)] |= (0x80 >> (draw_x & 7));
+					}
+				}
+			}
+		}
+	}
 
-	        for (int x = 0; x < 45; x++) {
-	            // 解析原始 Bit
-	            int is_black = (row_ptr[x >> 3] >> (7 - (x & 7))) & 1;
-
-	            if (is_black) {
-	                // 3. 計算放大後的座標 (移除偏移量，由 0 開始)
-	                int start_x = x * 3; // 3倍放大
-	                int start_y = y * 3;
-
-	                // 4. 繪製 3x3 像素
-	                for (int dy = 0; dy < 3; dy++) {
-	                    // 計算行開頭 (Target Width 144 = 18 bytes)
-	                    int row_offset = (start_y + dy) * 18;
-
-	                    for (int dx = 0; dx < 3; dx++) {
-	                        int draw_x = start_x + dx;
-
-	                        // 直接填入，因為沒有 Offset，第一個點就是 buffer[0] 的 bit 7
-	                        out_buffer[row_offset + (draw_x >> 3)] |= (0x80 >> (draw_x & 7));
-	                    }
-	                }
-	            }
-	        }
-	    }
 }
 
 char* sta_code_decoder(char *sta_code)
