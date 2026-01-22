@@ -228,6 +228,7 @@ int main(void)
   char input_date[16] = {0};
   char input_dept_time[10] = {0};
   char input_arr_time[10] = {0};
+  char input_dept_sta[20] = {0};
   char input_arr_sta[20] = {0};
   char input_car[10] = {0};
   char input_seat[10] = {0};
@@ -254,24 +255,35 @@ int main(void)
 	    {
 	    	if (isalpha((unsigned)debug_ticket[i][0]))
 	    	{
-	    		input_train_type = "TRA";
-	    		if (debug_ticket[i][0] == 'A')  input_train_kind = "Local";
-	    		if (debug_ticket[i][0] == 'N')  input_train_kind = "T.C.Exp.";
+	    		strcpy(input_train_type, "TRA");
+	    		if (debug_ticket[i][0] == 'A')  strcpy(input_train_kind, "Local");
+	    		if (debug_ticket[i][0] == 'N')  strcpy(input_train_kind, "T.C.Exp.");
 	    	}
 
 	    	else
 	    	{
-	    		input_train_type = "THSR";
-	    		input_train_kind = "Standard";
-	    		char tmp_train_num[10] = {0};
+	    		strcpy(input_train_type, "THSR");
+	    		strcpy(input_train_kind, "Standard");
 	    		strncpy(input_train_num, debug_ticket[i] + 25, 4); // Train number
-	    		input_train_num = tmp_train_num;
 	    		strncpy(dept_sta_code, debug_ticket[i] + 30, 2);   // Departure station code
-	    		input_dept_sta = sta_code_decoder(dept_sta_code);
-	    		strncpy(input_date, debug_ticket[i] + 32, 8);      // Date
+	    		//input_dept_sta = sta_code_decoder(dept_sta_code);
+	    		char raw_date[9] = {0};
+	    		strncpy(raw_date, debug_ticket[i] + 31, 8);      // Date
+	    		input_date[0] = raw_date[0];
+	    		input_date[1] = raw_date[1];
+	    		input_date[2] = raw_date[2];
+	    		input_date[3] = raw_date[3];
+	    		input_date[4] = ':';
+	    		input_date[5] = raw_date[4];
+	    		input_date[6] = raw_date[5];
+	    		input_date[7] = ':';
+	    		input_date[8] = raw_date[6];
+	    		input_date[9] = raw_date[7];
+	    		input_date[10] = '\0';
+
 	    		strncpy(input_dept_time, debug_ticket[i] + 40, 4); // Departure time
 	    		strncpy(arr_sta_code, debug_ticket[i] + 47, 2);    // Arrival station code
-	    		input_arr_sta = sta_code_decoder(arr_sta_code);
+	    		//input_arr_sta = sta_code_decoder(arr_sta_code);
 	    		strncpy(input_arr_time, debug_ticket[i] + 57, 4);  // Arrival time
 	    		strncpy(input_car, debug_ticket[i] + 77, 2);       // Car
 	    		strncpy(input_seat, debug_ticket[i] + 80, 5);      // Seat
