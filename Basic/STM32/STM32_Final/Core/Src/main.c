@@ -260,6 +260,8 @@ int main(void)
 	    		strcpy(input_train_type, "TRA");
 	    		if (debug_ticket[i][0] == 'A')  strcpy(input_train_kind, "Local");
 	    		if (debug_ticket[i][0] == 'N')  strcpy(input_train_kind, "T.C.Exp.");
+	    		strncpy(input_dept_sta, debug_ticket[i] + 19, 4);
+	    		strncpy(input_arr_sta, debug_ticket[i] + 23, 4);
 	    	}
 
 	    	else
@@ -268,6 +270,7 @@ int main(void)
 	    		strcpy(input_train_kind, "Standard");
 	    		strncpy(input_train_num, debug_ticket[i] + 24 , 4); // Train number
 	    		strncpy(input_dept_sta, debug_ticket[i] + 29, 2);   // Departure station code
+	    		input_dept_sta[2] = '\0';
 	    		//input_dept_sta = sta_code_decoder(dept_sta_code);
 	    		char raw_date[9] = {0};
 	    		strncpy(raw_date, debug_ticket[i] + 31, 8);      // Date
@@ -285,6 +288,7 @@ int main(void)
 
 	    		strncpy(input_dept_time, debug_ticket[i] + 39, 4); // Departure time
 	    		strncpy(input_arr_sta, debug_ticket[i] + 46, 2);    // Arrival station code
+	    		input_arr_sta[2] = '\0';
 	    		strncpy(input_arr_time, debug_ticket[i] + 56, 4);  // Arrival time
 	    		strncpy(input_car, debug_ticket[i] + 76, 2);       // Car
 	    		strncpy(input_seat, debug_ticket[i] + 79, 5);      // Seat
@@ -1355,6 +1359,149 @@ char* sta_code_decoder(char *sta_code)
 	    case 12:
 	        return "Zuoying";
 	        break;
+
+		case 980:
+			return "Nangang";    // 南港
+			break;
+		case 990:
+			return "Songshan";   // 松山
+			break;
+		case 1000:
+			return "Taipei";     // 台北
+			break;
+		case 1010:
+			return "Wanhua";     // 萬華
+			break;
+		case 1020:
+			return "Banqiao";    // 板橋
+			break;
+		case 1030:
+			return "Fuzhou";     // 浮洲
+			break;
+		case 1040:
+			return "Shulin";     // 樹林
+			break;
+		case 1050:
+			return "South Shulin";// 南樹林
+			break;
+		case 1060:
+			return "Shanjia";    // 山佳
+			break;
+		case 1070:
+			return "Yingge";     // 鶯歌
+			break;
+		case 1080:
+			return "Taoyuan";    // 桃園
+			break;
+		case 1090:
+			return "Neili";      // 內壢
+			break;
+		case 1100:
+			return "Zhongli";    // 中壢
+			break;
+		case 1110:
+			return "Puxin";      // 埔心
+			break;
+		case 1120:
+			return "Yangmei";    // 楊梅
+			break;
+		case 1130:
+			return "Fugang";     // 富岡
+			break;
+		case 1140:
+			return "Xinfu";      // 新富
+			break;
+		case 1150:
+			return "Beihu";      // 北湖
+			break;
+		case 1160:
+			return "Hukou";      // 湖口
+			break;
+		case 1170:
+			return "Xinfeng";    // 新豐
+			break;
+		case 1180:
+			return "Zhubei";     // 竹北
+			break;
+		case 1190:
+			return "North Hsinchu"; // 北新竹
+			break;
+		case 1210:
+			return "Hsinchu";    // 新竹
+			break;
+	    case 3220:
+			return "Houli";     // 后里
+			break;
+		case 3230:
+			return "Fengyuan";  // 豐原
+			break;
+		case 3240:
+			return "Lilin";    // 栗林
+			break;
+		case 3250:
+			return "Tanzi";     // 潭子
+			break;
+		case 3260:
+			return "Toujiacuo"; // 頭家厝
+			break;
+		case 3270:
+			return "Songzhu";   // 松竹
+			break;
+		case 3280:
+			return "Taiyuan";   // 太原
+			break;
+		case 3290:
+			return "Jingwu";    // 精武
+			break;
+		case 3300:
+			return "Taichung";  // 台中
+			break;
+		case 3310:
+			return "Wuquan";    // 五權
+			break;
+		case 3320:
+			return "Daqing";    // 大慶
+			break;
+		case 3330:
+			return "Wuri";      // 烏日
+			break;
+		case 3340:
+			return "Xinwuri";   // 新烏日
+			break;
+		case 3350:
+			return "Chenggong"; // 成功
+			break;
+		case 3360:
+			return "Changhua";   // 彰化
+			break;
+		case 3370:
+			return "Huatan";     // 花壇
+			break;
+		case 3380:
+			return "Dacun";      // 大村
+			break;
+		case 3390:
+			return "Yuanlin";    // 員林
+			break;
+		case 3400:
+			return "Yongjing";   // 永靖
+			break;
+		case 3410:
+			return "Shetou";     // 社頭
+			break;
+		case 3420:
+			return "Tianzhong";  // 田中
+		case 3430:
+			return "Ershui";     // 二水
+			break;
+		case 3450:
+			return "Linnei";     // 林內 (註：台鐵代碼跳過3440)
+		case 3460:
+			return "Shizeng";    // 石榴
+			break;
+		case 3470:
+			return "Douliu";     // 斗六
+			break;
 	    default:
 	        return sta_code;
 	        break;
