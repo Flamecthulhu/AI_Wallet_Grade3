@@ -241,7 +241,7 @@ int main(void)
 	  "0720412420244007936860000849004202508301834470072025083019154701000000300000030030030000000540006001INTIRS000020250830109ABE",  //台中->板橋
 	  "0421511450742087503470000333004202505252215520072025052522475201000000100000080020010000000540006000INTETS000020250525101909",  //桃園->台中
 	  "2902100093118070992280000845007202601091817000082026010918270001000000100000040100050000000130006001INTETS000020260109105067",
-	  "0720412420241007936860000616007202508300932470042025083010094701000000200000020140030000000540006001INTIRS00002025083010701D"
+	  "0720412420241007936860000616007202508300932470042025083010094701000000200000100140030000000540006001INTIRS00002025083010701D"
   };
 
   // End Define Variable
@@ -286,7 +286,7 @@ int main(void)
 	    		strncpy(input_arr_sta, debug_ticket[i] + 46, 2);    // Arrival station code
 	    		strncpy(input_arr_time, debug_ticket[i] + 56, 4);  // Arrival time
 	    		strncpy(input_car, debug_ticket[i] + 76, 2);       // Car
-	    		strncpy(input_seat, debug_ticket[i] + 79, 5);      // Seat
+	    		strncpy(input_seat, debug_ticket[i] + 80, 5);      // Seat
 	    		strncpy(input_arr_sta, debug_ticket[i] + 90, 1);    // Price
 	    	}
 
@@ -294,7 +294,7 @@ int main(void)
 	    	epd_ticket_handler(input_train_type, input_train_kind, input_train_num, input_date, input_dept_time, input_dept_sta,
 	    			input_arr_time, input_arr_sta, input_car, input_seat, input_price);
 	    	//debug_disp();
-	    	HAL_Delay(3000);
+	    	HAL_Delay(1000);
 	    }
   }
 
@@ -1242,39 +1242,40 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 	}
 
 	SSD1680_Text(&hepd, 88, 32, "Depart", &cp866_8x14);
-	SSD1680_Text(&hepd, 88, 46, sta_code_decoder(dept_sta), &cp866_8x16);
+	SSD1680_Text(&hepd, 8, 46, sta_code_decoder(dept_sta), &cp866_8x16);
 
 	SSD1680_Text(&hepd, 88, 62, "Car", &cp866_8x16);
-	if (car[0] == '0') SSD1680_Text(&hepd, 120, 62, car + 1, &cp866_8x16);
+	if (car[0] == '0') SSD1680_Text(&hepd, 128, 62, car + 1, &cp866_8x16);
 	else SSD1680_Text(&hepd, 120, 62, car, &cp866_8x16);
 
-	SSD1680_Text(&hepd, 88, 78, "Seat", &cp866_8x16);
+	//SSD1680_Text(&hepd, 88, 78, "Seat", &cp866_8x16);
 	char seat_decoded[4] = {0};
 	seat_decoded[0] = seat[1];
+	seat_decoded[1] = seat[2];
 	switch (seat[4])
 	{
 		case '1':
-			seat_decoded[1] = 'A';
+			seat_decoded[2] = 'A';
 			break;
 		case '2':
-			seat_decoded[1] = 'B';
+			seat_decoded[2] = 'B';
 			break;
 		case '3':
-			seat_decoded[1] = 'C';
+			seat_decoded[2] = 'C';
 			break;
 		case '4':
-			seat_decoded[1] = 'D';
+			seat_decoded[2] = 'D';
 			break;
 		case '5':
-			seat_decoded[1] = 'E';
+			seat_decoded[2] = 'E';
 			break;
 		default:
-			seat_decoded[1] = 0;
+			seat_decoded[2] = 0;
 	}
-	SSD1680_Text(&hepd, 128, 78, seat_decoded, &cp866_8x16);
+	SSD1680_Text(&hepd, 120, 78, seat, &cp866_8x16);
 
 	SSD1680_Text(&hepd, 88, 94, "Arrive", &cp866_8x14);
-	SSD1680_Text(&hepd, 88, 110, sta_code_decoder(arr_sta), &cp866_8x16);
+	SSD1680_Text(&hepd, 8, 110, sta_code_decoder(arr_sta), &cp866_8x16);
 
 	SSD1680_Refresh(&hepd, REFRESH_MODE);
 	HAL_Delay(1000);
