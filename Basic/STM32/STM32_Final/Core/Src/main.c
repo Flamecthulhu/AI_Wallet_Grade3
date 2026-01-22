@@ -31,7 +31,6 @@
 #include "SSD1680.h"
 #include "fonts.h"
 
-#include "interfacev.h"
 #include "fc_weights.h"
 //#include "model_weights.c"
 /* USER CODE END Includes */
@@ -251,7 +250,7 @@ int main(void)
       {STA_LED_GPIO_Port,  STA_LED_Pin,  GPIO_PIN_SET},
       {EC_LED_GPIO_Port,   EC_LED_Pin,   GPIO_PIN_SET},
       {EC_RELAY_GPIO_Port, EC_RELAY_Pin, GPIO_PIN_RESET},
-	  {EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET}
+	  {EPD_EN_GPIO_Port,   EPD_EN_Pin,   GPIO_PIN_RESET}
   };
 
   for (int i = 0; i < sizeof(list)/sizeof(list[0]); i++)
@@ -316,27 +315,13 @@ int main(void)
 	    		strncpy(input_train_num, debug_ticket[i] + 24 , 4); // Train number
 	    		strncpy(input_dept_sta, debug_ticket[i] + 29, 2);   // Departure station code
 	    		input_dept_sta[2] = '\0';
-	    		//input_dept_sta = sta_code_decoder(dept_sta_code);
-	    		char raw_date[9] = {0};
-	    		strncpy(raw_date, debug_ticket[i] + 31, 8);      // Date
-	    		input_date[0] = raw_date[0];
-	    		input_date[1] = raw_date[1];
-	    		input_date[2] = raw_date[2];
-	    		input_date[3] = raw_date[3];
-	    		input_date[4] = '-';
-	    		input_date[5] = raw_date[4];
-	    		input_date[6] = raw_date[5];
-	    		input_date[7] = '-';
-	    		input_date[8] = raw_date[6];
-	    		input_date[9] = raw_date[7];
-	    		input_date[10] = '\0';
-
-	    		strncpy(input_dept_time, debug_ticket[i] + 39, 4); // Departure time
+	    		strncpy(input_date, debug_ticket[i] + 31, 8);       // Date
+	    		strncpy(input_dept_time, debug_ticket[i] + 39, 4);  // Departure time
 	    		strncpy(input_arr_sta, debug_ticket[i] + 46, 2);    // Arrival station code
 	    		input_arr_sta[2] = '\0';
-	    		strncpy(input_arr_time, debug_ticket[i] + 56, 4);  // Arrival time
-	    		strncpy(input_car, debug_ticket[i] + 76, 2);       // Car
-	    		strncpy(input_seat, debug_ticket[i] + 79, 5);      // Seat
+	    		strncpy(input_arr_time, debug_ticket[i] + 56, 4);   // Arrival time
+	    		strncpy(input_car, debug_ticket[i] + 76, 2);        // Car
+	    		strncpy(input_seat, debug_ticket[i] + 79, 5);       // Seat
 	    		strncpy(input_arr_sta, debug_ticket[i] + 90, 1);    // Price
 	    	}
 
@@ -347,32 +332,6 @@ int main(void)
 	    	//debug_disp();
 	    	HAL_Delay(1000);
 	    }
-  }
-
-  else if (!DEBUG_MODE)
-  {
-	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
-	  HAL_Delay(100);
-	  SSD1680_Clear(&hepd, ColorWhite);
-	  SSD1680_DrawBitmap(&hepd, 0, 0, startupv, 152, 296);
-	  SSD1680_Refresh(&hepd, REFRESH_MODE);
-	  HAL_Delay(2000);
-	  SSD1680_DrawBitmap(&hepd, 0, 0, einvoicev, 152, 296);
-	  SSD1680_Refresh(&hepd, REFRESH_MODE);
-	  HAL_Delay(1000);
-	  SSD1680_DrawBitmap(&hepd, 0, 0, easycardv, 152, 296);
-	  SSD1680_Refresh(&hepd, REFRESH_MODE);
-	  HAL_Delay(1000);
-	  SSD1680_DrawBitmap(&hepd, 0, 0, exhomescreen, 152, 296);
-	  SSD1680_Refresh(&hepd, REFRESH_MODE);
-	  HAL_Delay(1000);
-	  SSD1680_DrawBitmap(&hepd, 0, 0, extra, 152, 296);
-	  SSD1680_Refresh(&hepd, REFRESH_MODE);
-	  HAL_Delay(1000);
-	  SSD1680_DrawBitmap(&hepd, 0, 0, exthsr, 152, 296);
-	  SSD1680_Refresh(&hepd, REFRESH_MODE);
-	  HAL_Delay(3000);
-	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
   }
 
   while (1)
@@ -1281,9 +1240,10 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 	if (strcmp(train_type, "THSR") == 0)
 	{
 		SSD1680_Text(&hepd, 64, 0, "THSR", &cp866_8x16);
-		generate_v7_upscale();
-		SSD1680_SetRegion(&hepd, 8, 152, 144, 144, out_buffer, NULL);
+		generate_upscaled_qr(145, 144, 4, version7);
+		SSD1680_SetRegion(&hepd, 8, 152, 144, 145, out_buffer, NULL);
 	}
+
 	else if (strcmp(train_type, "TRA") == 0)
 	{
 		SSD1680_Text(&hepd, 64, 0, "TRA ", &cp866_8x16);
@@ -1291,13 +1251,26 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 		SSD1680_SetRegion(&hepd, 8, 152, 144, 145, out_buffer, NULL);
 	}
 
-	if (date != NULL)  SSD1680_Text(&hepd, 0, 16, date, &cp866_8x16);
-	if (train_kind != NULL && strcmp(train_type, "TRA") == 0)  SSD1680_Text(&hepd, 88, 16, train_kind, &cp866_8x16);
-	if (train_kind != NULL && (strcmp(train_type, "THSR") == 0)) SSD1680_Text(&hepd, 88, 16, train_kind, &cp866_8x8);
+	char new_date[11] = {0};
+	new_date[0] = date[0];
+	new_date[1] = date[1];
+	new_date[2] = date[2];
+	new_date[3] = date[3];
+	new_date[4] = '-';
+	new_date[5] = date[4];
+	new_date[6] = date[5];
+	new_date[7] = '-';
+	new_date[8] = date[6];
+	new_date[9] = date[7];
+	new_date[10] = '\0';
+
+	if (date != NULL)  SSD1680_Text(&hepd, 0, 20, new_date, &cp866_8x16);
+	if (train_kind != NULL && strcmp(train_type, "TRA") == 0)  SSD1680_Text(&hepd, 88, 20, train_kind, &cp866_8x16);
+	if (train_kind != NULL && (strcmp(train_type, "THSR") == 0)) SSD1680_Text(&hepd, 88, 20, train_kind, &cp866_8x8);
 	if (train_num != NULL && (strcmp(train_type, "THSR") == 0))
 	{
-		if (train_num[0] == '0')  SSD1680_Text(&hepd, 88, 24, train_num + 1, &cp866_8x8);
-		else  SSD1680_Text(&hepd, 88, 24, train_num, &cp866_8x8);
+		if (train_num[0] == '0')  SSD1680_Text(&hepd, 88, 28, train_num + 1, &cp866_8x8);
+		else  SSD1680_Text(&hepd, 88, 28, train_num, &cp866_8x8);
 	}
 
 	SSD1680_Text(&hepd, 88, 40, "Depart", &cp866_8x14);
@@ -1377,6 +1350,7 @@ void debug_disp(void)
 void generate_upscaled_qr(uint16_t height, uint16_t width, uint8_t scale,const unsigned char qrcode[])
 {
 	memset(out_buffer, 0x00, sizeof(out_buffer));
+	for (int i = 0; i < 4; i++)  out_buffer[i] = 0xFF;
 	for (int y = 0; y < height; y++)
 	{
 		int src_y = y / scale;
@@ -1402,38 +1376,56 @@ void generate_upscaled_qr(uint16_t height, uint16_t width, uint8_t scale,const u
 
 void generate_v7_upscale()
 {
-	memset(out_buffer, 0xFF, 2592);
+	memset(out_buffer, 0x00, sizeof(out_buffer));
 
-	    for (int y = 0; y < 45; y++) {
-	        // 使用 6 Bytes Stride (既然 8 是全錯的，那 6 應該是對的)
-	        const uint8_t* row_ptr = &version7[y * 6];
+	// 2. 計算來源資料的跨度 (Stride)
+	// V7 (45px) => (45 + 7) / 8 = 6 bytes
+	int src_stride = 6;
 
-	        for (int x = 0; x < 45; x++) {
+	for (int y = 0; y < 135; y++)
+	{
+	    int src_y = y / 3;
 
-	            // --- 【關鍵修改】 ---
-	            // 原本是 MSB: (row_ptr[x >> 3] >> (7 - (x & 7))) & 1;
-	            // 改成 LSB 試試看 (從低位元讀起)：
-	            int is_black = (row_ptr[x >> 3] >> (x & 7)) & 1;
-	            // ------------------
+	    // 安全檢查：防止 src_y 超過 44
+	    if (src_y >= 45) break;
 
-	            if (is_black) {
-	                // 放大 3 倍
-	                int start_x = x * 3;
-	                int start_y = y * 3;
+	    // 【關鍵修正】這裡必須是 * 6，因為 270 / 45 = 6
+	    const uint8_t* row_ptr = &version7[src_y * src_stride];
 
-	                for (int dy = 0; dy < 3; dy++) {
-	                    int row_offset = (start_y + dy) * 18;
-	                    for (int dx = 0; dx < 3; dx++) {
-	                        int draw_x = start_x + dx;
+	    for (int x = 0; x < 135; x++)
+	    {
+	        int src_x = x / 3;
 
-	                        // 寫入 Output Buffer
-	                        // 注意：Output 給螢幕通常還是維持 MSB (7 - bit)，除非螢幕也是反的
-	                        out_buffer[row_offset + (draw_x >> 3)] &= ~(1 << (7 - (draw_x & 7)));
-	                    }
-	                }
-	            }
+	        // 安全檢查：防止 src_x 超過 44 (雖然 V7 只有 45 寬，但邏輯上保護一下)
+	        if (src_x >= 45) continue;
+
+	        int byte_idx = src_x / 8;
+	        int bit_idx = 7 - (src_x % 8); // MSB First 讀取
+
+	        // 從來源讀取一個 bit
+	        int is_black = (row_ptr[byte_idx] >> bit_idx) & 1;
+
+	        if (is_black)
+	        {
+	            // 電子紙/螢幕輸出計算
+	            // 這裡假設 out_buffer 也是一行對齊 byte (width / 8)
+	            // 如果你的螢幕寬度是 144，那每行就是 18 bytes
+	            int out_stride = 135 / 8;
+
+	            // 如果 width 不是 8 的倍數，out_stride 可能需要 +1 或依螢幕規格調整
+	            // 假設 width=144 (scale=3.2?) 或 135?
+	            // 如果 width=135, 135/8 = 16 (少存了7bit), 應該是 (135+7)/8 = 17
+	            // 建議直接寫死你的螢幕寬度 stride，例如 18 (for 144px)
+
+	            int row_offset = y * 18; // 假設螢幕寬 144，Byte寬度為 18
+	            int buf_idx = row_offset + (x / 8);
+	            int bit_pos = 7 - (x % 8);
+
+	            // 寫入 (1=黑)
+	            out_buffer[buf_idx] |= (1 << bit_pos);
 	        }
 	    }
+	}
 }
 
 char* sta_code_decoder(char *sta_code)
