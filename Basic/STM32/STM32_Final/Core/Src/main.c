@@ -95,6 +95,7 @@ int mlp_forward_pass(double current_lat, double current_lon, uint8_t hour_of_day
 void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time,
 						char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price);
 void generate_upscaled_qr(uint16_t height, uint16_t width, uint8_t scale,const unsigned char qrcode[]);
+void generate_v7_upscale();
 char* sta_code_decoder(char *sta_code);
 SPI_HandleTypeDef hspi1;
 SSD1680_HandleTypeDef hepd;
@@ -1270,8 +1271,8 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 	if (strcmp(train_type, "THSR") == 0)
 	{
 		SSD1680_Text(&hepd, 64, 0, "THSR", &cp866_8x16);
-		generate_upscaled_qr(132, 132, 3, version7);
-		SSD1680_SetRegion(&hepd, 8, 152, 132, 132, out_buffer, NULL);
+		generate_v7_upscale();
+		SSD1680_SetRegion(&hepd, 8, 152, 144, 144, out_buffer, NULL);
 	}
 	else if (strcmp(train_type, "TRA") == 0)
 	{
@@ -1386,6 +1387,53 @@ void generate_upscaled_qr(uint16_t height, uint16_t width, uint8_t scale,const u
 			}
 		}
 	}
+}
+
+void generate_v7_upscale()
+{
+    // 1. 先將整張畫布清空為白色 (0x00)
+    // 這樣我們就不需要處理 "留白" 的邏輯，剩下的 9px 自動會是白的
+    memset(out_buffer, 0x00, sizeof(out_buffer));
+
+    // 2. 遍歷原始 Version 7 (45x45)
+    for (int y = 0; y < 45; y++) {
+
+        // 取得該行的原始指標 (每行 6 bytes)
+        const uint8_t* row_ptr = &version7[y * 6];
+
+        for (int x = 0; x < 45; x++) {
+            // 解析原始 Bit (假設 MSB First)
+            int byte_idx = x / 8;
+            int bit_idx = 7 - (x % 8);
+            int is_black = (row_ptr[byte_idx] >> bit_idx) & 1;
+
+            if (is_black) {
+                // 3. 計算放大後的起始座標 (加入 Offset 置中)
+                int start_x = 4 + (x * 3);
+                int start_y = (y * 3);
+
+                // 4. 繪製 3x3 黑塊
+                for (int dy = 0; dy < 3; dy++) {
+                    int draw_y = start_y + dy;
+
+                    // 優化：計算該行在 Buffer 的起始 Index
+                    // TGT_DIM / 8 = 18 bytes (144px寬)
+                    int row_offset = draw_y * 18;
+
+                    for (int dx = 0; dx < 3; dx++) {
+                        int draw_x = start_x + dx;
+
+                        // 計算在 Buffer 中的位置
+                        int buf_idx = row_offset + (draw_x / 8);
+                        int bit_pos = 7 - (draw_x % 8);
+
+                        // 設定 Bit 為 1 (黑)
+                        out_buffer[buf_idx] |= (1 << bit_pos);
+                    }
+                }
+            }
+        }
+    }
 }
 
 char* sta_code_decoder(char *sta_code)
