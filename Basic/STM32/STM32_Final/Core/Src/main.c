@@ -163,6 +163,18 @@ const unsigned char version7[270] = {
 0X9F,0XAF,0XAF,0XAA,0XBA,0XE8,0X55,0X5F,0X01,0X65,0X4A,0XE8,0XAA,0XE9,0XDA,0XA8,
 0XBA,0XE8,0X40,0X81,0X58,0XDF,0X6A,0X08,0XFA,0XEC,0XA3,0X6E,0X2B,0XF8,};
 
+const unsigned char arrow[162] = {
+0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,
+0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,
+0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,
+0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,
+0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,
+0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,0XFF,0X00,0X00,
+0XFF,0X00,0X00,0XFF,0X00,0X20,0XFF,0X00,0X70,0XFF,0X00,0XF8,0XFF,0X01,0XFC,0XFF,
+0X03,0XFE,0XFF,0X07,0XFF,0XFF,0X0F,0XFE,0XFF,0X1F,0XFC,0XFF,0X3F,0XF8,0XFF,0X7F,
+0XF0,0XFF,0XFF,0XE0,0XFF,0XFF,0XC0,0XFF,0XFF,0X80,0XFF,0XFF,0X00,0XFF,0XFE,0X00,
+0XFF,0XFC,0X00,0XFF,0XF8,0X00,0XFF,0XF0,0X00,0XFF,0XE0,0X00,0XFF,0XC0,0X00,0XFF,
+0X80,0X00,};
 
 
 
@@ -1303,6 +1315,8 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 	SSD1680_Text(&hepd, 88, 56, convert_dept_time, &cp866_8x16);
 	SSD1680_Text(&hepd, 8, 40, sta_code_decoder(dept_sta), &cp866_8x16);
 
+	SSD1680_SetRegion(&hepd, 24, 72, 24, 54, arrow, NULL);
+
 	SSD1680_Text(&hepd, 88, 72, "Car", &cp866_8x16);
 	if (car[0] == '0') SSD1680_Text(&hepd, 128, 72, car + 1, &cp866_8x16);
 	else SSD1680_Text(&hepd, 128, 72, car, &cp866_8x16);
@@ -1397,16 +1411,17 @@ void generate_v7_upscale()
 	memset(out_buffer, 0xFF, 2592);
 
 	    for (int y = 0; y < 45; y++) {
-	        const uint8_t* row_ptr = &version7[y * 6];
+
+	        // 【關鍵】每一行的開頭位置
+	        // 如果來源有 Padding，這裡必須跳過正確的 byte 數
+	        const uint8_t* row_ptr = &version7[y * 5];
 
 	        for (int x = 0; x < 45; x++) {
 
-	            // 讀取原始資料 (假設原始資料是標準的 1=黑)
-	            // 如果你的來源也是反的，請把最後的 & 1 改成 == 0
+	            // 讀取 Bit (如果不對，試著換回 MSB: >> (7 - (x & 7)))
 	            int is_black = (row_ptr[x >> 3] >> (7 - (x & 7))) & 1;
 
 	            if (is_black) {
-	                // 放大 3 倍，靠左上 (0,0)
 	                int start_x = x * 3;
 	                int start_y = y * 3;
 
@@ -1415,20 +1430,13 @@ void generate_v7_upscale()
 	                    for (int dx = 0; dx < 3; dx++) {
 	                        int draw_x = start_x + dx;
 
-	                        // 計算位置
-	                        int byte_idx = row_offset + (draw_x >> 3);
-	                        int bit_pos = 7 - (draw_x & 7); // MSB First
-
-	                        // 2. 【寫入黑色】
-	                        // 目標是把該 bit 變成 0 (黑色)
-	                        // 使用 &= ~mask (例如 &= ~0x80 會把最高位變成 0，其他不變)
-	                        out_buffer[byte_idx] &= ~(1 << bit_pos);
+	                        // 寫入 Buffer (把 bit 清成 0 代表黑色)
+	                        out_buffer[row_offset + (draw_x >> 3)] &= ~(1 << (7 - (draw_x & 7)));
 	                    }
 	                }
 	            }
 	        }
 	    }
-
 }
 
 char* sta_code_decoder(char *sta_code)
