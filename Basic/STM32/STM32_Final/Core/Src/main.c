@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -49,7 +50,12 @@
 #define HIDDEN_2   32
 #define OUTPUT_DIM 5
 #define REFRESH_MODE 199
-#define TIME_MODE 12 // 12&24 Hour mode
+
+#define SRC_DIM 29
+#define DEST_DIM 145
+#define SCALE 5
+#define BYTES_PER_ROW 4
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -94,6 +100,7 @@ int mlp_forward_pass(double current_lat, double current_lon, uint8_t hour_of_day
 					 int time_to_dept, uint8_t is_ticket_reg, uint8_t is_entering, uint8_t is_exiting);
 void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time,
 						char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price);
+void unpack_to_buffer(const unsigned char *src, uint8_t dest_buf[DEST_DIM][DEST_DIM]);
 char* sta_code_decoder(char *sta_code);
 SPI_HandleTypeDef hspi1;
 SSD1680_HandleTypeDef hepd;
@@ -129,6 +136,18 @@ static uint8_t bt_idx = 0;
 char parts[15][16];
 
 int result;
+uint8_t flat_array[DEST_DIM * DEST_DIM];
+
+const unsigned char version3[116] = {
+    0XFE,0XA4,0X3B,0XF8,0X82,0X53,0XBA,0X08,0XBA,0X25,0X7A,0XE8,0XBA,0XC3,0XD2,0XE8,
+    0XBA,0XF1,0X2A,0XE8,0X82,0X26,0X9A,0X08,0XFE,0XAA,0XAB,0XF8,0X00,0X81,0X08,0X00,
+    0XEF,0XFF,0X4E,0X20,0X0C,0XD9,0X25,0X68,0X8B,0XDC,0X1E,0XF0,0X95,0X21,0X58,0X50,
+    0X88,0X7E,0XAE,0X38,0XE1,0X55,0X50,0X40,0X0C,0XAB,0X63,0XA0,0X54,0X63,0X11,0X70,
+    0XE6,0XFC,0X83,0X78,0X53,0X17,0X7D,0X78,0XCD,0XA5,0X72,0XB0,0X55,0X5C,0X85,0XE0,
+    0X1F,0XA0,0X8F,0X20,0X48,0X95,0X68,0X00,0XCA,0XA7,0XAB,0XF8,0X58,0XE1,0X12,0X08,
+    0XEF,0XD3,0X72,0XE8,0X10,0XEF,0X92,0XE8,0XCE,0X3D,0X5A,0XE8,0X54,0XD6,0X32,0X08,
+    0XE8,0XBB,0XD3,0XF8
+};
 /* USER CODE END 0 */
 
 /**
@@ -298,6 +317,7 @@ int main(void)
 	    	//(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time, char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price)
 	    	epd_ticket_handler(input_train_type, input_train_kind, input_train_num, input_date, input_dept_time, input_dept_sta,
 	    			input_arr_time, input_arr_sta, input_car, input_seat, input_price);
+
 	    	//debug_disp();
 	    	HAL_Delay(1000);
 	    }
@@ -1300,6 +1320,10 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 	SSD1680_Text(&hepd, 88, 118, convert_arr_time, &cp866_8x16);
 	SSD1680_Text(&hepd, 8, 112, sta_code_decoder(arr_sta), &cp866_8x16);
 
+	static uint8_t my_new_array[DEST_DIM][DEST_DIM];
+	unpack_to_buffer(version3, my_new_array);
+	SSD1680_SetRegion(&hepd, 0, 144, 145, 145, my_new_array, NULL);
+
 	SSD1680_Refresh(&hepd, REFRESH_MODE);
 	HAL_Delay(1000);
 	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
@@ -1316,6 +1340,28 @@ void debug_disp(void)
 	SSD1680_Refresh(&hepd, REFRESH_MODE);
 	HAL_Delay(1000);
 	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
+}
+
+void unpack_to_buffer(const unsigned char *src, uint8_t dest_buf[DEST_DIM][DEST_DIM]) {
+    for (int y = 0; y < SRC_DIM; y++) {
+        for (int x = 0; x < SRC_DIM; x++) {
+
+            // 1. 計算來源位元位置
+            int byte_index = (y * BYTES_PER_ROW) + (x / 8);
+            int bit_pos    = 7 - (x % 8);
+
+            // 2. 提取位元並決定顏色 (1=黑/0x00, 0=白/0xFF)
+            int is_dark = (src[byte_index] >> bit_pos) & 1;
+            uint8_t color = is_dark ? 0x00 : 0xFF;
+
+            // 3. 寫入目標陣列 (縮放 5x)
+            for (int dy = 0; dy < SCALE; dy++) {
+                for (int dx = 0; dx < SCALE; dx++) {
+                	flat_array[ (y * SCALE + dy) * DEST_DIM + (x * SCALE + dx) ] = color;
+                }
+            }
+        }
+    }
 }
 
 char* sta_code_decoder(char *sta_code)
@@ -1495,12 +1541,155 @@ char* sta_code_decoder(char *sta_code)
 			return "Ershui";     // 二水
 			break;
 		case 3450:
-			return "Linnei";     // 林內 (註：台鐵代碼跳過3440)
+			return "Linnei";     // 林內
 		case 3460:
 			return "Shizeng";    // 石榴
 			break;
 		case 3470:
 			return "Douliu";     // 斗六
+			break;
+
+		case 4080:
+			return "Chiayi";     // 嘉義
+			break;
+		case 4090:
+			return "Shuishang";  // 水上
+			break;
+		case 4100:
+			return "Nanjing";    // 南靖
+			break;
+		case 4110:
+			return "Houbi";      // 後壁
+			break;
+		case 4120:
+			return "Xinying";    // 新營
+			break;
+		case 4130:
+			return "Liuying";    // 柳營
+			break;
+		case 4140:
+			return "Linfengying"; // 林鳳營
+			break;
+		case 4150:
+			return "Longtian";   // 隆田
+			break;
+		case 4160:
+			return "Bahe";       // 拔林
+			break;
+		case 4170:
+			return "Shanhua";    // 善化
+			break;
+		case 4180:
+			return "Nanke";      // 南科
+			break;
+		case 4190:
+			return "Xinshi";     // 新市
+			break;
+		case 4200:
+			return "Yongkang";   // 永康
+			break;
+		case 4210:
+			return "Daqiao";     // 大橋
+			break;
+		case 4220:
+			return "Tainan";     // 台南
+			break;
+		case 4250:
+			return "Bao'an";    // 保安
+			break;
+		case 4260:
+			return "Rende";      // 仁德
+			break;
+		case 4270:
+			return "Zhongzhou";  // 中洲
+			break;
+		case 4290: // 4280 跳號
+			return "Dahu";       // 大湖
+			break;
+		case 4300:
+			return "Lujia";      // 路竹
+			break;
+		case 4310:
+			return "Gangshan";   // 岡山
+			break;
+		case 4320:
+			return "Qiaotou";    // 橋頭
+			break;
+		case 4330:
+			return "Nanzi";      // 楠梓
+			break;
+		case 4340:
+			return "Xinzuoying"; // 新左營
+			break;
+		case 4350:
+			return "Zuoying";    // 左營
+			break;
+		case 4360:
+			return "Neiwei";     // 內惟
+			break;
+		case 4370:
+			return "Museum of Fine Arts"; // 美術館
+			break;
+		case 4380:
+			return "Gushan";     // 鼓山
+			break;
+		case 4390:
+			return "Sankuaicuo"; // 三塊厝
+			break;
+		case 4400:
+			return "Kaohsiung";  // 高雄
+			break;
+
+		case 1250:
+			return "Zhunan";     // 竹南
+			break;
+		case 2110:
+			return "Tanwen";     // 談文
+			break;
+		case 2120:
+			return "Dashan";     // 大山
+			break;
+		case 2130:
+			return "Houlong";    // 後龍
+			break;
+		case 2140:
+			return "Longgang";   // 龍港
+			break;
+		case 2150:
+			return "Baishatun";  // 白沙屯
+			break;
+		case 2160:
+			return "Xinpu";      // 新埔
+			break;
+		case 2170:
+			return "Tongxiao";   // 通霄
+			break;
+		case 2180:
+			return "Yuanli";     // 苑裡
+			break;
+		case 2190:
+			return "Rinan";      // 日南
+			break;
+		case 2200:
+			return "Dajia";      // 大甲
+			break;
+		case 2210:
+			return "Taichung Port"; // 臺中港
+			break;
+		case 2220:
+			return "Qingshui";   // 清水
+			break;
+		case 2230:
+			return "Shalu";      // 沙鹿
+			break;
+		case 2240:
+			return "Longjing";   // 龍井
+			break;
+		case 2250:
+			return "Dadu";       // 大肚
+			break;
+		case 2260:
+			return "Zhuifen";    // 追分
 			break;
 	    default:
 	        return sta_code;
