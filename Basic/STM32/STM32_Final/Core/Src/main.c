@@ -53,8 +53,7 @@
 
 #define SRC_DIM 29
 #define DEST_DIM 145
-#define SCALE 5
-#define BYTES_PER_ROW 4
+#define DEST_BYTE_WIDTH (DEST_DIM / 8)
 
 /* USER CODE END PD */
 
@@ -100,7 +99,7 @@ int mlp_forward_pass(double current_lat, double current_lon, uint8_t hour_of_day
 					 int time_to_dept, uint8_t is_ticket_reg, uint8_t is_entering, uint8_t is_exiting);
 void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time,
 						char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price);
-void unpack_to_buffer(const unsigned char *src, uint8_t dest_buf[DEST_DIM][DEST_DIM]);
+void unpack_to_epd_format(const unsigned char *src);
 char* sta_code_decoder(char *sta_code);
 SPI_HandleTypeDef hspi1;
 SSD1680_HandleTypeDef hepd;
@@ -136,18 +135,18 @@ static uint8_t bt_idx = 0;
 char parts[15][16];
 
 int result;
-uint8_t flat_array[DEST_DIM * DEST_DIM];
-
-const unsigned char version3[116] = {
-    0XFE,0XA4,0X3B,0XF8,0X82,0X53,0XBA,0X08,0XBA,0X25,0X7A,0XE8,0XBA,0XC3,0XD2,0XE8,
-    0XBA,0XF1,0X2A,0XE8,0X82,0X26,0X9A,0X08,0XFE,0XAA,0XAB,0XF8,0X00,0X81,0X08,0X00,
-    0XEF,0XFF,0X4E,0X20,0X0C,0XD9,0X25,0X68,0X8B,0XDC,0X1E,0XF0,0X95,0X21,0X58,0X50,
-    0X88,0X7E,0XAE,0X38,0XE1,0X55,0X50,0X40,0X0C,0XAB,0X63,0XA0,0X54,0X63,0X11,0X70,
-    0XE6,0XFC,0X83,0X78,0X53,0X17,0X7D,0X78,0XCD,0XA5,0X72,0XB0,0X55,0X5C,0X85,0XE0,
-    0X1F,0XA0,0X8F,0X20,0X48,0X95,0X68,0X00,0XCA,0XA7,0XAB,0XF8,0X58,0XE1,0X12,0X08,
-    0XEF,0XD3,0X72,0XE8,0X10,0XEF,0X92,0XE8,0XCE,0X3D,0X5A,0XE8,0X54,0XD6,0X32,0X08,
-    0XE8,0XBB,0XD3,0XF8
+static uint8_t epd_buffer[DEST_BYTE_WIDTH * DEST_DIM];
+const unsigned char version3[128] = {
+0XFF,0X52,0X0E,0XFF,0X81,0X29,0XEE,0X81,0XB9,0X12,0XDE,0X9D,0XBD,0X11,0XF4,0XBD,
+0XBD,0X60,0XC0,0XBD,0XBD,0X78,0XCA,0XBD,0X81,0X13,0XA6,0X81,0XFF,0X54,0XAA,0XFF,
+0X00,0X40,0X42,0X00,0XE7,0XFF,0XD3,0X84,0X06,0X6C,0XC9,0X4D,0X85,0XEE,0X07,0X9E,
+0X82,0X90,0X56,0X0A,0X8C,0X3F,0X2B,0X87,0XC0,0XAB,0XD4,0X08,0X04,0X55,0XD8,0XF4,
+0X06,0X55,0XD8,0X64,0X4A,0X31,0XC4,0X6F,0XF3,0X7E,0X20,0XEF,0X59,0X8B,0XDF,0X6F,
+0XC6,0XD2,0XDC,0XB6,0X5A,0XAE,0X21,0X7C,0X1F,0XD0,0X23,0XE4,0X44,0X4A,0X5A,0X00,
+0XC5,0X53,0XEA,0XFF,0X5C,0X70,0XC4,0X81,0XF7,0XE9,0XDC,0X9D,0XE7,0X69,0XC4,0X9D,
+0X18,0X77,0XC6,0X9D,0XC7,0X1F,0X56,0X9D,0X52,0X6B,0X0C,0X81,0XE4,0X5D,0XF4,0XFF,
 };
+
 /* USER CODE END 0 */
 
 /**
@@ -327,10 +326,9 @@ int main(void)
   {
 	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
 	  HAL_Delay(100);
-	  uint8_t my_new_array[DEST_DIM][DEST_DIM];
-	  unpack_to_buffer(version3, my_new_array);
-	  SSD1680_DrawBitmap(&hepd, 0, 0, (uint8_t *)my_new_array, 145, 145);
-	  SSD1680_Refresh(&hepd, REFRESH_MODE);
+	  unpack_to_epd_format(version3);
+	  SSD1680_SetRegion(&hepd, 0, 0, 152, 152, epd_buffer, NULL);
+	  SSD1680_Refresh(&hepd, FullRefresh);
 	  HAL_Delay(3000);
 	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
 	  /*
@@ -1351,23 +1349,27 @@ void debug_disp(void)
 	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
 }
 
-void unpack_to_buffer(const unsigned char *src, uint8_t dest_buf[DEST_DIM][DEST_DIM]) {
-    for (int y = 0; y < SRC_DIM; y++) {
-        for (int x = 0; x < SRC_DIM; x++) {
+void unpack_to_epd_format(const unsigned char *src) {
+    // 初始化背景為白色 (電子紙通常 1 是白, 0 是黑，或反之，視硬體定義)
+    memset(epd_buffer, 0xFF, sizeof(epd_buffer));
 
-            // 1. 計算來源位元位置
-            int byte_index = (y * BYTES_PER_ROW) + (x / 8);
-            int bit_pos    = 7 - (x % 8);
+    for (int y = 0; y < DEST_DIM; y++) {
+        for (int x = 0; x < DEST_DIM; x++) {
+            // 使用「最近鄰插值」找到對應的原始 QR 坐標
+            int src_x = x * SRC_DIM / DEST_DIM;
+            int src_y = y * SRC_DIM / DEST_DIM;
 
-            // 2. 提取位元並決定顏色 (1=黑/0x00, 0=白/0xFF)
-            int is_dark = (src[byte_index] >> bit_pos) & 1;
-            uint8_t color = is_dark ? 0x00 : 0xFF;
+            // 從原始 116 bytes 中提取位元
+            int byte_idx = (src_y * 4) + (src_x / 8);
+            int bit_pos  = 7 - (src_x % 8);
+            int is_dark  = (src[byte_idx] >> bit_pos) & 1;
 
-            // 3. 寫入目標陣列 (縮放 5x)
-            for (int dy = 0; dy < SCALE; dy++) {
-                for (int dx = 0; dx < SCALE; dx++) {
-                	flat_array[ (y * SCALE + dy) * DEST_DIM + (x * SCALE + dx) ] = color;
-                }
+            if (is_dark) {
+                // 將對應的位元設為 0 (黑色)
+                // 這裡假設 SSD1680 的 0 是黑色，1 是白色
+                int target_byte_idx = (y * DEST_BYTE_WIDTH) + (x / 8);
+                int target_bit_pos  = 7 - (x % 8);
+                epd_buffer[target_byte_idx] &= ~(1 << target_bit_pos);
             }
         }
     }
