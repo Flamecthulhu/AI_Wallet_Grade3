@@ -43,7 +43,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define DEBUG_MODE 0
+#define DEBUG_MODE 1
 
 #define INPUT_DIM  9
 #define HIDDEN_1   64
@@ -52,7 +52,7 @@
 #define REFRESH_MODE 199
 
 #define SRC_DIM 29
-#define SCALE 4
+#define SCALE 5
 #define TARGET_WIDTH 144  // 強制截斷寬度 (18 bytes)
 #define TARGET_HEIGHT 145
 
@@ -1328,7 +1328,8 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 	SSD1680_Text(&hepd, 88, 118, convert_arr_time, &cp866_8x16);
 	SSD1680_Text(&hepd, 8, 112, sta_code_decoder(arr_sta), &cp866_8x16);
 
-
+	generate_upscaled_qr();
+	SSD1680_SetRegion(&hepd, 8, 152, 144, 144, out_buffer, NULL);
 
 	SSD1680_Refresh(&hepd, REFRESH_MODE);
 	HAL_Delay(1000);
