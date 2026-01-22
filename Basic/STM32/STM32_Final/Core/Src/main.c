@@ -145,23 +145,24 @@ const unsigned char version3[116] = {
 0X17,0X44,0X2C,0X00,};
 
 const unsigned char version7[270] = {
-		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
-		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
-		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
-		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
-		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
-		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
-		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
-		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
-		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
-		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
-		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
-		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
-		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
-		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
-		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
-		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,
-		0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,0X00,};
+0XFE,0X9C,0X71,0X02,0X13,0XF8,0XFE,0XDD,0X7F,0X5B,0XDB,0XE8,0XBA,0X51,0X77,0X4C,
+0X8A,0XE8,0XBA,0XC1,0XF3,0X4C,0XDA,0XE8,0XBA,0XF1,0XCF,0XED,0XBA,0XE8,0XBA,0XF9,
+0XDF,0XFD,0XBA,0XE8,0XFE,0XAA,0XBA,0XAA,0XAB,0XF8,0XFE,0XAA,0XAA,0XA2,0XB9,0XD0,
+0X6B,0X5B,0XBF,0X97,0XC6,0XF8,0XCE,0X23,0X54,0XDB,0X68,0X38,0XF7,0X23,0X76,0XF9,
+0X67,0XF0,0XA3,0X2C,0X80,0XD4,0X7C,0XA0,0X91,0X19,0XFE,0X63,0X47,0XF8,0XE1,0XFD,
+0X53,0X0D,0XA4,0X58,0XE8,0X1A,0XE0,0X05,0X37,0X60,0X1F,0X3B,0X25,0X90,0X84,0XB8,
+0X48,0XD5,0XD0,0XFE,0XCF,0X68,0XCF,0X09,0X60,0XC5,0X4C,0X90,0XA9,0XB4,0X84,0X60,
+0XEA,0XC8,0X44,0X88,0X0C,0XBB,0X4D,0X10,0XDF,0X8A,0X4F,0XFA,0XAF,0X98,0XF8,0XE5,
+0X78,0XB3,0XF8,0XB0,0X8A,0XFF,0X7A,0X84,0X6A,0XC8,0X98,0XA8,0XE8,0XD7,0XF8,0XF0,
+0X6F,0XE6,0XEF,0X92,0XDF,0X88,0X89,0XC6,0XD5,0X7D,0X89,0X18,0X8A,0XCA,0X56,0X8D,
+0X83,0XB8,0X25,0X19,0X5B,0X71,0XF1,0X50,0XF3,0XCA,0XA3,0X98,0X0A,0XA8,0X55,0X64,
+0XF4,0XC5,0X4D,0X58,0XE8,0X93,0X9C,0X9A,0XAB,0XB8,0X91,0X55,0X2C,0X75,0X50,0X98,
+0XA4,0XA9,0XB5,0X9A,0XAA,0X68,0X5D,0X64,0XD9,0X46,0X95,0X50,0X8A,0XB0,0X9A,0X9D,
+0X9A,0X80,0X0D,0X55,0X7D,0X76,0X74,0XF0,0XEF,0XAA,0XBF,0XBA,0X9A,0XC8,0X58,0XD5,
+0X58,0XCD,0X70,0X00,0XFA,0XEA,0XAA,0X8A,0X8B,0XF8,0X48,0XD0,0X58,0XD5,0X72,0X08,
+0X9F,0XAF,0XAF,0XAA,0XBA,0XE8,0X55,0X5F,0X01,0X65,0X4A,0XE8,0XAA,0XE9,0XDA,0XA8,
+0XBA,0XE8,0X40,0X81,0X58,0XDF,0X6A,0X08,0XFA,0XEC,0XA3,0X6E,0X2B,0XF8,};
+
 
 
 
@@ -1393,26 +1394,40 @@ void generate_v7_upscale()
 {
     // 1. 先將整張畫布清空為白色 (0x00)
     // 這樣我們就不需要處理 "留白" 的邏輯，剩下的 9px 自動會是白的
-	memset(out_buffer, 0x00, 2592);
+	memset(out_buffer, 0xFF, 2592);
 
-	    // 2. 正常產生 (同上一版程式碼)
-	for (int y = 0; y < 45; y++) {
-		const uint8_t* row_ptr = &version7[y * 6];
-		for (int x = 0; x < 45; x++) {
-			int is_black = (row_ptr[x >> 3] >> (7 - (x & 7))) & 1;
-			if (is_black) {
-				int start_x = x * 3;
-				int start_y = y * 3;
-				for (int dy = 0; dy < 3; dy++) {
-					int row_offset = (start_y + dy) * 18;
-					for (int dx = 0; dx < 3; dx++) {
-						int draw_x = start_x + dx;
-						out_buffer[row_offset + (draw_x >> 3)] |= (0x80 >> (draw_x & 7));
-					}
-				}
-			}
-		}
-	}
+	    for (int y = 0; y < 45; y++) {
+	        const uint8_t* row_ptr = &version7[y * 6];
+
+	        for (int x = 0; x < 45; x++) {
+
+	            // 讀取原始資料 (假設原始資料是標準的 1=黑)
+	            // 如果你的來源也是反的，請把最後的 & 1 改成 == 0
+	            int is_black = (row_ptr[x >> 3] >> (7 - (x & 7))) & 1;
+
+	            if (is_black) {
+	                // 放大 3 倍，靠左上 (0,0)
+	                int start_x = x * 3;
+	                int start_y = y * 3;
+
+	                for (int dy = 0; dy < 3; dy++) {
+	                    int row_offset = (start_y + dy) * 18;
+	                    for (int dx = 0; dx < 3; dx++) {
+	                        int draw_x = start_x + dx;
+
+	                        // 計算位置
+	                        int byte_idx = row_offset + (draw_x >> 3);
+	                        int bit_pos = 7 - (draw_x & 7); // MSB First
+
+	                        // 2. 【寫入黑色】
+	                        // 目標是把該 bit 變成 0 (黑色)
+	                        // 使用 &= ~mask (例如 &= ~0x80 會把最高位變成 0，其他不變)
+	                        out_buffer[byte_idx] &= ~(1 << bit_pos);
+	                    }
+	                }
+	            }
+	        }
+	    }
 
 }
 
