@@ -235,7 +235,6 @@ int main(void)
   char input_price[10] = {0};
   //(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time, char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price)
 
-  char dept_sta_code[5], arr_sta_code[5], seat_code[9];
   double debug_array[9] = {24.167680, 120.653612, 17, 1072, 5, 1, 0, 0, 1};
   char *debug_ticket[4] = {"A50111562576561ZZZZ33003230ZZZZZ6ZP7UNxP7UNx15VNA000V7UF0F07", //台中->豐原
 	  "N50049351999418ZZZZ10803300ZZZZZ3ZP1VLUP1VNI161NA004y1VHEA49", //桃園->台中
@@ -265,7 +264,7 @@ int main(void)
 	    		strcpy(input_train_type, "THSR");
 	    		strcpy(input_train_kind, "Standard");
 	    		strncpy(input_train_num, debug_ticket[i] + 24 , 4); // Train number
-	    		strncpy(dept_sta_code, debug_ticket[i] + 30, 2);   // Departure station code
+	    		strncpy(input_dept_sta, debug_ticket[i] + 30, 2);   // Departure station code
 	    		//input_dept_sta = sta_code_decoder(dept_sta_code);
 	    		char raw_date[9] = {0};
 	    		strncpy(raw_date, debug_ticket[i] + 31, 8);      // Date
@@ -281,13 +280,12 @@ int main(void)
 	    		input_date[9] = raw_date[7];
 	    		input_date[10] = '\0';
 
-	    		strncpy(input_dept_time, debug_ticket[i] + 40, 4); // Departure time
-	    		strncpy(arr_sta_code, debug_ticket[i] + 47, 2);    // Arrival station code
-	    		//input_arr_sta = sta_code_decoder(arr_sta_code);
-	    		strncpy(input_arr_time, debug_ticket[i] + 57, 4);  // Arrival time
-	    		strncpy(input_car, debug_ticket[i] + 77, 2);       // Car
-	    		strncpy(input_seat, debug_ticket[i] + 80, 5);      // Seat
-	    		strncpy(arr_sta_code, debug_ticket[i] + 91, 1);    // Price
+	    		strncpy(input_dept_time, debug_ticket[i] + 39, 4); // Departure time
+	    		strncpy(input_arr_sta, debug_ticket[i] + 46, 2);    // Arrival station code
+	    		strncpy(input_arr_time, debug_ticket[i] + 56, 4);  // Arrival time
+	    		strncpy(input_car, debug_ticket[i] + 76, 2);       // Car
+	    		strncpy(input_seat, debug_ticket[i] + 79, 5);      // Seat
+	    		strncpy(input_arr_sta, debug_ticket[i] + 90, 1);    // Price
 	    	}
 
 	    	//(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time, char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price)
@@ -1237,17 +1235,15 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 	if (train_kind != NULL && (strcmp(train_type, "THSR") == 0)) SSD1680_Text(&hepd, 88, 16, train_kind, &cp866_8x8);
 	if (train_num != NULL && (strcmp(train_type, "THSR") == 0))
 	{
-		if (train_num[0] == '0')
-		{
-		    SSD1680_Text(&hepd, 88, 24, train_num + 1, &cp866_8x8);
-		}
-
-		else
-		{
-			SSD1680_Text(&hepd, 88, 24, train_num, &cp866_8x8);
-		}
+		if (train_num[0] == '0')  SSD1680_Text(&hepd, 88, 24, train_num + 1, &cp866_8x8);
+		else  SSD1680_Text(&hepd, 88, 24, train_num, &cp866_8x8);
 	}
 
+	SSD1680_Text(&hepd, 88, 32, "Depart", &cp866_8x14);
+
+	SSD1680_Text(&hepd, 88, 46, sta_code_decoder(dept_sta), &cp866_8x14);
+	SSD1680_Text(&hepd, 88, 60, "Arrive", &cp866_8x14);
+	SSD1680_Text(&hepd, 88, 72, sta_code_decoder(arr_sta), &cp866_8x14);
 
 	SSD1680_Refresh(&hepd, REFRESH_MODE);
 	HAL_Delay(1000);
@@ -1309,7 +1305,7 @@ char* sta_code_decoder(char *sta_code)
 	        return "Zuoying";
 	        break;
 	    default:
-	        return "Unknown";
+	        return sta_code;
 	        break;
 	}
 }
