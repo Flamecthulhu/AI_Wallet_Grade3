@@ -22,12 +22,17 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "stm32h7xx_hal.h"
 #include "SSD1680.h"
 #include "fonts.h"
+
+#include "fc_weights.h"
+//#include "model_weights.c"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -37,7 +42,13 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define DEBUG_MODE 1
 
+#define INPUT_DIM  9
+#define HIDDEN_1   64
+#define HIDDEN_2   32
+#define OUTPUT_DIM 5
+#define REFRESH_MODE 199
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -76,7 +87,15 @@ static void MX_USART2_UART_Init(void);
 void parse_gpgga(uint8_t *line);
 void HM10_Process(uint8_t byte);
 void Handle_BT_Command(char* cmd);
-
+void Process_WiFi_Data(void);
+void debug_disp(void);
+int mlp_forward_pass(double current_lat, double current_lon, uint8_t hour_of_day, uint16_t min_of_day, uint8_t day_of_week,
+					 int time_to_dept, uint8_t is_ticket_reg, uint8_t is_entering, uint8_t is_exiting);
+void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time,
+						char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price);
+void generate_upscaled_qr(uint16_t height, uint16_t width, uint8_t scale,const unsigned char qrcode[]);
+void generate_v7_upscale();
+char* sta_code_decoder(char *sta_code);
 SPI_HandleTypeDef hspi1;
 SSD1680_HandleTypeDef hepd;
 
@@ -86,8 +105,6 @@ static void MX_SSD1680_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-#define DEBUG_MODE 1
-
 uint16_t idx = 0;
 uint8_t BTBuffer[1];
 
@@ -111,6 +128,51 @@ static char btrecv[BT_BUF_SIZE];
 static uint8_t bt_idx = 0;
 
 char parts[15][16];
+
+int result; //MLP
+
+uint8_t out_buffer[2592];
+
+const unsigned char version3[116] = {
+0X01,0X5B,0XC4,0X00,0X7D,0XAC,0X45,0XF0,0X45,0XDA,0X85,0X10,0X45,0X3C,0X2D,0X10,
+0X45,0X0E,0XD5,0X10,0X7D,0XD9,0X65,0XF0,0X01,0X55,0X54,0X00,0XFF,0X7E,0XF7,0XF8,
+0X10,0X00,0XB1,0XD8,0XF3,0X26,0XDA,0X90,0X74,0X23,0XE1,0X08,0X6A,0XDE,0XA7,0XA8,
+0X77,0X81,0X51,0XC0,0X1E,0XAA,0XAF,0XB8,0XF3,0X54,0X9C,0X58,0XAB,0X9C,0XEE,0X88,
+0X19,0X03,0X7C,0X80,0XAC,0XE8,0X82,0X80,0X32,0X5A,0X8D,0X48,0XAA,0XA3,0X7A,0X18,
+0XE0,0X5F,0X70,0XD8,0XB7,0X6A,0X97,0XF8,0X35,0X58,0X54,0X00,0XA7,0X1E,0XED,0XF0,
+0X10,0X2C,0X8D,0X10,0XEF,0X10,0X6D,0X10,0X31,0XC2,0XA5,0X10,0XAB,0X29,0XCD,0XF0,
+0X17,0X44,0X2C,0X00,};
+
+const unsigned char version7[270] = {
+0XFE,0X9C,0X71,0X02,0X13,0XF8,0XFE,0XDD,0X7F,0X5B,0XDB,0XE8,0XBA,0X51,0X77,0X4C,
+0X8A,0XE8,0XBA,0XC1,0XF3,0X4C,0XDA,0XE8,0XBA,0XF1,0XCF,0XED,0XBA,0XE8,0XBA,0XF9,
+0XDF,0XFD,0XBA,0XE8,0XFE,0XAA,0XBA,0XAA,0XAB,0XF8,0XFE,0XAA,0XAA,0XA2,0XB9,0XD0,
+0X6B,0X5B,0XBF,0X97,0XC6,0XF8,0XCE,0X23,0X54,0XDB,0X68,0X38,0XF7,0X23,0X76,0XF9,
+0X67,0XF0,0XA3,0X2C,0X80,0XD4,0X7C,0XA0,0X91,0X19,0XFE,0X63,0X47,0XF8,0XE1,0XFD,
+0X53,0X0D,0XA4,0X58,0XE8,0X1A,0XE0,0X05,0X37,0X60,0X1F,0X3B,0X25,0X90,0X84,0XB8,
+0X48,0XD5,0XD0,0XFE,0XCF,0X68,0XCF,0X09,0X60,0XC5,0X4C,0X90,0XA9,0XB4,0X84,0X60,
+0XEA,0XC8,0X44,0X88,0X0C,0XBB,0X4D,0X10,0XDF,0X8A,0X4F,0XFA,0XAF,0X98,0XF8,0XE5,
+0X78,0XB3,0XF8,0XB0,0X8A,0XFF,0X7A,0X84,0X6A,0XC8,0X98,0XA8,0XE8,0XD7,0XF8,0XF0,
+0X6F,0XE6,0XEF,0X92,0XDF,0X88,0X89,0XC6,0XD5,0X7D,0X89,0X18,0X8A,0XCA,0X56,0X8D,
+0X83,0XB8,0X25,0X19,0X5B,0X71,0XF1,0X50,0XF3,0XCA,0XA3,0X98,0X0A,0XA8,0X55,0X64,
+0XF4,0XC5,0X4D,0X58,0XE8,0X93,0X9C,0X9A,0XAB,0XB8,0X91,0X55,0X2C,0X75,0X50,0X98,
+0XA4,0XA9,0XB5,0X9A,0XAA,0X68,0X5D,0X64,0XD9,0X46,0X95,0X50,0X8A,0XB0,0X9A,0X9D,
+0X9A,0X80,0X0D,0X55,0X7D,0X76,0X74,0XF0,0XEF,0XAA,0XBF,0XBA,0X9A,0XC8,0X58,0XD5,
+0X58,0XCD,0X70,0X00,0XFA,0XEA,0XAA,0X8A,0X8B,0XF8,0X48,0XD0,0X58,0XD5,0X72,0X08,
+0X9F,0XAF,0XAF,0XAA,0XBA,0XE8,0X55,0X5F,0X01,0X65,0X4A,0XE8,0XAA,0XE9,0XDA,0XA8,
+0XBA,0XE8,0X40,0X81,0X58,0XDF,0X6A,0X08,0XFA,0XEC,0XA3,0X6E,0X2B,0XF8,};
+
+const unsigned char arrow[72] = {
+0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,
+0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,
+0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XFF,0X07,0XF7,0X07,0XE3,
+0X07,0XC1,0X07,0X80,0X07,0X01,0X06,0X03,0X04,0X07,0X00,0X0F,0X00,0X1F,0X00,0X3F,
+0X00,0X7F,0X00,0XFF,0X01,0XFF,0X03,0XFF,};
+
+
+
+
+
 /* USER CODE END 0 */
 
 /**
@@ -157,30 +219,7 @@ int main(void)
 
   SSD1680_Border(&hepd, ColorWhite);
   SSD1680_Clear(&hepd, ColorWhite);
-  SSD1680_Refresh(&hepd, FullRefresh);
-
-  uint8_t scale[152 / 8 * 4] = {  // 19 * 4 = 76 bytes
-      0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55,
-      0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55,  // 第1行
-
-      0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F,
-      0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F,  // 第2行
-
-      0x7F, 0xFF, 0x7F, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0x7F, 0xFF,
-      0xFF, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0x7F, 0xFF, 0x7F,  // 第3行
-
-      0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-      0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF   // 第4行
-  };
-
-  SSD1680_SetRegion(&hepd, 0, 0, 152, 4, scale, NULL);
-
-  SSD1680_Text(&hepd, 0, 16, "Font 8x8", &cp866_8x8);
-  SSD1680_Text(&hepd, 0, 24, "Font 8x14", &cp866_8x14);
-  SSD1680_Text(&hepd, 0, 38, "Font 8x16", &cp866_8x16);
-
-  SSD1680_Text(&hepd, 0, 16, "Font 8x8_r", &cp866_8x8_r);
-  SSD1680_Text(&hepd, 0, 38, "Font 8x16_r", &cp866_8x16_r);
+  SSD1680_Refresh(&hepd, REFRESH_MODE);
 
   HAL_NVIC_SetPriority(TIM1_UP_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(TIM1_UP_IRQn);
@@ -211,7 +250,7 @@ int main(void)
       {STA_LED_GPIO_Port,  STA_LED_Pin,  GPIO_PIN_SET},
       {EC_LED_GPIO_Port,   EC_LED_Pin,   GPIO_PIN_SET},
       {EC_RELAY_GPIO_Port, EC_RELAY_Pin, GPIO_PIN_RESET},
-	  {EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET}
+	  {EPD_EN_GPIO_Port,   EPD_EN_Pin,   GPIO_PIN_RESET}
   };
 
   for (int i = 0; i < sizeof(list)/sizeof(list[0]); i++)
@@ -226,22 +265,75 @@ int main(void)
   HAL_UART_Receive_IT(&huart5, WFBuffer, 1);
   HAL_UART_Receive_IT(&huart7, (uint8_t*)GPSBuffer, 1);
 
+  // Start Define Variable
   uint8_t msg[] = "STM32 is now on\n";
+  char input_train_type[10] = {0};
+  char input_train_kind[20] = {0};
+  char input_train_num[10] = {0};
+  char input_date[16] = {0};
+  char input_dept_time[10] = {0};
+  char input_arr_time[10] = {0};
+  char input_dept_sta[20] = {0};
+  char input_arr_sta[20] = {0};
+  char input_car[10] = {0};
+  char input_seat[10] = {0};
+  char input_price[10] = {0};
+  //(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time, char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price)
 
-  HAL_UART_Transmit(&huart2, msg, sizeof(msg)-1, 1000);
+  double debug_array[9] = {24.167680, 120.653612, 17, 1072, 5, 1, 0, 0, 1};
+  char *debug_ticket[5] = {"A50111562576561ZZZZ33003230ZZZZZ6ZP7UNxP7UNx15VNA000V7UF0F07", //台中->豐原
+	  "N50049351999418ZZZZ10803300ZZZZZ3ZP1VLUP1VNI161NA004y1VHEA49", //桃園->台中
+	  "0720412420244007936860000849004202508301834470072025083019154701000000300000030030030000000540006001INTIRS000020250830109ABE",  //台中->板橋
+	  "0421511450742087503470000333004202505252215520072025052522475201000000100000080020010000000540006000INTETS000020250525101909",  //桃園->台中
+	  "2902100093118070992280000845007202601091817000082026010918270001000000100000040100050000000130006001INTETS000020260109105067",
 
-  /*
-  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
-  HAL_Delay(200);
-  SSD1680_Clear(&hepd, ColorWhite);
-  SSD1680_Text(&hepd, 0, 0, "Hello World!", &cp866_8x16);
-  SSD1680_Refresh(&hepd, FullRefresh);
+  };
 
-  HAL_Delay(3000);
-  SSD1680_Clear(&hepd, ColorWhite);
-  SSD1680_Text(&hepd, 0, 0, "Hello World!", &cp866_8x16_r);
-  SSD1680_Refresh(&hepd, FullRefresh);
-  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);*/
+  // End Define Variable
+
+  if (DEBUG_MODE)
+  {
+	  	HAL_UART_Transmit(&huart2, msg, sizeof(msg)-1, 1000);
+
+	    result = mlp_forward_pass(debug_array[0], debug_array[1], debug_array[2], debug_array[3], debug_array[4], debug_array[5], debug_array[6], debug_array[7],debug_array[8]);
+
+	    for (int i = 0; i < (sizeof(debug_ticket) / sizeof(debug_ticket[0])); i++)
+	    {
+	    	if (isalpha((unsigned)debug_ticket[i][0]))
+	    	{
+	    		strcpy(input_train_type, "TRA");
+	    		if (debug_ticket[i][0] == 'A')  strcpy(input_train_kind, "Local");
+	    		if (debug_ticket[i][0] == 'N')  strcpy(input_train_kind, "T.C.Exp.");
+	    		strncpy(input_dept_sta, debug_ticket[i] + 19, 4);
+	    		strncpy(input_arr_sta, debug_ticket[i] + 23, 4);
+	    	}
+
+	    	else
+	    	{
+	    		strcpy(input_train_type, "THSR");
+	    		strcpy(input_train_kind, "Standard");
+	    		strncpy(input_train_num, debug_ticket[i] + 24 , 4); // Train number
+	    		strncpy(input_dept_sta, debug_ticket[i] + 29, 2);   // Departure station code
+	    		input_dept_sta[2] = '\0';
+	    		strncpy(input_date, debug_ticket[i] + 31, 8);       // Date
+	    		strncpy(input_dept_time, debug_ticket[i] + 39, 4);  // Departure time
+	    		strncpy(input_arr_sta, debug_ticket[i] + 46, 2);    // Arrival station code
+	    		input_arr_sta[2] = '\0';
+	    		strncpy(input_arr_time, debug_ticket[i] + 56, 4);   // Arrival time
+	    		strncpy(input_car, debug_ticket[i] + 76, 2);        // Car
+	    		strncpy(input_seat, debug_ticket[i] + 79, 5);       // Seat
+	    		strncpy(input_arr_sta, debug_ticket[i] + 90, 1);    // Price
+	    	}
+
+	    	//(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time, char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price)
+	    	epd_ticket_handler(input_train_type, input_train_kind, input_train_num, input_date, input_dept_time, input_dept_sta,
+	    			input_arr_time, input_arr_sta, input_car, input_seat, input_price);
+
+	    	//debug_disp();
+	    	HAL_Delay(1000);
+	    }
+  }
+
   while (1)
   {
     /* USER CODE END WHILE */
@@ -333,7 +425,7 @@ static void MX_SPI1_Init(void)
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_128;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -825,15 +917,43 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     }
 }
 
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	if(htim->Instance == TIM1)
+	{
+		HAL_GPIO_TogglePin(STA_LED_GPIO_Port, STA_LED_Pin);
+	}
+	else if(htim->Instance == TIM2)
+	{
+		// WiFi 掃描
+		#if DEBUG_MODE
+			uint8_t text[] = "\r\n>>> Starting WiFi Scan <<<\r\n";
+			HAL_UART_Transmit(&huart2, text, sizeof(text)-1, 100);
+		#endif
+
+		// 清空舊數據
+		wf_idx = 0;
+		wifi_count = 0;
+		memset(WFBuffer, 0, WIFI_BUF_SIZE);
+		memset(wifi_list, 0, sizeof(wifi_list));
+
+		// 發送掃描指令
+		uint8_t cmd[] = "AT+CWLAP\r\n";
+		HAL_UART_Transmit(&huart5, cmd, sizeof(cmd)-1, 100);
+
+		HAL_GPIO_TogglePin(WF_LED_GPIO_Port, WF_LED_Pin);
+	}
+}
+
 void parse_gpgga(uint8_t *line)
 {
-    if (strncmp(line, "$GPGGA", 6) != 0 && strncmp(line, "$GNGGA", 6) != 0)
+	if (strncmp((const char *)line, "$GPGGA", 6) != 0 && strncmp((const char *)line, "$GNGGA", 6) != 0)
     {
         return;
     }
 
     int i = 0;
-    char *token = strtok(line, ",");
+    char *token = strtok((char *)line, ",");
 
     while (token != NULL && i < 15) {
         size_t len = strlen(token);
@@ -905,23 +1025,6 @@ void Handle_BT_Command(char* cmd)
         int len = snprintf(msg, sizeof(msg), "\r\n[CMD] %s\r\n", cmd);
         HAL_UART_Transmit(&huart2, (uint8_t*)msg, len, 100);
     #endif
-
-    if (strcmp(cmd, "relay") == 0)
-    {
-        HAL_GPIO_TogglePin(EC_RELAY_GPIO_Port, EC_RELAY_Pin);
-        HAL_GPIO_TogglePin(EC_LED_GPIO_Port, EC_LED_Pin);
-    }
-    else if (strcmp(cmd, "cls") == 0)
-    {
-        SSD1680_Clear(&hepd, ColorWhite);
-        SSD1680_Refresh(&hepd, FullRefresh);
-    }
-    else if (strcmp(cmd, "test") == 0)
-    {
-        SSD1680_Clear(&hepd, ColorWhite);
-        SSD1680_Text(&hepd, 0, 0, "BT Test OK", &cp866_8x8);
-        SSD1680_Refresh(&hepd, FullRefresh);
-    }
 }
 
 void HM10_Process(uint8_t byte)
@@ -1057,7 +1160,6 @@ void Parse_WiFi_Line(char* line)
     }
 }
 
-// 顯示 WiFi 列表
 void Display_WiFi_List(void)
 {
     if (wifi_count == 0)
@@ -1084,20 +1186,8 @@ void Display_WiFi_List(void)
         uint8_t end[] = "============================\r\n\r\n";
         HAL_UART_Transmit(&huart2, end, sizeof(end)-1, 100);
     #endif
-
-    // 可選：顯示在 E-Paper 上
-    // SSD1680_Clear(&hepd, ColorWhite);
-    // char display_text[64];
-    // for (int i = 0; i < wifi_count && i < 3; i++)
-    // {
-    //     snprintf(display_text, sizeof(display_text), "%s: %ddBm",
-    //              wifi_list[i].ssid, wifi_list[i].rssi);
-    //     SSD1680_Text(&hepd, 0, i*16, display_text, &cp866_8x8);
-    // }
-    // SSD1680_Refresh(&hepd, FullRefresh);
 }
 
-// 處理 WiFi 數據
 void Process_WiFi_Data(void)
 {
     // 將緩衝區轉為字串
@@ -1135,38 +1225,618 @@ void Process_WiFi_Data(void)
         line_start = line_end + 1;
     }
 
-    // 清空緩衝區
     wf_idx = 0;
     memset(WFBuffer, 0, WIFI_BUF_SIZE);
 }
 
+void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time,
+						char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price)
+{   //0 16 32 48 64 80 96 112 128 144 160 176 192 208 224 240 256 272 288 304
+	//0 8 16 32 40 48 56 64 72 80 88 96 104 112 120 128 136 144 152 160
+	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
+	HAL_Delay(100);
+	SSD1680_Clear(&hepd, ColorWhite);
 
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+	if (strcmp(train_type, "THSR") == 0)
+	{
+		SSD1680_Text(&hepd, 64, 0, "THSR", &cp866_8x16);
+		generate_upscaled_qr(145, 144, 4, version7);
+		SSD1680_SetRegion(&hepd, 8, 152, 144, 145, out_buffer, NULL);
+	}
+
+	else if (strcmp(train_type, "TRA") == 0)
+	{
+		SSD1680_Text(&hepd, 64, 0, "TRA ", &cp866_8x16);
+		generate_upscaled_qr(145, 144, 5, version3);
+		SSD1680_SetRegion(&hepd, 8, 152, 144, 145, out_buffer, NULL);
+	}
+
+	char new_date[11] = {0};
+	new_date[0] = date[0];
+	new_date[1] = date[1];
+	new_date[2] = date[2];
+	new_date[3] = date[3];
+	new_date[4] = '-';
+	new_date[5] = date[4];
+	new_date[6] = date[5];
+	new_date[7] = '-';
+	new_date[8] = date[6];
+	new_date[9] = date[7];
+	new_date[10] = '\0';
+
+	if (date != NULL)  SSD1680_Text(&hepd, 0, 20, new_date, &cp866_8x16);
+	if (train_kind != NULL && strcmp(train_type, "TRA") == 0)  SSD1680_Text(&hepd, 88, 20, train_kind, &cp866_8x16);
+	if (train_kind != NULL && (strcmp(train_type, "THSR") == 0)) SSD1680_Text(&hepd, 88, 20, train_kind, &cp866_8x8);
+	if (train_num != NULL && (strcmp(train_type, "THSR") == 0))
+	{
+		if (train_num[0] == '0')  SSD1680_Text(&hepd, 88, 28, train_num + 1, &cp866_8x8);
+		else  SSD1680_Text(&hepd, 88, 28, train_num, &cp866_8x8);
+	}
+
+	SSD1680_Text(&hepd, 88, 40, "Depart", &cp866_8x14);
+	char convert_dept_time[6] = {0};
+	convert_dept_time[0] = dept_time[0];
+	convert_dept_time[1] = dept_time[1];
+	convert_dept_time[2] = ':';
+	convert_dept_time[3] = dept_time[2];
+	convert_dept_time[4] = dept_time[3];
+	convert_dept_time[5] = '\0';
+	SSD1680_Text(&hepd, 88, 56, convert_dept_time, &cp866_8x16);
+	SSD1680_Text(&hepd, 8, 40, sta_code_decoder(dept_sta), &cp866_8x16);
+
+	SSD1680_SetRegion(&hepd, 32, 68, 16, 36, arrow, NULL);
+
+	SSD1680_Text(&hepd, 88, 72, "Car", &cp866_8x16);
+	if (car[0] == '0') SSD1680_Text(&hepd, 128, 72, car + 1, &cp866_8x16);
+	else SSD1680_Text(&hepd, 128, 72, car, &cp866_8x16);
+
+	SSD1680_Text(&hepd, 88, 88, "Seat", &cp866_8x16);
+	char seat_decoded[4] = {0};
+	seat_decoded[0] = seat[0];
+	seat_decoded[1] = seat[1];
+	switch (seat[4])
+	{
+		case '1':
+			seat_decoded[2] = 'A';
+			break;
+		case '2':
+			seat_decoded[2] = 'B';
+			break;
+		case '3':
+			seat_decoded[2] = 'C';
+			break;
+		case '4':
+			seat_decoded[2] = 'D';
+			break;
+		case '5':
+			seat_decoded[2] = 'E';
+			break;
+		default:
+			seat_decoded[2] = 0;
+	}
+	seat_decoded[3] = '\0';
+	if (seat_decoded[0] == '0')  SSD1680_Text(&hepd, 128, 88, seat_decoded + 1, &cp866_8x16);
+	else SSD1680_Text(&hepd, 128, 88, seat_decoded, &cp866_8x16);
+
+	SSD1680_Text(&hepd, 88, 104, "Arrive", &cp866_8x14);
+	char convert_arr_time[6] = {0};
+	convert_arr_time[0] = arr_time[0];
+	convert_arr_time[1] = arr_time[1];
+	convert_arr_time[2] = ':';
+	convert_arr_time[3] = arr_time[2];
+	convert_arr_time[4] = arr_time[3];
+	convert_arr_time[5] = '\0';
+	SSD1680_Text(&hepd, 88, 118, convert_arr_time, &cp866_8x16);
+	SSD1680_Text(&hepd, 8, 112, sta_code_decoder(arr_sta), &cp866_8x16);
+
+	SSD1680_Refresh(&hepd, REFRESH_MODE);
+	HAL_Delay(1000);
+	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
+}
+
+void debug_disp(void)
 {
-	if(htim->Instance == TIM1)
+	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
+	HAL_Delay(100);
+	SSD1680_Text(&hepd,  0, 280, "Predict:", &cp866_8x16);
+	char predict_str[12];
+	sprintf(predict_str, "%d", result);
+	SSD1680_Text(&hepd,  72, 280, predict_str, &cp866_8x16);
+	SSD1680_Refresh(&hepd, REFRESH_MODE);
+	HAL_Delay(1000);
+	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
+}
+
+void generate_upscaled_qr(uint16_t height, uint16_t width, uint8_t scale,const unsigned char qrcode[])
+{
+	memset(out_buffer, 0x00, sizeof(out_buffer));
+	for (int i = 0; i < 4; i++)  out_buffer[i] = 0xFF;
+	for (int y = 0; y < height; y++)
 	{
-		HAL_GPIO_TogglePin(STA_LED_GPIO_Port, STA_LED_Pin);
+		int src_y = y / scale;
+		const uint8_t* row_ptr = &qrcode[src_y * 4];
+		for (int x = 0; x < width; x++)
+		{
+			int src_x = x / scale;
+			int byte_idx = src_x / 8;
+			int bit_idx = 7 - (src_x % 8);
+			int is_black = (row_ptr[byte_idx] >> bit_idx) & 1;
+
+			if (is_black)
+			{
+				int row_offset = y * (width / 8);
+				int buf_idx = row_offset + (x / 8);
+				int bit_pos = 7 - (x % 8);
+
+				out_buffer[buf_idx] |= (1 << bit_pos);
+			}
+		}
 	}
-	else if(htim->Instance == TIM2)
+}
+
+void generate_v7_upscale()
+{
+	memset(out_buffer, 0x00, sizeof(out_buffer));
+
+	// 2. 計算來源資料的跨度 (Stride)
+	// V7 (45px) => (45 + 7) / 8 = 6 bytes
+	int src_stride = 6;
+
+	for (int y = 0; y < 135; y++)
 	{
-		// WiFi 掃描
-		#if DEBUG_MODE
-			uint8_t text[] = "\r\n>>> Starting WiFi Scan <<<\r\n";
-			HAL_UART_Transmit(&huart2, text, sizeof(text)-1, 100);
-		#endif
+	    int src_y = y / 3;
 
-		// 清空舊數據
-		wf_idx = 0;
-		wifi_count = 0;
-		memset(WFBuffer, 0, WIFI_BUF_SIZE);
-		memset(wifi_list, 0, sizeof(wifi_list));
+	    // 安全檢查：防止 src_y 超過 44
+	    if (src_y >= 45) break;
 
-		// 發送掃描指令
-		uint8_t cmd[] = "AT+CWLAP\r\n";
-		HAL_UART_Transmit(&huart5, cmd, sizeof(cmd)-1, 100);
+	    // 【關鍵修正】這裡必須是 * 6，因為 270 / 45 = 6
+	    const uint8_t* row_ptr = &version7[src_y * src_stride];
 
-		HAL_GPIO_TogglePin(WF_LED_GPIO_Port, WF_LED_Pin);
+	    for (int x = 0; x < 135; x++)
+	    {
+	        int src_x = x / 3;
+
+	        // 安全檢查：防止 src_x 超過 44 (雖然 V7 只有 45 寬，但邏輯上保護一下)
+	        if (src_x >= 45) continue;
+
+	        int byte_idx = src_x / 8;
+	        int bit_idx = 7 - (src_x % 8); // MSB First 讀取
+
+	        // 從來源讀取一個 bit
+	        int is_black = (row_ptr[byte_idx] >> bit_idx) & 1;
+
+	        if (is_black)
+	        {
+	            // 電子紙/螢幕輸出計算
+	            // 這裡假設 out_buffer 也是一行對齊 byte (width / 8)
+	            // 如果你的螢幕寬度是 144，那每行就是 18 bytes
+	            int out_stride = 135 / 8;
+
+	            // 如果 width 不是 8 的倍數，out_stride 可能需要 +1 或依螢幕規格調整
+	            // 假設 width=144 (scale=3.2?) 或 135?
+	            // 如果 width=135, 135/8 = 16 (少存了7bit), 應該是 (135+7)/8 = 17
+	            // 建議直接寫死你的螢幕寬度 stride，例如 18 (for 144px)
+
+	            int row_offset = y * 18; // 假設螢幕寬 144，Byte寬度為 18
+	            int buf_idx = row_offset + (x / 8);
+	            int bit_pos = 7 - (x % 8);
+
+	            // 寫入 (1=黑)
+	            out_buffer[buf_idx] |= (1 << bit_pos);
+	        }
+	    }
 	}
+}
+
+char* sta_code_decoder(char *sta_code)
+{
+	int sta_code_int = atoi(sta_code);
+	switch (sta_code_int)
+	{
+	    case 1:
+	        return "Nangang";
+	        break;
+	    case 2:
+	        return "Taipei";
+	        break;
+	    case 3:
+	        return "Banqiao";
+	        break;
+	    case 4:
+	        return "Taoyuan";
+	        break;
+	    case 5:
+	        return "Hsinchu";
+	        break;
+	    case 6:
+	        return "Miaoli";
+	        break;
+	    case 7:
+	        return "Taichung";
+	        break;
+	    case 8:
+	        return "Changhua";
+	        break;
+	    case 9:
+	        return "Yunlin";
+	        break;
+	    case 10:
+	        return "Chiayi";
+	        break;
+	    case 11:
+	        return "Tainan";
+	        break;
+	    case 12:
+	        return "Zuoying";
+	        break;
+
+		case 980:
+			return "Nangang";    // 南港
+			break;
+		case 990:
+			return "Songshan";   // 松山
+			break;
+		case 1000:
+			return "Taipei";     // 台北
+			break;
+		case 1010:
+			return "Wanhua";     // 萬華
+			break;
+		case 1020:
+			return "Banqiao";    // 板橋
+			break;
+		case 1030:
+			return "Fuzhou";     // 浮洲
+			break;
+		case 1040:
+			return "Shulin";     // 樹林
+			break;
+		case 1050:
+			return "South Shulin";// 南樹林
+			break;
+		case 1060:
+			return "Shanjia";    // 山佳
+			break;
+		case 1070:
+			return "Yingge";     // 鶯歌
+			break;
+		case 1080:
+			return "Taoyuan";    // 桃園
+			break;
+		case 1090:
+			return "Neili";      // 內壢
+			break;
+		case 1100:
+			return "Zhongli";    // 中壢
+			break;
+		case 1110:
+			return "Puxin";      // 埔心
+			break;
+		case 1120:
+			return "Yangmei";    // 楊梅
+			break;
+		case 1130:
+			return "Fugang";     // 富岡
+			break;
+		case 1140:
+			return "Xinfu";      // 新富
+			break;
+		case 1150:
+			return "Beihu";      // 北湖
+			break;
+		case 1160:
+			return "Hukou";      // 湖口
+			break;
+		case 1170:
+			return "Xinfeng";    // 新豐
+			break;
+		case 1180:
+			return "Zhubei";     // 竹北
+			break;
+		case 1190:
+			return "North Hsinchu"; // 北新竹
+			break;
+		case 1210:
+			return "Hsinchu";    // 新竹
+			break;
+	    case 3220:
+			return "Houli";     // 后里
+			break;
+		case 3230:
+			return "Fengyuan";  // 豐原
+			break;
+		case 3240:
+			return "Lilin";    // 栗林
+			break;
+		case 3250:
+			return "Tanzi";     // 潭子
+			break;
+		case 3260:
+			return "Toujiacuo"; // 頭家厝
+			break;
+		case 3270:
+			return "Songzhu";   // 松竹
+			break;
+		case 3280:
+			return "Taiyuan";   // 太原
+			break;
+		case 3290:
+			return "Jingwu";    // 精武
+			break;
+		case 3300:
+			return "Taichung";  // 台中
+			break;
+		case 3310:
+			return "Wuquan";    // 五權
+			break;
+		case 3320:
+			return "Daqing";    // 大慶
+			break;
+		case 3330:
+			return "Wuri";      // 烏日
+			break;
+		case 3340:
+			return "Xinwuri";   // 新烏日
+			break;
+		case 3350:
+			return "Chenggong"; // 成功
+			break;
+		case 3360:
+			return "Changhua";   // 彰化
+			break;
+		case 3370:
+			return "Huatan";     // 花壇
+			break;
+		case 3380:
+			return "Dacun";      // 大村
+			break;
+		case 3390:
+			return "Yuanlin";    // 員林
+			break;
+		case 3400:
+			return "Yongjing";   // 永靖
+			break;
+		case 3410:
+			return "Shetou";     // 社頭
+			break;
+		case 3420:
+			return "Tianzhong";  // 田中
+		case 3430:
+			return "Ershui";     // 二水
+			break;
+		case 3450:
+			return "Linnei";     // 林內
+		case 3460:
+			return "Shizeng";    // 石榴
+			break;
+		case 3470:
+			return "Douliu";     // 斗六
+			break;
+
+		case 4080:
+			return "Chiayi";     // 嘉義
+			break;
+		case 4090:
+			return "Shuishang";  // 水上
+			break;
+		case 4100:
+			return "Nanjing";    // 南靖
+			break;
+		case 4110:
+			return "Houbi";      // 後壁
+			break;
+		case 4120:
+			return "Xinying";    // 新營
+			break;
+		case 4130:
+			return "Liuying";    // 柳營
+			break;
+		case 4140:
+			return "Linfengying"; // 林鳳營
+			break;
+		case 4150:
+			return "Longtian";   // 隆田
+			break;
+		case 4160:
+			return "Bahe";       // 拔林
+			break;
+		case 4170:
+			return "Shanhua";    // 善化
+			break;
+		case 4180:
+			return "Nanke";      // 南科
+			break;
+		case 4190:
+			return "Xinshi";     // 新市
+			break;
+		case 4200:
+			return "Yongkang";   // 永康
+			break;
+		case 4210:
+			return "Daqiao";     // 大橋
+			break;
+		case 4220:
+			return "Tainan";     // 台南
+			break;
+		case 4250:
+			return "Bao'an";    // 保安
+			break;
+		case 4260:
+			return "Rende";      // 仁德
+			break;
+		case 4270:
+			return "Zhongzhou";  // 中洲
+			break;
+		case 4290: // 4280 跳號
+			return "Dahu";       // 大湖
+			break;
+		case 4300:
+			return "Lujia";      // 路竹
+			break;
+		case 4310:
+			return "Gangshan";   // 岡山
+			break;
+		case 4320:
+			return "Qiaotou";    // 橋頭
+			break;
+		case 4330:
+			return "Nanzi";      // 楠梓
+			break;
+		case 4340:
+			return "Xinzuoying"; // 新左營
+			break;
+		case 4350:
+			return "Zuoying";    // 左營
+			break;
+		case 4360:
+			return "Neiwei";     // 內惟
+			break;
+		case 4370:
+			return "Museum of Fine Arts"; // 美術館
+			break;
+		case 4380:
+			return "Gushan";     // 鼓山
+			break;
+		case 4390:
+			return "Sankuaicuo"; // 三塊厝
+			break;
+		case 4400:
+			return "Kaohsiung";  // 高雄
+			break;
+
+		case 1250:
+			return "Zhunan";     // 竹南
+			break;
+		case 2110:
+			return "Tanwen";     // 談文
+			break;
+		case 2120:
+			return "Dashan";     // 大山
+			break;
+		case 2130:
+			return "Houlong";    // 後龍
+			break;
+		case 2140:
+			return "Longgang";   // 龍港
+			break;
+		case 2150:
+			return "Baishatun";  // 白沙屯
+			break;
+		case 2160:
+			return "Xinpu";      // 新埔
+			break;
+		case 2170:
+			return "Tongxiao";   // 通霄
+			break;
+		case 2180:
+			return "Yuanli";     // 苑裡
+			break;
+		case 2190:
+			return "Rinan";      // 日南
+			break;
+		case 2200:
+			return "Dajia";      // 大甲
+			break;
+		case 2210:
+			return "Taichung Port"; // 臺中港
+			break;
+		case 2220:
+			return "Qingshui";   // 清水
+			break;
+		case 2230:
+			return "Shalu";      // 沙鹿
+			break;
+		case 2240:
+			return "Longjing";   // 龍井
+			break;
+		case 2250:
+			return "Dadu";       // 大肚
+			break;
+		case 2260:
+			return "Zhuifen";    // 追分
+			break;
+	    default:
+	        return sta_code;
+	        break;
+	}
+}
+
+void relu(float *data, int size) {
+    for (int i = 0; i < size; i++) {
+        if (data[i] < 0.0f) data[i] = 0.0f;
+    }
+}
+
+void softmax(float *data, int size) {
+    float max_val = data[0];
+    for (int i = 1; i < size; i++) if (data[i] > max_val) max_val = data[i];
+    float sum = 0.0f;
+    for (int i = 0; i < size; i++) {
+        data[i] = expf(data[i] - max_val);
+        sum += data[i];
+    }
+    for (int i = 0; i < size; i++) data[i] /= sum;
+}
+
+int mlp_forward_pass(double current_lat, double current_lon, uint8_t hour_of_day, uint16_t min_of_day, uint8_t day_of_week, int time_to_dept, uint8_t is_ticket_reg, uint8_t is_entering, uint8_t is_exiting)
+{
+    float x[INPUT_DIM];
+    x[0] = current_lat;
+    x[1] = current_lon;
+    x[2] = (float)hour_of_day;
+    x[3] = (float)min_of_day;
+    x[4] = (float)day_of_week;
+    x[5] = (float)time_to_dept;
+    x[6] = (float)is_ticket_reg;
+    x[7] = (float)is_entering;
+    x[8] = (float)is_exiting;
+
+    float h1[HIDDEN_1];
+    float h2[HIDDEN_2];
+    float out[OUTPUT_DIM];
+
+    // 2. 第一層前向傳播 (9 -> 64)
+    for (int i = 0; i < HIDDEN_1; i++) {
+        float sum = fc1_bias[i];
+        for (int j = 0; j < INPUT_DIM; j++) {
+            sum += x[j] * fc1_weight[i][j];
+        }
+        h1[i] = sum;
+    }
+    relu(h1, HIDDEN_1);
+
+    // 3. 第二層前向傳播 (64 -> 32)
+    for (int i = 0; i < HIDDEN_2; i++) {
+        float sum = fc2_bias[i];
+        for (int j = 0; j < HIDDEN_1; j++) {
+            sum += h1[j] * fc2_weight[i][j];
+        }
+        h2[i] = sum;
+    }
+    relu(h2, HIDDEN_2);
+
+    // 4. 第三層前向傳播 (32 -> 5)
+    for (int i = 0; i < OUTPUT_DIM; i++) {
+        float sum = fc3_bias[i];
+        for (int j = 0; j < HIDDEN_2; j++) {
+            sum += h2[j] * fc3_weight[i][j];
+        }
+        out[i] = sum;
+    }
+
+    // 5. 使用 Softmax 轉換為機率並挑選最大值
+    softmax(out, OUTPUT_DIM);
+
+    int best_class = 0;
+    float max_p = out[0];
+    for (int i = 1; i < OUTPUT_DIM; i++) {
+        if (out[i] > max_p) {
+            max_p = out[i];
+            best_class = i;
+        }
+    }
+
+    return best_class; // 回傳預測類別 (0~4)
 }
 
 /* USER CODE END 4 */
@@ -1199,6 +1869,8 @@ void MPU_Config(void)
   HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
 
 }
+
+
 
 /**
   * @brief  This function is executed in case of error occurrence.

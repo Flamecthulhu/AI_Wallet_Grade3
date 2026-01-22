@@ -164,4 +164,5 @@ HAL_StatusTypeDef SSD1680_SetRegion(SSD1680_HandleTypeDef *hepd, const uint8_t l
 HAL_StatusTypeDef SSD1680_Text(SSD1680_HandleTypeDef *hepd, const uint8_t left, const uint16_t top, const char *string, const SSD1680_FontTypeDef *font);
 HAL_StatusTypeDef SSD1680_VerticalText(SSD1680_HandleTypeDef *hepd, const uint8_t left, const uint16_t top, const char *string, const SSD1680_FontTypeDef *font);
 HAL_StatusTypeDef SSD1680_Checker(SSD1680_HandleTypeDef *hepd);
+HAL_StatusTypeDef SSD1680_DrawBitmap(SSD1680_HandleTypeDef *hepd, const uint8_t x, const uint16_t y, const uint8_t *pData_k, const uint8_t width, const uint16_t height);
 #endif // INC_SSD1680_H_
