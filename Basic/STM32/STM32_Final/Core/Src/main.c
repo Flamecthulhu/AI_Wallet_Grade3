@@ -50,12 +50,6 @@
 #define HIDDEN_2   32
 #define OUTPUT_DIM 5
 #define REFRESH_MODE 199
-
-#define SRC_DIM 29
-#define SCALE 5
-#define TARGET_WIDTH 144  // 強制截斷寬度 (18 bytes)
-#define TARGET_HEIGHT 145
-
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -100,7 +94,7 @@ int mlp_forward_pass(double current_lat, double current_lon, uint8_t hour_of_day
 					 int time_to_dept, uint8_t is_ticket_reg, uint8_t is_entering, uint8_t is_exiting);
 void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time,
 						char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price);
-void generate_upscaled_qr();
+void generate_upscaled_qr(uint16_t height, uint16_t width, uint8_t scale,const unsigned char qrcode[]);
 char* sta_code_decoder(char *sta_code);
 SPI_HandleTypeDef hspi1;
 SSD1680_HandleTypeDef hepd;
@@ -136,7 +130,9 @@ static uint8_t bt_idx = 0;
 char parts[15][16];
 
 int result; //MLP
-uint8_t out_buffer[TARGET_WIDTH * TARGET_HEIGHT / 8];
+
+uint8_t out_buffer[144 * 144 / 8];
+
 const unsigned char version3[116] = {
 0X01,0X5B,0XC4,0X00,0X7D,0XAC,0X45,0XF0,0X45,0XDA,0X85,0X10,0X45,0X3C,0X2D,0X10,
 0X45,0X0E,0XD5,0X10,0X7D,0XD9,0X65,0XF0,0X01,0X55,0X54,0X00,0XFF,0X7E,0XF7,0XF8,
@@ -146,6 +142,25 @@ const unsigned char version3[116] = {
 0XE0,0X5F,0X70,0XD8,0XB7,0X6A,0X97,0XF8,0X35,0X58,0X54,0X00,0XA7,0X1E,0XED,0XF0,
 0X10,0X2C,0X8D,0X10,0XEF,0X10,0X6D,0X10,0X31,0XC2,0XA5,0X10,0XAB,0X29,0XCD,0XF0,
 0X17,0X44,0X2C,0X00,};
+
+const unsigned char version7[270] = {
+0XFE,0X9C,0X71,0X02,0X13,0XF8,0XFE,0XDD,0X7F,0X5B,0XDB,0XE8,0XBA,0X51,0X77,0X4C,
+0X8A,0XE8,0XBA,0XC1,0XF3,0X4C,0XDA,0XE8,0XBA,0XF1,0XCF,0XED,0XBA,0XE8,0XBA,0XF9,
+0XDF,0XFD,0XBA,0XE8,0XFE,0XAA,0XBA,0XAA,0XAB,0XF8,0XFE,0XAA,0XAA,0XA2,0XB9,0XD0,
+0X6B,0X5B,0XBF,0X97,0XC6,0XF8,0XCE,0X23,0X54,0XDB,0X68,0X38,0XF7,0X23,0X76,0XF9,
+0X67,0XF0,0XA3,0X2C,0X80,0XD4,0X7C,0XA0,0X91,0X19,0XFE,0X63,0X47,0XF8,0XE1,0XFD,
+0X53,0X0D,0XA4,0X58,0XE8,0X1A,0XE0,0X05,0X37,0X60,0X1F,0X3B,0X25,0X90,0X84,0XB8,
+0X48,0XD5,0XD0,0XFE,0XCF,0X68,0XCF,0X09,0X60,0XC5,0X4C,0X90,0XA9,0XB4,0X84,0X60,
+0XEA,0XC8,0X44,0X88,0X0C,0XBB,0X4D,0X10,0XDF,0X8A,0X4F,0XFA,0XAF,0X98,0XF8,0XE5,
+0X78,0XB3,0XF8,0XB0,0X8A,0XFF,0X7A,0X84,0X6A,0XC8,0X98,0XA8,0XE8,0XD7,0XF8,0XF0,
+0X6F,0XE6,0XEF,0X92,0XDF,0X88,0X89,0XC6,0XD5,0X7D,0X89,0X18,0X8A,0XCA,0X56,0X8D,
+0X83,0XB8,0X25,0X19,0X5B,0X71,0XF1,0X50,0XF3,0XCA,0XA3,0X98,0X0A,0XA8,0X55,0X64,
+0XF4,0XC5,0X4D,0X58,0XE8,0X93,0X9C,0X9A,0XAB,0XB8,0X91,0X55,0X2C,0X75,0X50,0X98,
+0XA4,0XA9,0XB5,0X9A,0XAA,0X68,0X5D,0X64,0XD9,0X46,0X95,0X50,0X8A,0XB0,0X9A,0X9D,
+0X9A,0X80,0X0D,0X55,0X7D,0X76,0X74,0XF0,0XEF,0XAA,0XBF,0XBA,0X9A,0XC8,0X58,0XD5,
+0X58,0XCD,0X70,0X00,0XFA,0XEA,0XAA,0X8A,0X8B,0XF8,0X48,0XD0,0X58,0XD5,0X72,0X08,
+0X9F,0XAF,0XAF,0XAA,0XBA,0XE8,0X55,0X5F,0X01,0X65,0X4A,0XE8,0XAA,0XE9,0XDA,0XA8,
+0XBA,0XE8,0X40,0X81,0X58,0XDF,0X6A,0X08,0XFA,0XEC,0XA3,0X6E,0X2B,0XF8,};
 
 
 /* USER CODE END 0 */
@@ -327,14 +342,6 @@ int main(void)
   {
 	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
 	  HAL_Delay(100);
-	  generate_upscaled_qr();
-	  SSD1680_SetRegion(&hepd, 0, 0, 144, 144, out_buffer, NULL);
-	  SSD1680_Refresh(&hepd, FullRefresh);
-	  HAL_Delay(3000);
-	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
-	  /*
-	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
-	  HAL_Delay(100);
 	  SSD1680_Clear(&hepd, ColorWhite);
 	  SSD1680_DrawBitmap(&hepd, 0, 0, startupv, 152, 296);
 	  SSD1680_Refresh(&hepd, REFRESH_MODE);
@@ -354,7 +361,7 @@ int main(void)
 	  SSD1680_DrawBitmap(&hepd, 0, 0, exthsr, 152, 296);
 	  SSD1680_Refresh(&hepd, REFRESH_MODE);
 	  HAL_Delay(3000);
-	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);*/
+	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
   }
 
   while (1)
@@ -1183,7 +1190,6 @@ void Parse_WiFi_Line(char* line)
     }
 }
 
-// 顯示 WiFi 列表
 void Display_WiFi_List(void)
 {
     if (wifi_count == 0)
@@ -1212,7 +1218,6 @@ void Display_WiFi_List(void)
     #endif
 }
 
-// 處理 WiFi 數據
 void Process_WiFi_Data(void)
 {
     // 將緩衝區轉為字串
@@ -1262,8 +1267,18 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 	HAL_Delay(100);
 	SSD1680_Clear(&hepd, ColorWhite);
 
-	if (strcmp(train_type, "THSR") == 0)  SSD1680_Text(&hepd, 64, 0, "THSR", &cp866_8x16);
-	else if (strcmp(train_type, "TRA") == 0)  SSD1680_Text(&hepd, 64, 0, "TRA ", &cp866_8x16);
+	if (strcmp(train_type, "THSR") == 0)
+	{
+		SSD1680_Text(&hepd, 64, 0, "THSR", &cp866_8x16);
+		generate_upscaled_qr(132, 132, 3, version7);
+		SSD1680_SetRegion(&hepd, 8, 152, 132, 132, out_buffer, NULL);
+	}
+	else if (strcmp(train_type, "TRA") == 0)
+	{
+		SSD1680_Text(&hepd, 64, 0, "TRA ", &cp866_8x16);
+		generate_upscaled_qr(145, 144, 5, version3);
+		SSD1680_SetRegion(&hepd, 8, 152, 144, 145, out_buffer, NULL);
+	}
 
 	if (date != NULL)  SSD1680_Text(&hepd, 0, 16, date, &cp866_8x16);
 	if (train_kind != NULL && strcmp(train_type, "TRA") == 0)  SSD1680_Text(&hepd, 88, 16, train_kind, &cp866_8x16);
@@ -1328,9 +1343,6 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 	SSD1680_Text(&hepd, 88, 118, convert_arr_time, &cp866_8x16);
 	SSD1680_Text(&hepd, 8, 112, sta_code_decoder(arr_sta), &cp866_8x16);
 
-	generate_upscaled_qr();
-	SSD1680_SetRegion(&hepd, 8, 152, 144, 144, out_buffer, NULL);
-
 	SSD1680_Refresh(&hepd, REFRESH_MODE);
 	HAL_Delay(1000);
 	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
@@ -1349,39 +1361,31 @@ void debug_disp(void)
 	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
 }
 
-void generate_upscaled_qr() {
+void generate_upscaled_qr(uint16_t height, uint16_t width, uint8_t scale,const unsigned char qrcode[])
+{
+	out_buffer[width * height / 8];
 	memset(out_buffer, 0x00, sizeof(out_buffer));
+	for (int y = 0; y < height; y++)
+	{
+		int src_y = y / scale;
+		const uint8_t* row_ptr = &qrcode[src_y * 4];
+		for (int x = 0; x < width; x++)
+		{
+			int src_x = x / scale;
+			int byte_idx = src_x / 8;
+			int bit_idx = 7 - (src_x % 8);
+			int is_black = (row_ptr[byte_idx] >> bit_idx) & 1;
 
-	    // y 跑滿 5 倍 (0 ~ 144)
-	    for (int y = 0; y < TARGET_HEIGHT; y++) {
+			if (is_black)
+			{
+				int row_offset = y * (width / 8);
+				int buf_idx = row_offset + (x / 8);
+				int bit_pos = 7 - (x % 8);
 
-	        // 找出原始資料的第幾列 (y / 5)
-	        int src_y = y / SCALE;
-	        const uint8_t* row_ptr = &version3[src_y * 4];
-
-	        // x 只跑到 143 (共144點)，第 145 點 (index 144) 直接不跑
-	        for (int x = 0; x < TARGET_WIDTH; x++) {
-
-	            // 找出原始資料的第幾欄 (x / 5)
-	            // 當 x=140~143 時，src_x 都是 28 (最後一欄)，這沒問題
-	            int src_x = x / SCALE;
-
-	            // 取出原始 bit
-	            int byte_idx = src_x / 8;
-	            int bit_idx = 7 - (src_x % 8);
-	            int is_black = (row_ptr[byte_idx] >> bit_idx) & 1;
-
-	            if (is_black) {
-	                // 直接寫入 buffer
-	                // 因為寬度是 144 (18 bytes)，計算非常整齊
-	                int row_offset = y * (TARGET_WIDTH / 8);
-	                int buf_idx = row_offset + (x / 8);
-	                int bit_pos = 7 - (x % 8);
-
-	                out_buffer[buf_idx] |= (1 << bit_pos);
-	            }
-	        }
-	    }
+				out_buffer[buf_idx] |= (1 << bit_pos);
+			}
+		}
+	}
 }
 
 char* sta_code_decoder(char *sta_code)
