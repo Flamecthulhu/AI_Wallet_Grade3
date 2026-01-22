@@ -43,6 +43,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define DEBUG_MODE 1
+#define DEMO_MODE 0
 
 #define INPUT_DIM  9
 #define HIDDEN_1   64
@@ -116,7 +117,7 @@ uint8_t BTBuffer[1];
 static uint8_t WFBuffer[WIFI_BUF_SIZE];
 static uint16_t wf_idx = 0;
 
-uint8_t GPSBuffer[256];
+uint8_t GPSBuffer[20] = {0};
 
 typedef struct {
     char ssid[32];
@@ -298,7 +299,7 @@ int main(void)
 
   // End Define Variable
 
-  if (DEBUG_MODE)
+  if (DEMO_MODE)
   {
 	  	HAL_UART_Transmit(&huart2, msg, sizeof(msg)-1, 1000);
 
@@ -339,6 +340,21 @@ int main(void)
 	    	//debug_disp();
 	    	HAL_Delay(1000);
 	    }
+  }
+
+  if (DEBUG_MODE)
+  {
+	    HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
+	  	HAL_Delay(100);
+	  	SSD1680_Text(&hepd,  0, 0, "GPS:", &cp866_8x16);
+	  	SSD1680_Text(&hepd,  0, 40, (char *)GPSBuffer, &cp866_8x8);
+	  	SSD1680_Text(&hepd,  0, 280, "Predict:", &cp866_8x16);
+	  	char predict_str[12];
+	  	sprintf(predict_str, "%d", result);
+	  	SSD1680_Text(&hepd,  72, 280, predict_str, &cp866_8x16);
+	  	SSD1680_Refresh(&hepd, REFRESH_MODE);
+	  	HAL_Delay(1000);
+	  	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
   }
 
   while (1)
@@ -989,6 +1005,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
     else if (huart->Instance == USART3)
     {
+    	HAL_GPIO_TogglePin(EC_LED_GPIO_Port, EC_LED_Pin);
     	HAL_UART_Transmit(&huart2, GPSBuffer, sizeof(GPSBuffer), 100);
     	HAL_UART_Receive_DMA(&huart3, GPSBuffer, sizeof(GPSBuffer));
     }
@@ -1487,7 +1504,7 @@ void generate_v7_upscale()
 	            // 電子紙/螢幕輸出計算
 	            // 這裡假設 out_buffer 也是一行對齊 byte (width / 8)
 	            // 如果你的螢幕寬度是 144，那每行就是 18 bytes
-	            int out_stride = 135 / 8;
+	            //int out_stride = 135 / 8;
 
 	            // 如果 width 不是 8 的倍數，out_stride 可能需要 +1 或依螢幕規格調整
 	            // 假設 width=144 (scale=3.2?) 或 135?
