@@ -32,6 +32,8 @@
 #include "fonts.h"
 
 #include "fc_weights.h"
+#include "interface.h"
+
 //#include "model_weights.c"
 /* USER CODE END Includes */
 
@@ -49,7 +51,7 @@
 #define HIDDEN_1   64
 #define HIDDEN_2   32
 #define OUTPUT_DIM 5
-#define REFRESH_MODE 199
+#define REFRESH_MODE FullRefresh //FullRefresh 247
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -343,21 +345,22 @@ int main(void)
   }
 
 
+    HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
+	HAL_Delay(100);
 
+	SSD1680_Clear(&hepd, ColorWhite);
+	SSD1680_DrawBitmap(&hepd,  0, 0, easycard, 152, 296);
+	SSD1680_Refresh(&hepd, REFRESH_MODE);
+	HAL_Delay(2000);
+	SSD1680_Clear(&hepd, ColorWhite);
+	SSD1680_DrawBitmap(&hepd,  0, 0, einvoice, 152, 296);
+	SSD1680_Refresh(&hepd, REFRESH_MODE);
+	HAL_Delay(2000);
+	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
   while (1)
   {
     /* USER CODE END WHILE */
-	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
-	  	HAL_Delay(100);
-	  	SSD1680_Text(&hepd,  0, 0, "GPS:", &cp866_8x16);
-	  	SSD1680_Text(&hepd,  40, 0, (char *)GPSBuffer, &cp866_8x16);
-	  	SSD1680_Text(&hepd,  0, 280, "Predict:", &cp866_8x16);
-	  	char predict_str[12];
-	  	sprintf(predict_str, "%d", result);
-	  	SSD1680_Text(&hepd,  72, 280, predict_str, &cp866_8x16);
-	  	SSD1680_Refresh(&hepd, REFRESH_MODE);
-	  	HAL_Delay(1000);
-	  	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
