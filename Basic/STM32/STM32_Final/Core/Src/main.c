@@ -71,7 +71,6 @@ UART_HandleTypeDef huart5;
 UART_HandleTypeDef huart7;
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
-DMA_HandleTypeDef hdma_usart3_rx;
 
 /* USER CODE BEGIN PV */
 uint8_t GPSBuffer[256];
@@ -146,7 +145,6 @@ const unsigned char arrow[72] = {
 void SystemClock_Config(void);
 static void MPU_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_DMA_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_TIM2_Init(void);
@@ -212,7 +210,6 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_DMA_Init();
   MX_SPI1_Init();
   MX_TIM1_Init();
   MX_TIM2_Init();
@@ -289,16 +286,27 @@ int main(void)
   //(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time, char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price)
 
   double debug_array[9] = {24.167680, 120.653612, 17, 1072, 5, 1, 0, 0, 1};
-  char *debug_ticket[5] = {"A50111562576561ZZZZ33003230ZZZZZ6ZP7UNxP7UNx15VNA000V7UF0F07", //台中->豐原
+  /*char *debug_ticket[5] = {"A50111562576561ZZZZ33003230ZZZZZ6ZP7UNxP7UNx15VNA000V7UF0F07", //台中->豐原
 	  "N50049351999418ZZZZ10803300ZZZZZ3ZP1VLUP1VNI161NA004y1VHEA49", //桃園->台中
 	  "0720412420244007936860000849004202508301834470072025083019154701000000300000030030030000000540006001INTIRS000020250830109ABE",  //台中->板橋
 	  "0421511450742087503470000333004202505252215520072025052522475201000000100000080020010000000540006000INTETS000020250525101909",  //桃園->台中
 	  "2902100093118070992280000845007202601091817000082026010918270001000000100000040100050000000130006001INTETS000020260109105067",
-  };
-
+  };*/
+  char *debug_ticket[1] = {"A50111562576561ZZZZ33203300ZZZZZ6ZP7UNxP7UNx15VNA000V7UF0F07",};
   // End Define Variable
 
-  if (DEMO_MODE)
+  if (0)
+  {
+	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
+	  	HAL_Delay(100);
+	  	SSD1680_Clear(&hepd, ColorWhite);
+	  	SSD1680_DrawBitmap(&hepd,  0, 0, easycard, 152, 296);
+	  	SSD1680_Refresh(&hepd, REFRESH_MODE);
+	  	HAL_Delay(2000);
+	  	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
+  }
+
+  if (1)
   {
 	  	//HAL_UART_Transmit(&huart2, msg, sizeof(msg)-1, 1000);
 
@@ -802,22 +810,6 @@ static void MX_USART3_UART_Init(void)
 }
 
 /**
-  * Enable DMA controller clock
-  */
-static void MX_DMA_Init(void)
-{
-
-  /* DMA controller clock enable */
-  __HAL_RCC_DMA1_CLK_ENABLE();
-
-  /* DMA interrupt init */
-  /* DMA1_Stream0_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
-
-}
-
-/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -1012,7 +1004,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	}
 	else if(htim->Instance == TIM2)
 	{
-		// WiFi 掃描
 		#if DEBUG_MODE
 			uint8_t text[] = "\r\n>>> Starting WiFi Scan <<<\r\n";
 			HAL_UART_Transmit(&huart2, text, sizeof(text)-1, 100);
@@ -1333,7 +1324,7 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 	if (strcmp(train_type, "TRA") == 0)
 	{
 		SSD1680_Text(&hepd, 64, 0, "TRA ", &cp866_8x16);
-		//generate_upscaled_qr(145, 144, 5, version3);
+		generate_upscaled_qr(145, 144, 5, version3);
 		SSD1680_SetRegion(&hepd, 8, 152, 144, 145, out_buffer, NULL);
 	}
 
@@ -1359,7 +1350,7 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 		else  SSD1680_Text(&hepd, 88, 28, train_num, &cp866_8x8);
 	}
 
-	SSD1680_Text(&hepd, 88, 40, "Depart", &cp866_8x14);
+	//SSD1680_Text(&hepd, 88, 40, "Depart", &cp866_8x14);
 	char convert_dept_time[6] = {0};
 	convert_dept_time[0] = dept_time[0];
 	convert_dept_time[1] = dept_time[1];
@@ -1372,11 +1363,11 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 
 	SSD1680_SetRegion(&hepd, 32, 68, 16, 36, arrow, NULL);
 
-	SSD1680_Text(&hepd, 88, 72, "Car", &cp866_8x16);
+	//SSD1680_Text(&hepd, 88, 72, "Car", &cp866_8x16);
 	if (car[0] == '0') SSD1680_Text(&hepd, 128, 72, car + 1, &cp866_8x16);
 	else SSD1680_Text(&hepd, 128, 72, car, &cp866_8x16);
 
-	SSD1680_Text(&hepd, 88, 88, "Seat", &cp866_8x16);
+	//SSD1680_Text(&hepd, 88, 88, "Seat", &cp866_8x16);
 	char seat_decoded[4] = {0};
 	seat_decoded[0] = seat[0];
 	seat_decoded[1] = seat[1];
@@ -1404,7 +1395,7 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 	if (seat_decoded[0] == '0')  SSD1680_Text(&hepd, 128, 88, seat_decoded + 1, &cp866_8x16);
 	else SSD1680_Text(&hepd, 128, 88, seat_decoded, &cp866_8x16);
 
-	SSD1680_Text(&hepd, 88, 104, "Arrive", &cp866_8x14);
+	//SSD1680_Text(&hepd, 88, 104, "Arrive", &cp866_8x14);
 	char convert_arr_time[6] = {0};
 	convert_arr_time[0] = arr_time[0];
 	convert_arr_time[1] = arr_time[1];
@@ -1435,29 +1426,54 @@ void debug_disp(void)
 
 void generate_upscaled_qr(uint16_t height, uint16_t width, uint8_t scale, const unsigned char qrcode[])
 {
-	memset(out_buffer, 0x00, sizeof(out_buffer));
-	for (int i = 0; i < 4; i++)  out_buffer[i] = 0xFF;
-	for (int y = 0; y < height; y++)
-	{
-		int src_y = y / scale;
-		const uint8_t* row_ptr = &qrcode[src_y * 4];
-		for (int x = 0; x < width; x++)
-		{
-			int src_x = x / scale;
-			int byte_idx = src_x / 8;
-			int bit_idx = 7 - (src_x % 8);
-			int is_black = (row_ptr[byte_idx] >> bit_idx) & 1;
+    // qr_original_size: V3 給 29, V7 給 45
+    // 計算來源每行佔用幾個 byte (例如 45 像素需要 6 bytes)
+    int src_stride = (29 + 7) / 8;
 
-			if (is_black)
-			{
-				int row_offset = y * (width / 8);
-				int buf_idx = row_offset + (x / 8);
-				int bit_pos = 7 - (x % 8);
+    // 你的螢幕寬度是 144，所以一行一定是 18 bytes
+    const int screen_stride = 18;
+    const int max_buf_size = 2592;
 
-				out_buffer[buf_idx] |= (1 << bit_pos);
-			}
-		}
-	}
+    memset(out_buffer, 0x00, max_buf_size);
+
+    for (int y = 0; y < height; y++)
+    {
+        int src_y = y / scale;
+
+        // 【檢查 1】防止超過 QR Code 原始高度
+        if (src_y >= 29) break;
+
+        const uint8_t* row_ptr = &qrcode[src_y * src_stride];
+
+        for (int x = 0; x < width; x++)
+        {
+            int src_x = x / scale;
+
+            // 【檢查 2】防止超過 QR Code 原始寬度
+            if (src_x >= 29) break;
+
+            int byte_idx = src_x / 8;
+            int bit_idx = 7 - (src_x % 8);
+            int is_black = (row_ptr[byte_idx] >> bit_idx) & 1;
+
+            if (is_black)
+            {
+                // 【檢查 3】防止螢幕座標越界
+                // 假設螢幕是 144x144，x 和 y 不應超過 143
+                if (x < 144 && y < 144)
+                {
+                    int buf_idx = (y * screen_stride) + (x / 8);
+
+                    // 【檢查 4】最後一道防線，確認 index 在 buffer 內
+                    if (buf_idx < max_buf_size)
+                    {
+                        int bit_pos = 7 - (x % 8);
+                        out_buffer[buf_idx] |= (1 << bit_pos);
+                    }
+                }
+            }
+        }
+    }
 }
 
 void generate_v7_upscale()
