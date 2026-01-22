@@ -264,7 +264,7 @@ int main(void)
 	    	{
 	    		strcpy(input_train_type, "THSR");
 	    		strcpy(input_train_kind, "Standard");
-	    		strncpy(input_train_num, debug_ticket[i] + 25, 4); // Train number
+	    		strncpy(input_train_num, debug_ticket[i] + 24 , 4); // Train number
 	    		strncpy(dept_sta_code, debug_ticket[i] + 30, 2);   // Departure station code
 	    		//input_dept_sta = sta_code_decoder(dept_sta_code);
 	    		char raw_date[9] = {0};
@@ -1235,7 +1235,19 @@ void epd_ticket_handler(char *train_type, char *train_kind, char *train_num, cha
 	if (date != NULL)  SSD1680_Text(&hepd, 0, 16, date, &cp866_8x16);
 	if (train_kind != NULL && strcmp(train_type, "TRA") == 0)  SSD1680_Text(&hepd, 88, 16, train_kind, &cp866_8x16);
 	if (train_kind != NULL && (strcmp(train_type, "THSR") == 0)) SSD1680_Text(&hepd, 88, 16, train_kind, &cp866_8x8);
-	if (train_num != NULL && (strcmp(train_type, "THSR") == 0)) SSD1680_Text(&hepd, 88, 24, train_num, &cp866_8x8);
+	if (train_num != NULL && (strcmp(train_type, "THSR") == 0))
+	{
+		if (train_num[0] == '0')
+		{
+		    SSD1680_Text(&hepd, 88, 24, train_num + 1, &cp866_8x8);
+		}
+
+		else
+		{
+			SSD1680_Text(&hepd, 88, 24, train_num, &cp866_8x8);
+		}
+	}
+
 
 	SSD1680_Refresh(&hepd, REFRESH_MODE);
 	HAL_Delay(1000);
