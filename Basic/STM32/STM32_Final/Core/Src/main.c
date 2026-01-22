@@ -271,8 +271,7 @@ int main(void)
   HAL_UART_Receive_IT(&huart4, BTBuffer, 1);
   HAL_UART_Receive_IT(&huart5, WFBuffer, 1);
   //HAL_UART_Receive_IT(&huart7, (uint8_t*)GPSBuffer, 1);
-  HAL_UARTEx_ReceiveToIdle_DMA(&huart3, GPSBuffer, sizeof(GPSBuffer));
-  __HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_HT);
+  HAL_UART_Receive_DMA(&huart3, (uint8_t *)p, 1);
 
   // Start Define Variable
   uint8_t msg[] = "STM32 is now on\n";
@@ -348,7 +347,17 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
+	  	HAL_Delay(100);
+	  	SSD1680_Text(&hepd,  0, 0, "GPS:", &cp866_8x16);
+	  	SSD1680_Text(&hepd,  40, 0, (char *)GPSBuffer, &cp866_8x16);
+	  	SSD1680_Text(&hepd,  0, 280, "Predict:", &cp866_8x16);
+	  	char predict_str[12];
+	  	sprintf(predict_str, "%d", result);
+	  	SSD1680_Text(&hepd,  72, 280, predict_str, &cp866_8x16);
+	  	SSD1680_Refresh(&hepd, REFRESH_MODE);
+	  	HAL_Delay(1000);
+	  	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -994,22 +1003,28 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
     else if (huart->Instance == USART3)
     {
-    	if (Size < sizeof(GPSBuffer))
+    	p++;
+    	HAL_UART_Receive_DMA(&huart3, (uint8_t *)p, 256);
+    	if (*(p - 2) == 0x0D)
     	{
-			GPSBuffer[Size] = '\0';
-		}
-    	else
-    	{
-			GPSBuffer[sizeof(GPSBuffer) - 1] = '\0';
-		}
+    		memcpy(send_buf + 7, GPSBuffer, p - GPSBuffer);
+    		HAL_UART_Transmit_DMA(&huart2, (uint8_t *)send_buf, p - GPSBuffer + 7);
+    		p = GPSBuffer;
 
-		// 處理數據 (例如解析 GPS)
-		// parse_gpgga(GPSBuffer);
+    	}
+    }
+}
 
-		// 重新開啟監聽
-		HAL_UARTEx_ReceiveToIdle_DMA(&huart3, GPSBuffer, sizeof(GPSBuffer));
-		__HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_HT);
-	}
+/* 注意：函式名多了一個 Ex，且名稱是 RxEventCallback */
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
+{
+    if (huart->Instance == USART3) // 假設 GPS 在 UART3
+    {
+        GPSBuffer[Size] = '\0'; // 正確使用 Size 來補結束符
+
+        // 重新啟動接收
+        HAL_UARTEx_ReceiveToIdle_DMA(&huart3, GPSBuffer, sizeof(GPSBuffer));
+    }
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
