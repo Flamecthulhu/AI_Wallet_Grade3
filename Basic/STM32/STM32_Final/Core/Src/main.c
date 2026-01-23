@@ -295,18 +295,18 @@ int main(void)
   char *debug_ticket[1] = {"A50111562576561ZZZZ33203300ZZZZZ6ZP7UNxP7UNx15VNA000V7UF0F07",};
   // End Define Variable
 
-  if (0)
+  if (1)
   {
 	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
 	  	HAL_Delay(100);
 	  	SSD1680_Clear(&hepd, ColorWhite);
-	  	SSD1680_DrawBitmap(&hepd,  0, 0, easycard, 152, 296);
+	  	SSD1680_DrawBitmap(&hepd,  0, 0, einvoice, 152, 296);
 	  	SSD1680_Refresh(&hepd, REFRESH_MODE);
 	  	HAL_Delay(2000);
 	  	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
   }
 
-  if (1)
+  if (0)
   {
 	  	//HAL_UART_Transmit(&huart2, msg, sizeof(msg)-1, 1000);
 
