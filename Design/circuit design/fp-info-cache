@@ -1,4 +1,4 @@
-27144872849831332
+27146646221762645
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -71805,6 +71805,13 @@ Yellow 5381 Series LED
 0
 2
 2
+Module
+MODULE_ESP-01
+Wi-Fi Module, https://docs.ai-thinker.com/_media/esp8266/esp8266_series_modules_user_manual_en.pdf
+Wi-Fi Module
+0
+4
+4
 Module
 MODULE_STM327H7xx Dev Module
 
