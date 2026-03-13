@@ -328,15 +328,6 @@
 		(solder_mask_margin 0.102)
 		(uuid "c2df81a8-c776-4d73-8c24-23ae07d6ccfa")
 	)
-	(pad "PD13" thru_hole circle
-		(at 19.2 -15.44 180)
-		(size 1.53 1.53)
-		(drill 1.02)
-		(layers "*.Cu" "*.Mask")
-		(remove_unused_layers no)
-		(solder_mask_margin 0.102)
-		(uuid "552b14c9-1358-4d3d-be4c-d0d51189396e")
-	)
 	(pad "PD14" thru_hole circle
 		(at 16.66 -12.9 180)
 		(size 1.53 1.53)
