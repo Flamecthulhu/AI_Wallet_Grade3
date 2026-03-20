@@ -5951,7 +5951,7 @@
 			(at 17.4 -32.7 180)
 			(size 3.55 3.55)
 			(drill 3.35)
-			(layers "*.Cu" "*.Mask")
+			(layers "*.Mask")
 			(remove_unused_layers no)
 			(solder_mask_margin 0.102)
 			(uuid "b44c7df8-75da-4a9d-adc6-d424be48d853")
@@ -13347,6 +13347,17 @@
 				(xyz 0 0 0)
 			)
 		)
+	)
+	(gr_rect
+		(start 90.424 25.4)
+		(end 205.486 190.5)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(fill no)
+		(layer "B.Cu")
+		(uuid "ee65b731-97f1-46e3-88a6-7d48e66a601f")
 	)
 	(gr_rect
 		(start 115.316 51.308)
