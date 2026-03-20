@@ -8,7 +8,7 @@
 		(title "AI Wallet")
 		(date "2025-11-14")
 		(rev "v1.0.0")
-		(company "WUFAI")
+		(company "WUFAI ELE 3B")
 	)
 	(lib_symbols
 		(symbol "Connector:USB_C_Receptacle_PowerOnly_6P"

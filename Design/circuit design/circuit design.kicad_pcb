@@ -10,7 +10,7 @@
 	(title_block
 		(title "Smart Wallet")
 		(date "2026-03-13")
-		(company "SStudio")
+		(company "WUFAI ELE 3B T7")
 	)
 	(layers
 		(0 "F.Cu" signal)
