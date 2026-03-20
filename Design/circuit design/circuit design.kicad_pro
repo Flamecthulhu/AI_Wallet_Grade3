@@ -37,9 +37,9 @@
         "other_text_thickness": 0.15,
         "other_text_upright": false,
         "pads": {
-          "drill": 0.8,
-          "height": 2.0,
-          "width": 2.0
+          "drill": 0.7,
+          "height": 1.8,
+          "width": 1.8
         },
         "silk_line_width": 0.1,
         "silk_text_italic": false,
@@ -85,10 +85,6 @@
         ],
         [
           "solder_mask_bridge|125000000|129180000|ad87cf38-489b-40f1-911a-5f663468c72e|9d35b8f5-491b-405d-932f-7c062a99d3a4",
-          ""
-        ],
-        [
-          "solder_mask_bridge|127000000|121560000|4c1d92b5-587e-4dc5-b1b9-5410cb07a1f3|7861df42-4b00-4c8c-b780-5b8d277898cd",
           ""
         ],
         [
@@ -173,10 +169,6 @@
         ],
         [
           "solder_mask_bridge|144000000|139000000|0bc36546-217c-48fd-a7da-aa9dbd277be8|125ad2a7-9401-4358-8522-0b6e8def8b9a",
-          ""
-        ],
-        [
-          "solder_mask_bridge|146000000|112120000|d74afcff-cf2f-4de9-a938-c2d53916cf5e|792d628d-9b47-494b-a4db-e71ee627fd35",
           ""
         ],
         [
