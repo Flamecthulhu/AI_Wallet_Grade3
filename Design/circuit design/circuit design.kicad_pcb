@@ -13817,7 +13817,7 @@
 			(justify left bottom)
 		)
 	)
-	(gr_text "v1.2.0\n"
+	(gr_text "v1.2.1"
 		(at 173.482 150.368 0)
 		(layer "User.1")
 		(uuid "a66d7026-5c71-4791-9589-b8f429ee0a3b")
