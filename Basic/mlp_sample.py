@@ -57,7 +57,7 @@ for i in range(100):
 
     model.eval()
     test_sample = [24.073544,20.699775,7,457,5,-1,-1,-1,1]
-    # Ensure test sample matches the model input size
+
     if len(test_sample) > input_size:
         test_sample = test_sample[:input_size]
     elif len(test_sample) < input_size:
