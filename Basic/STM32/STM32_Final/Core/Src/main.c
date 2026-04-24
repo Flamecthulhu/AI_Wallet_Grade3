@@ -44,8 +44,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define DEBUG_MODE 0
-#define DEMO_MODE 1
+#define DEBUG_MODE 1
+#define DEMO_MODE 0
 
 #define INPUT_DIM  9
 #define HIDDEN_1   64
@@ -295,7 +295,7 @@ int main(void)
   char *debug_ticket[1] = {"A50111562576561ZZZZ33203300ZZZZZ6ZP7UNxP7UNx15VNA000V7UF0F07",};
   // End Define Variable
 
-  if (0)
+  if (1)
   {
 	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
 	  	HAL_Delay(100);
@@ -306,7 +306,7 @@ int main(void)
 	  	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
   }
 
-  if (1)
+  if (0)
   {
 	  	//HAL_UART_Transmit(&huart2, msg, sizeof(msg)-1, 1000);
 

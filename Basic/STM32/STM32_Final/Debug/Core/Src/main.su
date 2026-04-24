@@ -1,4 +1,4 @@
-../Core/Src/main.c:185:5:main	392	static
+../Core/Src/main.c:185:5:main	360	static
 ../Core/Src/main.c:377:6:SystemClock_Config	120	static
 ../Core/Src/main.c:437:13:MX_SPI1_Init	8	static
 ../Core/Src/main.c:485:13:MX_TIM1_Init	40	static
@@ -10,14 +10,14 @@
 ../Core/Src/main.c:769:13:MX_USART3_UART_Init	8	static
 ../Core/Src/main.c:817:13:MX_GPIO_Init	56	static
 ../Core/Src/main.c:887:13:MX_SSD1680_Init	8	static
-../Core/Src/main.c:907:6:HAL_UART_RxCpltCallback	280	static
-../Core/Src/main.c:999:6:HAL_TIM_PeriodElapsedCallback	32	static
-../Core/Src/main.c:1026:6:parse_gpgga	80	static
-../Core/Src/main.c:1099:6:Handle_BT_Command	16	static
-../Core/Src/main.c:1108:6:HM10_Process	16	static
+../Core/Src/main.c:907:6:HAL_UART_RxCpltCallback	288	static
+../Core/Src/main.c:999:6:HAL_TIM_PeriodElapsedCallback	72	static
+../Core/Src/main.c:1026:6:parse_gpgga	184	static
+../Core/Src/main.c:1099:6:Handle_BT_Command	88	static
+../Core/Src/main.c:1108:6:HM10_Process	72	static
 ../Core/Src/main.c:1189:6:Parse_WiFi_Line	72	static
-../Core/Src/main.c:1241:6:Display_WiFi_List	4	static
-../Core/Src/main.c:1269:6:Process_WiFi_Data	16	static
+../Core/Src/main.c:1241:6:Display_WiFi_List	216	static
+../Core/Src/main.c:1269:6:Process_WiFi_Data	152	static
 ../Core/Src/main.c:1310:6:epd_ticket_handler	72	static
 ../Core/Src/main.c:1414:6:debug_disp	32	static
 ../Core/Src/main.c:1427:6:generate_upscaled_qr	80	static
