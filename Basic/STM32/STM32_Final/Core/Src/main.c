@@ -300,7 +300,7 @@ int main(void)
 
 
 
-  if (1)
+  if (0)
   {
 	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
 	  	HAL_Delay(100);
