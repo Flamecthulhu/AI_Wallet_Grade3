@@ -266,10 +266,12 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  HAL_UART_Receive_IT(&huart4, BTBuffer, 1);
-  HAL_UART_Receive_IT(&huart5, WFBuffer, 1);
+  //HAL_UART_Receive_IT(&huart4, BTBuffer, 1);
+  //HAL_UART_Receive_IT(&huart5, WFBuffer, 1);
   //HAL_UART_Receive_IT(&huart7, (uint8_t*)GPSBuffer, 1);
   //HAL_UART_Receive_DMA(&huart3, (uint8_t *)p, 1);
+
+  HAL_GPIO_WritePin(EC_LED_GPIO_Port, EC_LED_Pin, 0);
 
   // Start Define Variable
   uint8_t msg[] = "STM32 is now on\n";
@@ -287,17 +289,17 @@ int main(void)
   //(char *train_type, char *train_kind, char *train_num, char *date, char *dept_time, char *dept_sta, char *arr_time, char *arr_sta, char *car, char *seat, char *price)
 
   double debug_array[9] = {24.167680, 120.653612, 17, 1072, 5, 1, 0, 0, 1};
-  /*char *debug_ticket[5] = {"A50111562576561ZZZZ33003230ZZZZZ6ZP7UNxP7UNx15VNA000V7UF0F07", //台中->豐原
+  char *debug_ticket[5] = {"A50111562576561ZZZZ33003230ZZZZZ6ZP7UNxP7UNx15VNA000V7UF0F07", //台中->豐原
 	  "N50049351999418ZZZZ10803300ZZZZZ3ZP1VLUP1VNI161NA004y1VHEA49", //桃園->台中
 	  "0720412420244007936860000849004202508301834470072025083019154701000000300000030030030000000540006001INTIRS000020250830109ABE",  //台中->板橋
 	  "0421511450742087503470000333004202505252215520072025052522475201000000100000080020010000000540006000INTETS000020250525101909",  //桃園->台中
 	  "2902100093118070992280000845007202601091817000082026010918270001000000100000040100050000000130006001INTETS000020260109105067",
-  };*/
-  char *debug_ticket[1] = {"A50111562576561ZZZZ33203300ZZZZZ6ZP7UNxP7UNx15VNA000V7UF0F07",};
+  };
+  //char *debug_ticket[1] = {"A50111562576561ZZZZ33203300ZZZZZ6ZP7UNxP7UNx15VNA000V7UF0F07",};
   // End Define Variable
 
-  HAL_GPIO_WritePin(EC_LED_GPIO_Port, EC_LED_Pin, 0);
-  /*
+
+
   if (1)
   {
 	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
@@ -309,7 +311,7 @@ int main(void)
 	  	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
   }
 
-  if (0)
+  if (1)
   {
 	  	//HAL_UART_Transmit(&huart2, msg, sizeof(msg)-1, 1000);
 
@@ -352,19 +354,6 @@ int main(void)
 	    }
   }
 
-  if (DEBUG_MODE){
-    HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
-	HAL_Delay(100);
-	SSD1680_Clear(&hepd, ColorWhite);
-	SSD1680_DrawBitmap(&hepd,  0, 0, easycard, 152, 296);
-	SSD1680_Refresh(&hepd, REFRESH_MODE);
-	HAL_Delay(2000);
-	SSD1680_Clear(&hepd, ColorWhite);
-	SSD1680_DrawBitmap(&hepd,  0, 0, einvoice, 152, 296);
-	SSD1680_Refresh(&hepd, REFRESH_MODE);
-	HAL_Delay(2000);
-	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
-  }*/
   while (1)
   {
     /* USER CODE END WHILE */
