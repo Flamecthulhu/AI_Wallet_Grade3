@@ -1,10 +1,10 @@
 #include <Arduino.h>
 #include <SPI.h>
 
-#define EPD_CS    8
-#define EPD_DC    18
+#define EPD_CS    4 //8
+#define EPD_DC    16 //18
 #define EPD_RST   17
-#define EPD_BUSY  3
+#define EPD_BUSY  0 //3
 #define EPD_WIDTH  152
 #define EPD_HEIGHT 296
 
@@ -202,7 +202,6 @@ void loop() {
 
 void displayTestPattern() {
   Serial.println("顯示測試圖案");
-  /*
   uint16_t width = (EPD_WIDTH % 8 == 0) ? (EPD_WIDTH / 8) : (EPD_WIDTH / 8 + 1);
   uint16_t height = EPD_HEIGHT;
   uint8_t image[width * height];
@@ -235,7 +234,5 @@ void displayTestPattern() {
     Serial.printf("%d", binaryNum[j]);
   Serial.printf("\n");
 
-  */
-  uint8_t image = 1070468032;
   epd.display(image);
 }
