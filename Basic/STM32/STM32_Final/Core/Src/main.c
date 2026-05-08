@@ -299,7 +299,6 @@ int main(void)
   // End Define Variable
 
 
-
   if (0)
   {
 	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
@@ -312,6 +311,22 @@ int main(void)
   }
 
   if (1)
+  {
+	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
+	  	HAL_Delay(100);
+	  	SSD1680_Text(&hepd, 0, 0, "2026-05-08", &cp866_8x16);
+	  	SSD1680_Text(&hepd, 0, 16, "15:12", &cp866_8x16);
+	  	SSD1680_Text(&hepd,  0, 32, "Predict:", &cp866_8x16);
+	  	char predict_str[12];
+	  	sprintf(predict_str, "%d", result);
+	  	SSD1680_Text(&hepd,  72, 32, predict_str, &cp866_8x16);
+
+	  	SSD1680_Refresh(&hepd, REFRESH_MODE);
+	  	HAL_Delay(1000);
+	  	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
+  }
+
+  if (0)
   {
 	  	//HAL_UART_Transmit(&huart2, msg, sizeof(msg)-1, 1000);
 
