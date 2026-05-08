@@ -189,7 +189,6 @@ void setup() {
   
   // 顯示測試圖案
   displayTestPattern();
-  
 
 
   // 進入睡眠模式以省電

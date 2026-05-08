@@ -111,11 +111,11 @@ const uint16_t BTBAUD = 9600;
 
 const uint8_t RELAY = 46;
 
-const uint8_t EP_CS = 8;
-const uint8_t EP_DC = 18;
+const uint8_t EP_CS = 4; //8
+const uint8_t EP_DC = 16; //18
 const uint8_t EP_RST = 17;
-const uint8_t EP_BUSY = 3;
-const uint16_t EP_HEIGHT = 296;
+const uint8_t EP_BUSY = 0; //3
+const uint16_t EP_HEIGHT = 296  ;
 const uint8_t EP_WIDTH = 152;
 
 uint8_t hour, minute, second, status = 0;
@@ -390,9 +390,10 @@ void setup()
 
 void loop()
 {
+  String command = "";
   if (Serial.available()) 
   {
-    String command = "";
+    
     command.trim();
     
     while (Serial.available()) 
