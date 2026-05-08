@@ -261,6 +261,7 @@ int main(void)
   {
       HAL_GPIO_WritePin(list[i].port, list[i].pin, list[i].state);
   }
+  HAL_GPIO_WritePin(EC_LED_GPIO_Port, EC_LED_Pin, 1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -295,6 +296,8 @@ int main(void)
   char *debug_ticket[1] = {"A50111562576561ZZZZ33203300ZZZZZ6ZP7UNxP7UNx15VNA000V7UF0F07",};
   // End Define Variable
 
+  HAL_GPIO_WritePin(EC_LED_GPIO_Port, EC_LED_Pin, 0);
+  /*
   if (1)
   {
 	  HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_SET);
@@ -360,7 +363,8 @@ int main(void)
 	SSD1680_DrawBitmap(&hepd,  0, 0, einvoice, 152, 296);
 	SSD1680_Refresh(&hepd, REFRESH_MODE);
 	HAL_Delay(2000);
-	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);}
+	HAL_GPIO_WritePin(EPD_EN_GPIO_Port, EPD_EN_Pin, GPIO_PIN_RESET);
+  }*/
   while (1)
   {
     /* USER CODE END WHILE */
